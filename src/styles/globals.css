@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@theme {
+  --color-primary-50: #EFF7E7;
+  --color-primary-100: #627D45;
+  --color-primary-300: #3B6429;
+  --color-primary-500: #264B1D;
+  --color-primary-700: #0D2E12;
+  --color-primary-900: #0A1D0C;
+
+  --color-status-success: #BFA931;
+  --color-status-error: #8B1E1E;
+  --color-status-info: #205072;
+}
+
+/* 타이포그래피 */
+.headline1 {
+  @apply text-3xl font-normal;
+}
+
+.headline2 {
+  @apply text-2xl font-normal;
+}
+
+.headline3 {
+  @apply text-xl font-normal;
+}
+
+.headline4 {
+  @apply text-base font-normal;
+}
+
+.body {
+  @apply text-base font-normal;
+}
+
+.body-m {
+  @apply text-base font-medium;
+}
+
+.body-sb {
+  @apply text-base font-semibold;
+}
+
+.caption {
+  @apply text-sm font-normal;
+}
+
+.caption-m {
+  @apply text-sm font-medium;
+}
+
+/* 버튼 */
+/* 기본 */
+.button-primary {
+  @apply text-base text-primary-50 bg-primary-500 px-3 py-2 rounded-md
+    hover:bg-primary-700 cursor-pointer
+}
+
+/* 기본 */
+.button-secondary {
+  @apply text-base text-primary-700 bg-primary-50 px-3 py-2 rounded-md
+    hover:bg-primary-700 cursor-pointer
+}
+
+.button-outline {
+  @apply text-base text-primary-900 bg-white border border-primary-500 px-2.75 py-1.75 rounded-md
+    hover:bg-primary-700 cursor-pointer
+}
