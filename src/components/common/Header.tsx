@@ -6,6 +6,7 @@ import Button from "./Button";
 import Link from "next/link";
 
 export default function Header() {
+
   // 임시 로그인 상태
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -57,7 +58,6 @@ export default function Header() {
                         onClick={handleLoggedIn}>
                   로그아웃
                 </Button>
-
                 <Link href='/mypage'>
                   <Button size="md">
                     마이페이지
