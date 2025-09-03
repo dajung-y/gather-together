@@ -1,16 +1,26 @@
 type ButtonProps = {
+  size?: "sm" | "md" | "lg";
   variant?: "primary" | "secondary" | "outline";
   type?: "button" | "submit" | "reset";
   onClick?: () => void;
   children?: React.ReactNode;
 }
-export default function Button(props: ButtonProps) {
+
+export default function Button({
+  size = "md",
+  variant = "primary",
+  type = "button",
+  onClick,
+  children,
+}: ButtonProps) {
   return (
     <button
-      className={`button-${props.variant ?? "primary"}`}
-      type={props.type ?? "button"}
-      onClick={props.onClick}>
-      {props.children}
+      className={`button-base button-${variant} button-${size}`}
+      type={type}
+      onClick={onClick}
+    >
+      {children}
     </button>
   )
 }
+

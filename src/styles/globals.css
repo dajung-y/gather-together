@@ -63,18 +63,35 @@ body {
 
 /* 버튼 */
 /* 기본 */
-.button-primary {
-  @apply text-base text-primary-50 bg-primary-500 px-3 py-2 rounded-md
-    hover:bg-primary-700 cursor-pointer
+.button-base {
+  @apply text-base transition cursor-pointer
 }
 
-/* 기본 */
+.button-base:hover {
+  @apply brightness-95
+}
+
+.button-primary {
+  @apply text-primary-50 bg-primary-500
+  hover:brightness-75;
+}
+
 .button-secondary {
-  @apply text-base text-primary-700 bg-primary-50 px-3 py-2 rounded-md
-    hover:bg-primary-700 cursor-pointer
+  @apply text-primary-700 bg-primary-50
 }
 
 .button-outline {
-  @apply text-base text-primary-900 bg-white border border-primary-500 px-2.75 py-1.75 rounded-md
-    hover:bg-primary-700 cursor-pointer
+  @apply text-primary-700 bg-white border border-primary-500
+}
+
+.button-sm{
+  @apply text-sm px-1.5 py-0.5 rounded-sm
+}
+
+.button-md{
+  @apply text-base px-2.5 py-1.5 rounded-md
+}
+
+.button-lg{
+  @apply text-lg px-3.5 py-2.5 rounded-lg
 }
