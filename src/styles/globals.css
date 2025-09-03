@@ -26,19 +26,19 @@ body {
 
 /* 타이포그래피 */
 .headline1 {
-  @apply text-3xl font-normal;
+  @apply text-3xl font-semibold;
 }
 
 .headline2 {
-  @apply text-2xl font-normal;
+  @apply text-2xl font-semibold;
 }
 
 .headline3 {
-  @apply text-xl font-normal;
+  @apply text-xl font-semibold;
 }
 
 .headline4 {
-  @apply text-base font-normal;
+  @apply text-base font-semibold;
 }
 
 .body {
