@@ -21,7 +21,7 @@ export const variantStyles = {
     isToggleDisabled: true,
   },
   memberClosed: {
-    isDisabled: false,
+    isDisabled: true,
     canDelete: true,
     canEnter: false,
     isTagDisabled: true,
