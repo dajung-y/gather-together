@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "@/styles/globals.css";
+import Header from "@/components/common/Header";
+
+export const metadata: Metadata = {
+  title: "모여모여",
+  description: "함께 성장하는 스터디 플랫폼, 모여모여에서 새로운 동료들과 학습하세요",
+  keywords: ["스터디", "온라인 스터디", "온라인 학습", "스터디 플랫폼"]
+}
 
 export default function RootLayout({
   children,
@@ -10,6 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <Header />
         {children}
       </body>
     </html>
