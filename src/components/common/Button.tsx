@@ -15,7 +15,7 @@ export default function Button({
 }: ButtonProps) {
   return (
     <button
-      className={`button-base button-${variant} button-${size} flex justify-center`}
+      className={`button-base button-${variant} button-${size} flex w-full justify-center`}
       type={type}
       onClick={onClick}
     >

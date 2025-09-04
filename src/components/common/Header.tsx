@@ -40,7 +40,7 @@ export default function Header() {
           </div>
 
           {/* 사용자 메뉴 */}
-          <div>
+          <div className="w-fit whitespace-nowrap">
             { !isLoggedIn ? (
               <Button size="md"
                       onClick={handleLoggedIn}>

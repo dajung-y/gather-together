@@ -33,10 +33,10 @@ export default function AlertModal({
       <div className="px-8 py-10 sm:px-10">
         <div className="flex flex-col items-center">
           {/* title, subtitle */}
-          <h2 className="headline2 py-4 text-center">{title}</h2>
-          { subtitle&& <p className="body pt-4 pb-8 text-center">{subtitle}</p> }
+          <h2 className="headline2 mt-8 text-center">{title}</h2>
+          { subtitle&& <p className="body my-8 text-center">{subtitle}</p> }
           {/* button */}
-          <div className="flex gap-4 pt-8">
+          <div className="flex w-full my-4 space-x-4">
             <Button size="md"
                     variant="outline"
                     onClick={onClose}>
