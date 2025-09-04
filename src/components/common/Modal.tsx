@@ -2,25 +2,21 @@
 
 import { useEffect } from "react";
 import { X } from 'lucide-react';
+import Portal from "./Portal";
 
 interface ModalProps {
-  // 모달 오픈 여부
-  isOpen: boolean;
-  // 모달 닫는 함수
-  onClose: () => void;
-  // 모달 안에 들어갈 내용
-  children: React.ReactNode;
-  // 필수 모달 여부
-  isRequired?: boolean;
+  isOpen: boolean;            // 모달 열림 여부
+  onClose: () => void;        // 닫기 핸들러
+  children: React.ReactNode;  // 모달 콘텐츠
 }
 
 export default function Modal({
   isOpen,
   onClose,
   children,
-  isRequired = false      // 기본값 false
 }: ModalProps) {
 
+  // 모달 열린경우 body 스크롤 방지
   useEffect(() => {
     if(isOpen){
       document.body.style.overflow = 'hidden';
@@ -37,38 +33,34 @@ export default function Modal({
 
   // 배경 클릭 핸들러
   const handleBgClick = () => {
-    if(!isRequired){
       onClose();
-    }
   }
 
   return(
-    <div className="fixed inset-0 z-50">
-      <div className="fixed inset-0 bg-black/10"
-           onClick={handleBgClick}>
-        <div className="flex min-h-screen items-center justify-center p-4">
-          <div className="
-            w-full
-            max-w-sm mx-4           
-            sm:max-w-lg sm:mx-6
-            lg:max-w-2xl lg:mx-8
-            bg-white rounded-lg shadow-xl
-            relative
-            max-h-[90vh] overflow-y-auto
-            "
-              onClick={(e) => e.stopPropagation()}
-          >
-            {!isRequired && (
-              <button onClick={onClose}
-                      className="absolute top-4 right-4 p-1 rounded-full hover:bg-gray-200 transition-colors">
-                <X className="w-6 h-6 text-gray-400" />
-              </button>
-            )}
+    <Portal>
+      <div className="fixed inset-0 z-50">
+        <div className="fixed inset-0 bg-black/10"
+             onClick={handleBgClick}>
+          <div className="flex min-h-screen items-center justify-center p-4">
+            <div className="
+              w-auto 
+              min-w-[280px] max-w-[90vw]
+              sm:min-w-[320px] sm:max-w-[400px]
+              md:min-w-[300px] md:max-w-[500px]
+              bg-white rounded-2xl shadow-xl
+              relative max-h-[90vh] overflow-y-auto
+              "
+                onClick={(e) => e.stopPropagation()}>
+            <button onClick={onClose}
+                    className="absolute top-4 right-4 p-1 rounded-full hover:bg-gray-200 transition-colors">
+              <X className="w-6 h-6 text-gray-400" />
+            </button>
             {/* 각 모달 내용 */}
             {children}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </Portal>
   )
 }
