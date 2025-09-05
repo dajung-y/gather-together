@@ -38,8 +38,8 @@ export default function StudyCard({
   }
 
   return (
-    <div className="flex flex-col gap-4 w-60 h-max ">
-      <div className={`flex flex-col gap-4 w-60 h-max p-4 border border-gray-300 shadow-lg rounded-lg
+    <div className="flex flex-col gap-4 w-full h-full ">
+      <div className={`flex flex-col gap-4 w-full h-full p-4 border border-gray-300 shadow-lg rounded-lg
       ${style.isDisabled ? "bg-gray-100 opacity-60" : "bg-white"}`}>
         <div className="flex">
           <span className="bg-primary-500 text-white px-2 ">{name}</span>
