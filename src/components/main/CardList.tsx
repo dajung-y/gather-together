@@ -195,10 +195,10 @@ const dummyStudyCards: StudyCardProps[] = [
 
 export default function CardList () {
   return(
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
       {dummyStudyCards.map((card,i) => (
         <article key={i}
-                 className='flex justify-center w-full h-full'>
+                 className='flex justify-center w-full h-full items-stretch'>
           <StudyCard 
             key={i}
             variant={card.variant}
