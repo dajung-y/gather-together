@@ -4,11 +4,15 @@ import { MenuItem } from "@/types/sidebar";
 const menuItems: MenuItem[] = [
   //링크 이동
   {
-    label: '내가 지원한 스터디',
+    label: '메인',
     path: '/study/1'
   },
   {
-    label: '내가 만든 스터디',
+    label: '일정',
+    path: '/study/1/todo'
+  },
+  {
+    label: '설정',
     path: '/study/1/setting'
   },
 
@@ -26,8 +30,9 @@ export default function Layout({ children }: { children: React.ReactNode; }) {
     <div>
       <div className="fixed top-20 left-0">
         {/* 아래 수정필요! */}
-        <Sidebar title="훈정님의 페이지" menuItems={menuItems} />
+        <Sidebar title="1일 1영어" menuItems={menuItems} />
       </div>
+
       <div>{children}</div>
     </div>
   );
