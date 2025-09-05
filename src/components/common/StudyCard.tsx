@@ -6,6 +6,7 @@ import Button from "./Button";
 
 type StudyCardProps = {
   variant?: keyof typeof variantStyles;
+  name: string;
   title: string;
   startDate: Date;
   endDate: Date;
@@ -17,6 +18,7 @@ type StudyCardProps = {
 
 export default function StudyCard({
   variant = "mainClosed",
+  name,
   title,
   startDate,
   endDate,
@@ -40,10 +42,10 @@ export default function StudyCard({
       <div className={`flex flex-col gap-4 w-60 h-max p-4 border border-gray-300 shadow-lg rounded-lg
       ${style.isDisabled ? "bg-gray-100 opacity-60" : "bg-white"}`}>
         <div className="flex">
-          <span className="bg-primary-500 text-white px-2 ">{title}</span>
+          <span className="bg-primary-500 text-white px-2 ">{name}</span>
           {style.canDelete && <X className="ml-auto" />}
         </div>
-        <p className="headline3 text-primary-700 mb-2">[함께 토익공부 하실분]</p>
+        <p className="headline3 text-primary-700 mb-2">{title}</p>
         <div className="pb-4">
           <p className="body-m">{`${formatDate(startDate)} - ${formatDate(endDate)}`}</p>
           <p>{time}</p>
