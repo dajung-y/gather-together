@@ -38,7 +38,7 @@ body {
 }
 
 .headline4 {
-  @apply text-base font-semibold;
+  @apply text-lg font-semibold;
 }
 
 .body {
