@@ -2,9 +2,11 @@
 import {useEffect, useState} from "react";
 import StudyCard from "@/components/common/StudyCard";
 import Sidebar from "@/components/common/Sidebar";
+import Modal from "@/components/common/Modal";
 
 type CardDTO = {
     id: string;
+    name: string;
     variant: "memberOpen" | "memberClosed" | "leaderOpen" | "leaderClosed" | "mainOpen" | "mainClosed";
     title: string;
     startDate: string;
@@ -13,6 +15,7 @@ type CardDTO = {
     currentMembers: number;
     maxMembers: number;
     tag: string;
+    applicants?: Applicant[];
 };
 
 type ApiResp = {
@@ -30,18 +33,19 @@ const DEFAULT_APPLICANTS: Applicant[] = [
 ];
 
 export default function Page() {
+    const [isNickOpen, setIsNickOpen] = useState(false);
     const [active, setActive] = useState<"open" | "closed">("open");
     const menuItems = [
         { label: "내가 지원한 스터디", path: "/mypage/applied" },
         { label: "내가 만든 스터디", path: "/mypage/created" },
-        { label: "닉네임 변경", path: "/mypage/setting" },
+        { label: "닉네임 변경", onClick: () => setIsNickOpen(true) },
     ];
 
     const [data, setData] = useState<ApiResp>({ recruiting: [], completed: [] });
 
     useEffect(() => {
         (async () => {
-            const res = await fetch("/api/studycards/mypage", { cache: "no-store" });
+            const res = await fetch("/api/mypage/studycards", { cache: "no-store" });
             const json: ApiResp = await res.json();
             setData(json);
         })();
@@ -49,6 +53,7 @@ export default function Page() {
 
     const toCardProps = (c: CardDTO) => ({
         variant: c.variant,
+        name: c.name,
         title: c.title,
         startDate: new Date(c.startDate),
         endDate: new Date(c.endDate),
@@ -62,7 +67,11 @@ export default function Page() {
     return (
         <main className="flex justify-center mt-[100px]">
             <div className="w-full max-w-[1280px] px-4 flex gap-40">
-                <Sidebar title="마이페이지" menuItems={menuItems} />
+
+                <Sidebar
+                    title="마이페이지"
+                    menuItems={menuItems}
+                />
 
                 <section className="flex-1 flex flex-col text-[#666]">
                     {/* 토글 */}
@@ -133,6 +142,49 @@ export default function Page() {
                     )}
                 </section>
             </div>
+            <Modal isOpen={isNickOpen} onClose={() => setIsNickOpen(false)}>
+                <div className="p-6">
+                    <h3 className="text-lg font-semibold mb-4">닉네임 변경</h3>
+                    <NicknameForm onClose={() => setIsNickOpen(false)} />
+                </div>
+            </Modal>
         </main>
+    );
+}
+
+function NicknameForm({ onClose }: { onClose: () => void }) {
+    const [nickname, setNickname] = useState("");
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        // TODO: 닉네임 변경 API 연동
+        alert(`닉네임이 "${nickname}"(으)로 변경되었습니다!`);
+        onClose();
+    };
+
+    return (
+        <form onSubmit={handleSubmit} className="space-y-4">
+            <input
+                className="w-full border rounded-md px-3 py-2"
+                placeholder="새 닉네임"
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+            />
+            <div className="flex justify-end gap-2">
+                <button
+                    type="button"
+                    className="px-3 py-2 rounded-md border"
+                    onClick={onClose}
+                >
+                    취소
+                </button>
+                <button
+                    type="submit"
+                    className="px-3 py-2 rounded-md bg-[#264B1D] text-white"
+                >
+                    저장
+                </button>
+            </div>
+        </form>
     );
 }
