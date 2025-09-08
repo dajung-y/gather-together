@@ -29,7 +29,7 @@ export default function Page() {
     const menuItems = [
         { label: "내가 지원한 스터디", path: "/mypage/applied" },
         { label: "내가 만든 스터디", path: "/mypage/created" },
-        { label: "닉네임 변경", onClick: () => setIsNickOpen(true) },
+        { label: "닉네임 변경", path: "/mypage/setting" },
     ];
 
     const [data, setData] = useState<ApiResp>({ approved: [], pending: [], rejected: [] });
@@ -61,7 +61,6 @@ export default function Page() {
                     title="마이페이지"
                     menuItems={menuItems}
                 />
-
 
                 <section className="flex-1 flex flex-col text-[#666]">
                     {/* 승인완료 */}

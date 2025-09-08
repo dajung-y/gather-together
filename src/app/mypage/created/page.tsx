@@ -67,6 +67,7 @@ export default function Page() {
     return (
         <main className="flex justify-center mt-[100px]">
             <div className="w-full max-w-[1280px] px-4 flex gap-40">
+
                 <Sidebar
                     title="마이페이지"
                     menuItems={menuItems}
