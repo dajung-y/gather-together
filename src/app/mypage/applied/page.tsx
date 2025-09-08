@@ -66,25 +66,25 @@ export default function Page() {
                     {/* 승인완료 */}
                     <h1 className="text-xl mb-2">승인완료</h1>
                     <hr className="mt-2 mb-6 w-full border-t-2 border-gray-300"/>
-                    <div className="flex gap-8 flex-wrap">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mx-[20px] mb-[20px]">
                         {data.approved.map((c) => (
                             <StudyCard key={`approved-${c.id}`} {...toCardProps(c)} />
                         ))}
                     </div>
 
                     {/* 승인대기 */}
-                    <h1 className="text-xl mt-12 mb-2">승인대기</h1>
+                    <h1 className="text-xl mb-2">승인대기</h1>
                     <hr className="mt-2 mb-6 w-full border-t-2 border-gray-300"/>
-                    <div className="flex gap-8 flex-wrap ml-[10px]">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mx-[20px] mb-[20px]">
                         {data.pending.map((c) => (
                             <StudyCard key={`pending-${c.id}`} {...toCardProps(c)} />
                         ))}
                     </div>
 
                     {/* 승인거절 */}
-                    <h1 className="text-xl mt-12 mb-2">승인거절</h1>
+                    <h1 className="text-xl mb-2">승인거절</h1>
                     <hr className="mt-2 mb-6 w-full border-t-2 border-gray-300"/>
-                    <div className="flex gap-5 flex-wrap mb-[50px] ml-[10px]">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mx-[20px] mb-[20px]">
                         {data.rejected.map((c) => (
                             <StudyCard key={`rejected-${c.id}`} {...toCardProps(c)} />
                         ))}
