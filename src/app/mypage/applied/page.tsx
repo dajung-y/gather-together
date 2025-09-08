@@ -29,7 +29,7 @@ export default function Page() {
     const menuItems = [
         { label: "내가 지원한 스터디", path: "/mypage/applied" },
         { label: "내가 만든 스터디", path: "/mypage/created" },
-        { label: "닉네임 변경", path: "/mypage/setting" },
+        { label: "닉네임 변경", onClick: () => setIsNickOpen(true) },
     ];
 
     const [data, setData] = useState<ApiResp>({ approved: [], pending: [], rejected: [] });
