@@ -92,7 +92,7 @@ export default function Page() {
                         </button>
                     </div>
 
-                    {/*카드 & 지원자 리스트*/}
+                    {/*모집중*/}
                     {active === "open" ? (
                         <div className="mt-6 space-y-6 mb-[50px]">
                             {data.recruiting.map((c) => {
@@ -102,11 +102,11 @@ export default function Page() {
                                         key={`recruiting-${c.id}`}
                                         className="border border-gray-300 rounded-lg p-4 flex gap-8 bg-white"
                                     >
-                                        <div className="flex-shrink-0">
+                                        <div className="flex-shrink-0 flex-3">
                                             <StudyCard {...toCardProps(c)} />
                                         </div>
 
-                                        <div className="flex-1 flex flex-col justify-center gap-4">
+                                        <div className="flex-7 flex flex-col justify-center gap-4">
                                             {applicants.map((a, i) => (
                                                 <div
                                                     key={`${c.id}-applicant-${i}`}
@@ -134,7 +134,8 @@ export default function Page() {
                             )}
                         </div>
                     ) : (
-                        <div className="flex gap-8 flex-wrap ml-[10px] mt-[50px] mb-[50px]">
+                        // 모집중
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mx-[20px] my-[20px]">
                             {data.completed.map((c) => (
                                 <StudyCard key={`completed-${c.id}`} {...toCardProps(c)} />
                             ))}
