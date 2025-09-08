@@ -6,6 +6,7 @@ import Modal from "@/components/common/Modal";
 
 type CardDTO = {
     id: string;
+    name: string;
     variant: "memberOpen" | "memberClosed" | "leaderOpen" | "leaderClosed" | "mainOpen" | "mainClosed";
     title: string;
     startDate: string;
@@ -14,6 +15,7 @@ type CardDTO = {
     currentMembers: number;
     maxMembers: number;
     tag: string;
+    applicants?: Applicant[];
 };
 
 type ApiResp = {
@@ -43,7 +45,7 @@ export default function Page() {
 
     useEffect(() => {
         (async () => {
-            const res = await fetch("/api/studycards/mypage", { cache: "no-store" });
+            const res = await fetch("/api/mypage/studycards", { cache: "no-store" });
             const json: ApiResp = await res.json();
             setData(json);
         })();
@@ -51,6 +53,7 @@ export default function Page() {
 
     const toCardProps = (c: CardDTO) => ({
         variant: c.variant,
+        name: c.name,
         title: c.title,
         startDate: new Date(c.startDate),
         endDate: new Date(c.endDate),
@@ -67,7 +70,6 @@ export default function Page() {
                 <Sidebar
                     title="마이페이지"
                     menuItems={menuItems}
-                    onSettingClick={() => setIsNickOpen(true)}
                 />
 
                 <section className="flex-1 flex flex-col text-[#666]">

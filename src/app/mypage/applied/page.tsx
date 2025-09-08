@@ -36,7 +36,7 @@ export default function Page() {
 
     useEffect(() => {
         (async () => {
-            const res = await fetch("/api/studycards/mypage", { cache: "no-store" });
+            const res = await fetch("/api/mypage/studycards", { cache: "no-store" });
             const json: ApiResp = await res.json();
             setData(json);
         })();
@@ -60,7 +60,6 @@ export default function Page() {
                 <Sidebar
                     title="마이페이지"
                     menuItems={menuItems}
-                    onSettingClick={() => setIsNickOpen(true)}
                 />
 
 
