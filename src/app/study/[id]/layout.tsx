@@ -1,5 +1,7 @@
+'use client'
 import Sidebar, { handleLeaveRoom } from "@/components/common/Sidebar";
 import { MenuItem } from "@/types/sidebar";
+import { usePathname } from "next/navigation";
 
 const menuItems: MenuItem[] = [
   //링크 이동
@@ -26,13 +28,16 @@ const menuItems: MenuItem[] = [
 ]
 
 export default function Layout({ children }: { children: React.ReactNode; }) {
+  const pathname = usePathname();
+  const hideSidebar = pathname.includes('/about');
   return (
     <div>
-      <div className="fixed top-20 left-0">
-        {/* 아래 수정필요! */}
-        <Sidebar title="1일 1영어" menuItems={menuItems} />
-      </div>
-
+      { !hideSidebar && (
+        <div className="fixed top-20 left-0">
+          {/* 아래 수정필요! */}
+          <Sidebar title="1일 1영어" menuItems={menuItems} />
+        </div>
+      )}
       <div>{children}</div>
     </div>
   );
