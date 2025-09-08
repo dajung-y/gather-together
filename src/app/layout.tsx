@@ -1,7 +1,10 @@
+// app/layout.tex
+
 import type { Metadata } from "next";
 import "@/styles/globals.css";
 import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
+import Providers from "@/components/providers/SessionProvider";
 
 export const metadata: Metadata = {
   title: "모여모여",
@@ -17,9 +20,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Header />
-        {children}
-        <Footer />
+        <Providers>
+          <Header />
+          {children}
+          <Footer />
+        </Providers>
         <div id="modal-root" />
       </body>
     </html>
