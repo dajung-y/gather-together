@@ -5,6 +5,7 @@ export async function GET() {
         approved: [
             {
                 id: "1",
+                name: "기초부터 시작",
                 variant: "memberOpen",
                 title: "토익 스터디 1",
                 startDate: "2025-09-01",
@@ -16,6 +17,7 @@ export async function GET() {
             },
             {
                 id: "2",
+                name: "실전 대비반",
                 variant: "memberOpen",
                 title: "토익 스터디 2",
                 startDate: "2025-09-05",
@@ -27,6 +29,7 @@ export async function GET() {
             },
             {
                 id: "3",
+                name: "주말 집중반",
                 variant: "memberOpen",
                 title: "토익 스터디 3",
                 startDate: "2025-09-10",
@@ -40,6 +43,7 @@ export async function GET() {
         pending: [
             {
                 id: "1",
+                name: "기출 문제 풀이",
                 variant: "memberClosed",
                 title: "CS 면접 스터디 1",
                 startDate: "2025-09-12",
@@ -51,6 +55,7 @@ export async function GET() {
             },
             {
                 id: "2",
+                name: "코딩테스트 대비",
                 variant: "memberClosed",
                 title: "알고리즘 스터디 1",
                 startDate: "2025-09-15",
@@ -62,6 +67,7 @@ export async function GET() {
             },
             {
                 id: "3",
+                name: "자료구조 심화",
                 variant: "memberClosed",
                 title: "자료구조 스터디 1",
                 startDate: "2025-09-20",
@@ -75,6 +81,7 @@ export async function GET() {
         rejected: [
             {
                 id: "1",
+                name: "회화 중심",
                 variant: "memberClosed",
                 title: "영작 스터디 1",
                 startDate: "2025-09-18",
@@ -86,6 +93,7 @@ export async function GET() {
             },
             {
                 id: "2",
+                name: "단기 집중반",
                 variant: "memberClosed",
                 title: "코테 준비 1",
                 startDate: "2025-09-22",
@@ -97,6 +105,7 @@ export async function GET() {
             },
             {
                 id: "3",
+                name: "ES6 마스터",
                 variant: "memberClosed",
                 title: "JS 심화 1",
                 startDate: "2025-09-25",
@@ -110,6 +119,7 @@ export async function GET() {
         recruiting: [
             {
                 id: "1",
+                name: "핵심 개념 정리",
                 variant: "leaderOpen",
                 title: "JS 심화 1",
                 startDate: "2025-09-25",
@@ -121,6 +131,7 @@ export async function GET() {
             },
             {
                 id: "2",
+                name: "프로젝트 실습",
                 variant: "leaderOpen",
                 title: "JS 심화 2",
                 startDate: "2025-09-28",
@@ -132,6 +143,7 @@ export async function GET() {
             },
             {
                 id: "3",
+                name: "알고리즘 응용",
                 variant: "leaderOpen",
                 title: "JS 심화 3",
                 startDate: "2025-10-02",
@@ -145,6 +157,7 @@ export async function GET() {
         completed : [
             {
                 id: "1",
+                name: "핵심 개념 정리",
                 variant: "leaderClosed",
                 title: "JS 심화 1 (마감)",
                 startDate: "2025-09-25",
@@ -156,6 +169,7 @@ export async function GET() {
             },
             {
                 id: "2",
+                name: "프로젝트 실습",
                 variant: "leaderClosed",
                 title: "JS 심화 2 (마감)",
                 startDate: "2025-09-28",
@@ -167,6 +181,7 @@ export async function GET() {
             },
             {
                 id: "3",
+                name: "알고리즘 응용",
                 variant: "leaderClosed",
                 title: "JS 심화 3 (마감)",
                 startDate: "2025-10-02",
