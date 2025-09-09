@@ -55,42 +55,49 @@ export default function Page() {
     });
 
     return (
-        <main className="flex justify-center mt-[100px]">
-            <div className="w-full max-w-[1280px] px-4 flex gap-40">
-                <Sidebar
-                    title="마이페이지"
-                    menuItems={menuItems}
-                />
+        <main className="flex justify-center mt-6 md:mt-[100px]">
+            <div className="w-full max-w-[1280px] px-4 flex flex-col md:flex-row gap-6 md:gap-10">
+                <div className="w-full md:w-64 md:shrink-0">
+                    <Sidebar title="마이페이지" menuItems={menuItems} />
+                </div>
 
-                <section className="flex-1 flex flex-col text-[#666]">
+                <section className="flex-1 flex flex-col text-[#666] space-y-6">
                     {/* 승인완료 */}
-                    <h1 className="text-xl mb-2">승인완료</h1>
-                    <hr className="mt-2 mb-6 w-full border-t-2 border-gray-300"/>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mx-[20px] mb-[20px]">
-                        {data.approved.map((c) => (
-                            <StudyCard key={`approved-${c.id}`} {...toCardProps(c)} />
-                        ))}
+                    <div>
+                        <h1 className="text-lg sm:text-xl mb-2">승인완료</h1>
+                        <hr className="mt-2 mb-4 sm:mb-6 w-full border-t border-gray-300" />
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mx-0 sm:mx-5 mb-5">
+                            {data.approved.map((c) => (
+                                <StudyCard key={`approved-${c.id}`} {...toCardProps(c)} />
+                            ))}
+                        </div>
                     </div>
 
                     {/* 승인대기 */}
-                    <h1 className="text-xl mb-2">승인대기</h1>
-                    <hr className="mt-2 mb-6 w-full border-t-2 border-gray-300"/>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mx-[20px] mb-[20px]">
-                        {data.pending.map((c) => (
-                            <StudyCard key={`pending-${c.id}`} {...toCardProps(c)} />
-                        ))}
+                    <div>
+                        <h1 className="text-lg sm:text-xl mb-2">승인대기</h1>
+                        <hr className="mt-2 mb-4 sm:mb-6 w-full border-t border-gray-300" />
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mx-0 sm:mx-5 mb-5">
+                            {data.pending.map((c) => (
+                                <StudyCard key={`pending-${c.id}`} {...toCardProps(c)} />
+                            ))}
+                        </div>
                     </div>
 
                     {/* 승인거절 */}
-                    <h1 className="text-xl mb-2">승인거절</h1>
-                    <hr className="mt-2 mb-6 w-full border-t-2 border-gray-300"/>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mx-[20px] mb-[20px]">
-                        {data.rejected.map((c) => (
-                            <StudyCard key={`rejected-${c.id}`} {...toCardProps(c)} />
-                        ))}
+                    <div>
+                        <h1 className="text-lg sm:text-xl mb-2">승인거절</h1>
+                        <hr className="mt-2 mb-4 sm:mb-6 w-full border-t border-gray-300" />
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mx-0 sm:mx-5 mb-10">
+                            {data.rejected.map((c) => (
+                                <StudyCard key={`rejected-${c.id}`} {...toCardProps(c)} />
+                            ))}
+                        </div>
                     </div>
                 </section>
             </div>
+
+            {/* 닉네임 변경 모달 */}
             <Modal isOpen={isNickOpen} onClose={() => setIsNickOpen(false)}>
                 <div className="p-6">
                     <h3 className="text-lg font-semibold mb-4">닉네임 변경</h3>
@@ -106,7 +113,6 @@ function NicknameForm({ onClose }: { onClose: () => void }) {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // TODO: 닉네임 변경 API 연동
         alert(`닉네임이 "${nickname}"(으)로 변경되었습니다!`);
         onClose();
     };
