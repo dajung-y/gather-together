@@ -5,6 +5,7 @@ import "@/styles/globals.css";
 import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
 import Providers from "@/components/providers/SessionProvider";
+import FloatingButtons from "@/components/common/FloatingButtons";
 
 export const metadata: Metadata = {
   title: "모여모여",
@@ -24,6 +25,7 @@ export default function RootLayout({
           <Header />
           {children}
           <Footer />
+          <FloatingButtons />
         </Providers>
         <div id="modal-root" />
       </body>
