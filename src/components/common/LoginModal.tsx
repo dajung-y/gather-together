@@ -18,10 +18,21 @@ export default function LoginModal({
 }: LoginModalProps) {
 
   // 구글 로그인 연동
-  const handleGoogleLogin = () => {
-    signIn('google', {callbackUrl : '/'})
+  const handleGoogleLogin = async() => {
+    try{
+      const result = await signIn('google', {
+        redirect: false,   // 페이지 리디렉션 방지
+        callbackUrl: '/'   // 로그인 성공 후 이동할 페이지
+      })
+      if(result?.ok){
+        onLoginSuccess?.(); // 로그인 성공 콜백 실행
+        onClose()
+      }
+    } catch(error){
+      console.log('로그인 실패', error);
+    }
   }
-  
+
   return(
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="px-8 py-10 md:m-4">

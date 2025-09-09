@@ -5,22 +5,31 @@ import { useState } from "react";
 import Button from "./Button";
 import Link from "next/link";
 import LoginModal from "./LoginModal";
+import { signOut, useSession } from "next-auth/react";
 
 export default function Header() {
 
-  // 임시 로그인 상태
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // NextAuth 세션 사용
+  const {data: session, status} = useSession(); 
   
   // 모달
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   // 로그인 버튼 핸들러
   const handleLoginClick = () => {
-    if(!isLoggedIn){
+    if(!session){
       setIsModalOpen(true);
-    } else {
-      setIsLoggedIn(false);
     }
+  }
+
+  // 로그아웃 핸들러
+  const handleLogout = () => {
+    signOut({callbackUrl: '/'}); // NextAuth 로그 아웃
+  }
+
+  // 로그인 성공 핸들러
+  const handleLoginSuccess = () => {
+    setIsModalOpen(false);
   }
 
   // 모달닫기
@@ -54,7 +63,7 @@ export default function Header() {
 
             {/* 사용자 메뉴 */}
             <div className="w-fit whitespace-nowrap">
-              { !isLoggedIn ? (
+              { !session ? (
                 <Button size="md"
                         onClick={handleLoginClick}>
                   로그인
@@ -68,10 +77,10 @@ export default function Header() {
                   
                   <Button size="md"
                           variant="outline"
-                          onClick={handleLoginClick}>
+                          onClick={handleLogout}>
                     로그아웃
                   </Button>
-                  <Link href='/mypage'>
+                  <Link href='/mypage/applied'>
                     <Button size="md">
                       마이페이지
                     </Button>
@@ -84,7 +93,8 @@ export default function Header() {
       </header>
       <LoginModal
       isOpen={isModalOpen}
-      onClose={handleModalClose} />
+      onClose={handleModalClose}
+      onLoginSuccess={handleLoginSuccess} />
     </>
   )
 }
