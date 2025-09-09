@@ -25,8 +25,8 @@ export default function WeekdaySelect({
 
   const toggleDay = (dayKey: string) => {
     const newValue = value.includes(dayKey)
-      ? value.filter(day => day! == dayKey) // 존재하면 제거
-      : [...value, dayKey]                  // 없으면 추가
+      ? value.filter(day => day !== dayKey) // 존재하면 제거
+      : [...value, dayKey];                 // 없으면 추가
 
     onChange?.(newValue);                   // 부모에게 변경된값 전달
   }
@@ -37,24 +37,27 @@ export default function WeekdaySelect({
         요일
       </label>
       {/* 요일버튼 */}
-      {
-        weekdays.map((day) => (
-          <button 
-            key={day.key}
-            type="button"
-            onClick={() => toggleDay(day.key)}
-            className={`
-              p-2 rounded-md border border-gray-300 body
-              ${value.includes(day.key)
-                ? 'bg-primary-500 text-white border border-primary-500'
-                : 'bg-white text-black border border-gray-300 hover:bg-gray-50'
-              }
-            `}
-          >
-            {day.label}
-          </button>
-        ))
-      }
+      <div className="flex gap-2">
+        {
+          weekdays.map((day) => (
+            <button 
+              key={day.key}
+              type="button"
+              onClick={() => toggleDay(day.key)}
+              className={`
+                px-3 py-2 rounded-md border border-gray-300 body
+                ${value.includes(day.key)
+                  ? 'bg-primary-500 text-white border border-primary-500'
+                  : 'bg-white text-black border border-gray-300 hover:bg-gray-50'
+                }
+              `}
+            >
+              {day.label}
+            </button>
+          ))
+        }
+      </div>
+
       {/* 에러 메세지 */}
       {
         error && (
