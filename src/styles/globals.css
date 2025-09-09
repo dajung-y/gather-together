@@ -72,7 +72,7 @@ body {
 }
 
 .button-primary {
-  @apply text-primary-50 bg-primary-500
+  @apply text-primary-50 border bg-primary-500
   hover:brightness-75;
 }
 
