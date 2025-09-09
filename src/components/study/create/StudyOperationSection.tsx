@@ -1,11 +1,11 @@
 'use client'
 import CategorySelect from "./CategorySelect";
-import MemberCountSelect from "./MemberCountSelect";
-import PeriodInput from "./PeriodInput";
-import TimeInput from "./TimeInput";
+import CapacitySelect from "./CapacitySelect";
+import StudyPeriodInput from "./StudyPeriodInput";
+import StudyTimeInput from "./StudyTimeInput";
 import { useForm, Controller } from 'react-hook-form';
 import Weekdayselect from "./WeekdaySelect";
-import NameInput from "./NameInput";
+import StudyNameInput from "./StudyNameInput";
 
 interface StudyOperationSectionProps {
   register?: any;
@@ -29,15 +29,15 @@ export default function StudyOperationSection({ register,control, errors }: Stud
           error={errors?.category?.message}
         />
         
-        <MemberCountSelect
+        <CapacitySelect
           register={register}
           error={errors?.maxMembers?.message}
         />
       </div>
-      <PeriodInput 
+      <StudyPeriodInput 
         register={register}
         errors={errors}/>
-      <TimeInput
+      <StudyTimeInput
         register={register}
         errors={errors} />
       
@@ -56,7 +56,7 @@ export default function StudyOperationSection({ register,control, errors }: Stud
         />
       )}
 
-      <NameInput
+      <StudyNameInput
         register={register}
         error={errors?.studyName?.message} />
       
