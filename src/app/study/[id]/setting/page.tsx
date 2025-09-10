@@ -1,4 +1,4 @@
-import UserDelete from "@/components/study/UserDelete";
+import UserDelete from "@/components/study/main/UserDelete";
 
 // page
 export default function page() {
