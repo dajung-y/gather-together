@@ -2,6 +2,7 @@ import clientPromise from "@/lib/mongodb";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "../auth/[...nextauth]/route";
+import { request } from "http";
 
 export async function POST(request: NextRequest) {
 
@@ -68,13 +69,28 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try{
     const client = await clientPromise;
     const db = client.db();
+    const url = new URL(request.url);
+    
+    const creatorId = url.searchParams.get("creatorId");
+
+    const query: any = {};
+
+    if(creatorId){
+      query["creator.userId"] = creatorId;
+    }
+    
     const studies = await db.collection('studies').find({}).toArray();
 
-    return NextResponse.json(studies);
+    return NextResponse.json(
+      studies.map((s) => ({
+        ...s,
+        _id: s._id.toString()
+      }))
+    );
   } catch(error) {
     console.error("스터디 목록 조회 오류: ",error);
     return NextResponse.json(
