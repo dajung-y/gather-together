@@ -1,3 +1,4 @@
+
 import {variantStyles} from '../../styles/studyCardStyles'
 import StudyCard from '../common/StudyCard';
 
@@ -12,6 +13,7 @@ interface StudyCardProps {
   maxMembers: number;
   tag: string;
 }
+
 
 // 더미 데이터
 const dummyStudyCards: StudyCardProps[] = [
