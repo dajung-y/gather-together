@@ -1,5 +1,5 @@
 import DescriptionInput from "./DescriptionInput";
-import TitleInput from "./TitleInput";
+import StudyTitleInput from "./StudyTitleInput";
 
 interface StudyIntroductionSectionProps {
   register?: any;
@@ -15,7 +15,7 @@ export default function StudyIntroductionSection({ register, errors }: StudyIntr
         </h2>
       </div>
       <div className="space-y-2">
-        <TitleInput 
+        <StudyTitleInput
           register={register}
           error={errors?.title?.message}
         />

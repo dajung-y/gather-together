@@ -1,7 +1,10 @@
+// components/study/create/CategorySelect.tsx
+// 카테고리 선택폼
 
 import SelectField from "@/components/common/form/SelectField";
+import { UseFormRegister } from "react-hook-form";
 
-const CategoryOptions = [
+const categoryOptions = [
   { value: "it", label:"IT" },
   { value: 'language', label: '어학' },
   { value: 'design', label: '디자인' },
@@ -15,19 +18,22 @@ const CategoryOptions = [
 ];
 
 interface CategorySelectProps {
-  register?: any;
+  register?: UseFormRegister<any>;
   error?: string;
 }
 
-export default function CategorySelect({ register, error }: CategorySelectProps) {
+export default function CategorySelect({
+  register,
+  error
+}: CategorySelectProps) {
   return (
     <SelectField
       label="카테고리"
       name="category"
-      options={CategoryOptions}
+      options={categoryOptions}
       placeholder="카테고리를 선택하세요"
       register={register}
       error={error}
     />
-  );
+  )
 }

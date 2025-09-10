@@ -16,17 +16,23 @@ export default function Page(){
 
   return(
     <main className="w-full min-h-screen flex justify-center">
-      <div className="w-full max-w-[1280px] p-4">
+      <div className="w-full max-w-5xl mb-12 p-4 space-y-12">
         {/* 헤더 */}
-        <section className="my-3 lg:my-6 w-full flex flex-col space-y-2 items-center">
+        <section className="
+          w-full flex flex-col space-y-3 items-center
+          mt-4 mb-8 
+          lg:my-8 
+        ">
           <h1 className="text-2xl md:text-3xl font-semibold text-primary-700 text-center">
             스터디 만들기
           </h1>
-          <p className="body text-gray-500 text-center">함께 학습할 스터디를 생성하세요</p>
+          <p className="body text-gray-500 text-center">
+            함께 학습할 스터디를 생성하세요
+          </p>
         </section>
 
-        {/* 👈 form으로 감싸기 */}
-        <form onSubmit={handleSubmit(onSubmit)}>
+        {/* 폼 전체 */}
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-12">
           {/* 운영 정보 입력창 */}
           <section>
             <StudyOperationSection 
@@ -37,17 +43,17 @@ export default function Page(){
           </section>
           
           {/* 스터디 소개 입력창 */}
-          <section className="mt-12">
+          <section>
             <StudyIntroductionSection 
               register={register}
               errors={errors}
             />
           </section>
           
-          {/* 버튼 컨테이너 */}
-          <section>
+          {/* 취소/제출 버튼 */}
+          <div>
             <ButtonContainer />
-          </section>
+          </div>
         </form>
       </div>
     </main>
