@@ -2,9 +2,10 @@
 
 import Button from "@/components/common/Button";
 import StudyCard from "@/components/common/StudyCard";
-import AttendanceInfo from "@/components/study/AttendanceInfo";
-import NoticeInput from "@/components/study/Notice";
-import { Pen, Trash } from 'lucide-react';
+import AttendanceInfo from "@/components/study/main/AttendanceInfo";
+import MainNotice from "@/components/study/main/MainNotice";
+import Notice from "@/components/study/main/Notice";
+import NoticeForm from "@/components/study/main/NoticeForm";
 
 type StudyPageProps = {
   params: { id: string };
@@ -42,27 +43,14 @@ export default function page({ params }: StudyPageProps) {
           </div>
           {/* <hr className="text-gray-400" /> */}
           {/* 메인공지 */}
-          <div className="flex-1 flex gap-8">
-            <div className="flex-1 flex flex-col py-4 border rounded-lg p-4 border-primary-300">
-              <div className="flex">
-                <p className="headline2 text-primary-500 mb-4 ">메인 공지</p>
-                <Pen size={20} className="ml-auto" />
-              </div>
-
-              <p>영어 스터디에 오신 것을 환영합니다!!</p>
-              <p>교재: Grammar in use</p>
-              <p>스터디 링크: ---------- </p>
-
-            </div>
-          </div>
+          <MainNotice />
         </div>
 
 
-        <div className="h-8">
 
-        </div>
         {/* 공지 추가*/}
-        <NoticeInput />
+        <NoticeForm />
+        <Notice />
         {/* 일반 공지 */}
 
       </div>

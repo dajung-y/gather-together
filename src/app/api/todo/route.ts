@@ -50,7 +50,7 @@ export async function POST(req: Request) {
       updatedAt: new Date(),
     };
 
-    const result = await db.collection("tasks").insertOne(newTodo);
+    const result = await db.collection("todos").insertOne(newTodo);
 
     return NextResponse.json(
       { success: true, taskId: result.insertedId },
