@@ -4,7 +4,7 @@ import Button from "@/components/common/Button";
 import StudyCard from "@/components/common/StudyCard";
 import AttendanceInfo from "@/components/study/main/AttendanceInfo";
 import MainNotice from "@/components/study/main/MainNotice";
-import Notice from "@/components/study/main/Notice";
+import Notice from "@/components/study/main/NoticeList";
 import NoticeForm from "@/components/study/main/NoticeForm";
 
 type StudyPageProps = {
