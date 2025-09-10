@@ -7,7 +7,6 @@ import { Controller, UseFormRegister, Control } from 'react-hook-form';
 import StudyNameInput from "./StudyNameInput";
 import WeekdaySelect from "./WeekdaySelect";
 
-
 interface StudyOperationSectionProps {
   register?: UseFormRegister<any>;
   control?: Control<any>;
@@ -88,55 +87,3 @@ export default function StudyOperationSection({
 }
 
 
-
-
-// export default function StudyOperationSection({ register,control, errors }: StudyOperationSectionProps) {
-//   console.log('StudyOperationSection - control:', control);
-//   return (
-//     <section className="space-y-6">
-//       <div>
-//         <h2 className="headline3 my-4 text-primary-500">
-//           운영 정보를 입력해주세요
-//         </h2>
-//       </div>
-      
-//       <div className="space-y-4">
-//         <CategorySelect 
-//           register={register}
-//           error={errors?.category?.message}
-//         />
-        
-//         <CapacitySelect
-//           register={register}
-//           error={errors?.maxMembers?.message}
-//         />
-//       </div>
-//       <StudyPeriodInput 
-//         register={register}
-//         errors={errors}/>
-//       <StudyTimeInput
-//         register={register}
-//         errors={errors} />
-      
-//       {control && (
-//         <Controller
-//           name="weekdays"
-//           control={control}
-//           defaultValue={[]}
-//           render={({field}) => (
-//             <Weekdayselect
-//               value={field.value || []}
-//               onChange={field.onChange}
-//               error={errors?.weekdays?.message}
-//             />
-//           )}
-//         />
-//       )}
-
-//       <StudyNameInput
-//         register={register}
-//         error={errors?.studyName?.message} />
-      
-//     </section>
-//   );
-// }

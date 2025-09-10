@@ -1,6 +1,9 @@
 // components/study/create/Weekdayselect.tsx
 // 요일 선택폼
 
+// components/study/create/Weekdayselect.tsx
+// 요일 선택폼
+
 interface WeekdaySelectProps {
   value?: string[];
   onChange?: (days: string[]) => void;
@@ -12,6 +15,7 @@ export default function WeekdaySelect({
   onChange,
   error
 }: WeekdaySelectProps) {
+  
   
   const weekdays = [
     { key: 'mon', label: '월' },
@@ -58,6 +62,15 @@ export default function WeekdaySelect({
           ))
         }
       </div>
+
+      {/* 에러 메세지 */}
+      {
+        error && (
+          <span className="block my-1 caption text-red-500">
+            {error}
+          </span>
+        )
+      }
 
       {/* 에러 메세지 */}
       {
