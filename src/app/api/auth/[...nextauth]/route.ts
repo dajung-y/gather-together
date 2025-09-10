@@ -6,7 +6,7 @@ import { MongoDBAdapter } from '@auth/mongodb-adapter'
 import clientPromise from '@/lib/mongodb';
 import { User } from 'next-auth';
 
-const handler = NextAuth({
+export const authOptions = {
   adapter: {
     ...MongoDBAdapter(clientPromise),
     // createUser 메서드 오버라이드
@@ -57,7 +57,7 @@ const handler = NextAuth({
       return session
     }
   }
-});
+};
 
 
 function createRandomNickname(){
@@ -78,5 +78,7 @@ function createRandomNickname(){
 
   return `${adj}${animal}${numbers}`
 }
+
+const handler = NextAuth(authOptions);
 
 export {handler as GET, handler as POST}

@@ -1,12 +1,13 @@
 import clientPromise from "@/lib/mongodb";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
+import { authOptions } from "../auth/[...nextauth]/route";
 
 
 export async function POST(request: NextRequest) {
 
   try{
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     console.log('세션 확인: ',session?.user?.email)
 
     if(!session?.user?.id){
@@ -23,13 +24,13 @@ export async function POST(request: NextRequest) {
     const studyData = {
       // 폼 데이터
       category: formData.category,
-      capacity: parseInt(formData.maxMembers),
+      capacity: parseInt(formData.capacity),
       startDate: formData.startDate,
       endDate: formData.endDate,
       weekdays: formData.weekdays,
       startTime: formData.startTime,
       endTime: formData.endTime,
-      name: formData.studyName,
+      studyName: formData.studyName,
       title: formData.title,
       description: formData.description,
       // 사용자 정보
@@ -58,8 +59,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      studyId: result.insertedId
-    })
+      studyId: result.insertedId.toString()
+    });
+    
   } catch(error) {
     console.error('스터디 생성 오류:', error);
     return NextResponse.json(
