@@ -51,9 +51,7 @@ export default function FloatingButtons() {
 
   const handleStudyCreate = () => {
     if(!session){
-      <LoginModal
-        isOpen={isModalOpen}
-        onClose={handleModalClose} />
+      setIsModalOpen(true);
     } else {
       router.push('/study/create')
     }
@@ -99,6 +97,10 @@ export default function FloatingButtons() {
           </button>
         )
       }
+      <LoginModal
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+      />
     </div>
   )
 }
