@@ -70,6 +70,7 @@ export default function Page() {
     });
 
     return (
+        <div className="min-h-screen flex flex-col">
         <main className="flex justify-center mt-6 md:mt-[100px]">
             <div className="w-full max-w-[1280px] px-4 flex flex-col md:flex-row gap-6 md:gap-10">
                 <div className="w-full md:w-64 md:shrink-0">
@@ -182,6 +183,7 @@ export default function Page() {
                 </div>
             </Modal>
         </main>
+        </div>
     );
 }
 
