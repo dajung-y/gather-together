@@ -1,12 +1,17 @@
-
+// components/study/create/StudyTitleInput.tsx
+// 스터디 제목 입력폼
 import InputField from "@/components/common/form/InputField";
+import { UseFormRegister } from "react-hook-form";
 
-interface TitleInputProps {
-  register?: any;
+interface StudyTitleInputProps {
+  register?: UseFormRegister<any>;
   error?: string;
 }
 
-export default function TitleInput({ register, error }: TitleInputProps) {
+export default function StudyTitleInput({ 
+  register,
+  error 
+}: StudyTitleInputProps) {
   return (
     <InputField
       label="제목"
