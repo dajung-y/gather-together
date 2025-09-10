@@ -1,6 +1,9 @@
 // components/study/create/Weekdayselect.tsx
 // 요일 선택폼
 
+// components/study/create/Weekdayselect.tsx
+// 요일 선택폼
+
 interface WeekdaySelectProps {
   value?: string[];
   onChange?: (days: string[]) => void;
@@ -12,6 +15,7 @@ export default function WeekdaySelect({
   onChange,
   error
 }: WeekdaySelectProps) {
+  
   
   const weekdays = [
     { key: 'mon', label: '월' },
@@ -37,7 +41,7 @@ export default function WeekdaySelect({
         요일
       </label>
       {/* 요일버튼 */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 md:gap-4">
         {
           weekdays.map((day) => (
             <button 
@@ -45,7 +49,8 @@ export default function WeekdaySelect({
               type="button"
               onClick={() => toggleDay(day.key)}
               className={`
-                px-3 py-2 rounded-md border border-gray-300 body
+                px-3 py-2 md:px-4 md:py-3 
+                rounded-md border border-gray-300 body
                 ${value.includes(day.key)
                   ? 'bg-primary-500 text-white border border-primary-500'
                   : 'bg-white text-black border border-gray-300 hover:bg-gray-50'
@@ -57,6 +62,15 @@ export default function WeekdaySelect({
           ))
         }
       </div>
+
+      {/* 에러 메세지 */}
+      {
+        error && (
+          <span className="block my-1 caption text-red-500">
+            {error}
+          </span>
+        )
+      }
 
       {/* 에러 메세지 */}
       {
