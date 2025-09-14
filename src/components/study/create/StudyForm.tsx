@@ -39,7 +39,7 @@ export default function StudyForm() {
       const result = await res.json();
 
       if(res.ok && result.success) {
-        router.push(`/study/${result.studyId}`);
+        router.push(`/study/${result.studyId}/about`);
       } else {
         alert(result.error || "스터디 생성 중 오류가 발생했습니다");
       }

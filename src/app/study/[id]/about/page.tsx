@@ -1,7 +1,7 @@
 // app/study/[id]/about/page.tsx
 // 스터디 상세페이지
 
-import Button from "@/components/common/Button";
+import JoinButton from "@/components/study/about/JoinButton";
 import clientPromise from "@/lib/mongodb";
 import { getCategoryLabel } from "@/utils/category";
 import { ObjectId } from "mongodb";
@@ -23,8 +23,15 @@ interface Study {
   title: string;
   description: string;
   creator: {
+    userId: string;
     nickname: string;
   };
+  applicants?: {
+    userId: string;
+    nickname: string;
+    introduction: string;
+    status: string
+  }[];
   createdAt: string;
   updatedAt: string;
 }
@@ -146,9 +153,10 @@ export default async function page({params}: PageProps) {
       <section className="mb-8 bg-white">
         <div className="max-w-5xl mx-auto p-6">
           <div className="flex justify-center">
-            <Button size="lg" className="px-12">
-              참여하기
-            </Button>
+            <JoinButton
+              creatorId={studyData.creator.userId}
+              studyId={studyData._id.toString()}
+              applicants={studyData.applicants || []} />
           </div>
         </div>
       </section>

@@ -1,11 +1,14 @@
+'use client'
 import { X } from "lucide-react";
 import { User } from "lucide-react";
 import Toggle from "./Toggle";
 import { variantStyles } from "@/styles/studyCardStyles";
 import Button from "./Button";
+import { useRouter } from "next/navigation";
 
 type StudyCardProps = {
   variant?: keyof typeof variantStyles;
+  studyId?: string;
   name: string;
   title: string;
   startDate: Date;
@@ -14,10 +17,12 @@ type StudyCardProps = {
   currentMembers: number;
   maxMembers: number;
   tag: string;
+  isRecruiting?: boolean;
 }
 
 export default function StudyCard({
   variant = "mainClosed",
+  studyId,
   name,
   title,
   startDate,
@@ -26,9 +31,11 @@ export default function StudyCard({
   currentMembers,
   maxMembers,
   tag,
+  isRecruiting
 }: StudyCardProps
 ) {
   const style = variantStyles[variant];
+  const route = useRouter();
 
   function formatDate(date: Date): string {
     const yy = String(date.getFullYear()).slice(-2);
@@ -37,8 +44,12 @@ export default function StudyCard({
     return `${yy}/${mm}/${dd}`;
   }
 
+  const handleClick = () => {
+    route.push(`/study/${studyId}/about`);
+  }
+
   return (
-    <div className="flex flex-col gap-4 w-full h-full ">
+    <div className="flex flex-col gap-4 w-full h-full cursor-pointer" onClick={handleClick}>
       <div className={`flex flex-col gap-4 w-full h-full p-4 border border-gray-300 shadow-lg rounded-lg
       ${style.isDisabled ? "bg-gray-100 opacity-60" : "bg-white"}`}>
         <div className="flex">
@@ -56,10 +67,18 @@ export default function StudyCard({
         </div>
         <div className="flex">
           <span className="border border-primary-100 text-primary-500 px-3 rounded-full self-center">#{tag}</span>
-          {!style.isTagDisabled &&
-            <span className="bg-primary-50 text-primary-500 px-3 rounded-full ml-auto self-center">
-              모집 중
-            </span>}
+          {/* <span className={`px-3 rounded-full ml-auto self-center
+            ${isRecruiting ? "bg-primary-50 text-primary-500" : "bg-gray-300 text-gray-700"}`}>
+              {isRecruiting ? "모집중" : "모집마감"}
+          </span> */}
+          
+          {(variant === "mainOpen" || variant === "mainClosed") && (
+            <span className={`px-3 rounded-full ml-auto self-center
+              ${isRecruiting ? "bg-primary-50 text-primary-500" : "bg-gray-300 text-gray-700"}`}>
+              {isRecruiting ? "모집중" : "모집마감"}
+            </span>
+          )}
+          
           {!style.isToggleDisabled &&
             <div className="ml-auto">
               <Toggle />
