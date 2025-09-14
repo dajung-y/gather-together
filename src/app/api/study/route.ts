@@ -2,7 +2,6 @@ import clientPromise from "@/lib/mongodb";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "../auth/[...nextauth]/route";
-import { request } from "http";
 
 export async function POST(request: NextRequest) {
 
@@ -73,24 +72,51 @@ export async function GET(request: NextRequest) {
   try{
     const client = await clientPromise;
     const db = client.db();
+
+    // url
     const url = new URL(request.url);
-    
+    // 필터용 params
+    const page = parseInt(url.searchParams.get("page") || "1");    // 현재 페이지
+    const limit = parseInt(url.searchParams.get("limit") || "16"); // 페이지당 데이터 수
+    const isRecruiting = url.searchParams.get("isRecruiting");     // 모집중
     const creatorId = url.searchParams.get("creatorId");
 
+    // MongoDB query 객체
+
     const query: any = {};
+
+    if(isRecruiting !== null) {
+      query.isRecruiting = isRecruiting === "true"
+    }
 
     if(creatorId){
       query["creator.userId"] = creatorId;
     }
     
-    const studies = await db.collection('studies').find({}).toArray();
+    // 데이터 수 계산
+    const total = await db.collection("studies").countDocuments(query);
+    
+    // 페이지네이션 적용된 데이터 가져오기
+    const studies = await db.collection('studies')
+      .find(query)
+      .skip((page-1)*limit)
+      .limit(limit)
+      .sort({createdAt: -1})
+      .toArray();
 
-    return NextResponse.json(
-      studies.map((s) => ({
-        ...s,
-        _id: s._id.toString()
-      }))
-    );
+    const formattedStudies = studies.map((s) => ({
+      ...s,
+      _id: s._id.toString()
+    }));
+
+    
+    return NextResponse.json({
+      data: formattedStudies,
+      page,
+      limit,
+      total,
+      totalPage: Math.ceil(total/limit)
+    });
   } catch(error) {
     console.error("스터디 목록 조회 오류: ",error);
     return NextResponse.json(
