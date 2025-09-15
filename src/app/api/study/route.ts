@@ -80,17 +80,31 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(url.searchParams.get("limit") || "16"); // 페이지당 데이터 수
     const isRecruiting = url.searchParams.get("isRecruiting");     // 모집중
     const creatorId = url.searchParams.get("creatorId");
+    const search = url.searchParams.get("search");
+    const category = url.searchParams.get("category");
 
     // MongoDB query 객체
 
     const query: any = {};
 
+    // 모집중 여부
     if(isRecruiting !== null) {
       query.isRecruiting = isRecruiting === "true"
     }
 
+    // 작성자
     if(creatorId){
       query["creator.userId"] = creatorId;
+    }
+
+    // 카테고리
+    if(category){
+      query.category = category;
+    }
+
+    // 검색
+    if(search){
+      query.title = { $regex: search, $options: "i"};
     }
     
     // 데이터 수 계산

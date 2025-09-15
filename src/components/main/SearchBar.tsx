@@ -1,21 +1,30 @@
 'use client'
 
-import React, { useState } from "react";
+interface SearchBarProps {
+  value: string;
+  onChange: (val: string) => void;
+  onSubmit: () => void;
+}
 
-export default function SearchBar() {
-  const [value, setValue] = useState<string>("");
+export default function SearchBar({
+  value, 
+  onChange,
+  onSubmit
+}: SearchBarProps) {
+
   const handleSubmit = (e:React.FormEvent) => {
     e.preventDefault();
-
+    onSubmit();
   }
+
   return(
     <form onSubmit={handleSubmit} className="flex w-full h-full">
       <input 
         type="text"
         value={value}
-        onChange={e => setValue(e.target.value)}
+        onChange={e => onChange(e.target.value)}
         placeholder="검색어를 검색하세요"
-        className="flex-1 border border-gray-300 border-r-0 px-2 py-1 rounded-l-md"
+        className="flex-1 border border-gray-300 border-r-0 px-2 py-1 rounded-l-md focus:outline-none focus:ring-2 focus:ring-primary-500"
       />
       <button
         type="submit"
