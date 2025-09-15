@@ -8,6 +8,7 @@ import { useSession } from "next-auth/react"
 import { useState } from "react";
 import JoinModal from "./JoinModal";
 import LoginModal from "@/components/common/LoginModal";
+import toast from "react-hot-toast";
 
 interface JoinButtonProps {
   creatorId: string;
@@ -58,11 +59,10 @@ export default function JoinButton({
       const data = await res.json();
 
       if (!res.ok){
-        alert(data.message);
+        toast.error(data.message || "스터디 참여 신청에 실패했습니다." ,{duration: 2000});
         return;
       }
-
-      alert("스터디 신청 완료");
+      toast.success("스터디 참여 신청이 완료되었습니다!", {duration: 1000});
       setIsModalOpen(false);
     } catch(error){
       console.error(error);

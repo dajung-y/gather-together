@@ -9,6 +9,7 @@ import { studyFormSchema } from "@/lib/validation/studyFormSchema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 type FormData = z.infer<typeof studyFormSchema>;
 
@@ -39,7 +40,11 @@ export default function StudyForm() {
       const result = await res.json();
 
       if(res.ok && result.success) {
-        router.push(`/study/${result.studyId}/about`);
+        // toast 알람
+        toast.success("스터디가 생성되었습니다!", {duration:1500});
+        setTimeout(() => {
+          router.push(`/study/${result.studyId}/about`);
+        }, 1500);
       } else {
         alert(result.error || "스터디 생성 중 오류가 발생했습니다");
       }

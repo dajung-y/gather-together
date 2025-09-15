@@ -65,8 +65,8 @@ export default function StudyListClient() {
       {/* 카드 리스트 */}
       <section className="my-8">
         { isLoading ? (
-          <div>
-            로딩 중...
+          <div className="flex justify-center items-center h-64">
+            <span className="animate-pulse text-gray-500 text-lg">로딩 중...</span>
           </div>
         ) : (
           <CardList 
