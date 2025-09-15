@@ -15,7 +15,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ success: false, error: "groupId 필요" }, { status: 400 });
     }
 
-    const todos = await db.collection("tasks").find({ groupId }).toArray();
+    const todos = await db.collection("todos").find({ groupId }).toArray();
 
     console.log("가져온 투두" + todos);
 
@@ -41,7 +41,7 @@ export async function POST(req: Request) {
 
     const checks: Check[] = userIds.map((id: string) => ({ userId: id, checked: false }))
 
-    const newTodo: Todo = {
+    const todoData = {
       groupId,
       date,
       task,
@@ -50,10 +50,15 @@ export async function POST(req: Request) {
       updatedAt: new Date(),
     };
 
-    const result = await db.collection("todos").insertOne(newTodo);
+    const result = await db.collection("todos").insertOne(todoData);
+
+    const newTodo: Todo = {
+      ...todoData,
+      _id: result.insertedId.toString(),
+    };
 
     return NextResponse.json(
-      { success: true, taskId: result.insertedId },
+      { success: true, task: newTodo },
       { status: 201, }
     );
   } catch (error: any) {
