@@ -1,6 +1,7 @@
 // app/study/[id]/about/page.tsx
 // 스터디 상세페이지
 
+import BackButton from "@/components/study/about/BackButton";
 import JoinButton from "@/components/study/about/JoinButton";
 import clientPromise from "@/lib/mongodb";
 import { getCategoryLabel } from "@/utils/category";
@@ -83,7 +84,9 @@ export default async function page({params}: PageProps) {
     <div className="min-h-screen flex flex-col">
       {/* 메인 컨텐츠 영역 */}
       <div className="flex-1 max-w-5xl mx-auto w-full p-4">
-        
+        <div className="flex items-center mt-2 mb-4 w-full h-auto">
+          <BackButton />
+        </div>
         {/* 메인 제목 섹션 */}
         <section className="pb-6 mb-8 border-b border-gray-200">
           <h1 className="headline3 mb-4">

@@ -1,5 +1,7 @@
 'use client'
 
+import { Search } from 'lucide-react';
+
 interface SearchBarProps {
   value: string;
   onChange: (val: string) => void;
@@ -24,12 +26,13 @@ export default function SearchBar({
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder="검색어를 검색하세요"
-        className="flex-1 border border-gray-300 border-r-0 px-2 py-1 rounded-l-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+        className="flex-1 bg-primary-50 px-3 py-1 rounded-l-2xl focus:outline-none"
       />
       <button
         type="submit"
-        className="px-4 whitespace-nowrap text-primary-50 bg-primary-500 rounded-r-md hover:brightness-95 cursor-pointer ">
-          검색
+        className="px-2 py-1 whitespace-nowrap bg-primary-50 rounded-r-2xl cursor-pointer
+                   flex items-center justify-center">
+          <Search className='w-6 h-6 text-primary-500' />
       </button>
     </form>
   )
