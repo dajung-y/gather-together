@@ -5,20 +5,19 @@ import TextareaField from "@/components/common/form/TextareaField";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-export default function NoticeForm() {
+export default function NoticeForm({ studyId }: { studyId: string }) {
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
 
   const [showInput, setShowInput] = useState(false);
 
   const onSubmit = async (data: any) => {
     try {
-      const groupId = "1";
 
       const res = await fetch("/api/notice", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          groupId,
+          studyId,
           title: data.title,
           content: data.content,
         })
@@ -32,6 +31,8 @@ export default function NoticeForm() {
       else {
         reset();
         setShowInput(!showInput);
+        window.location.reload();
+
       }
     } catch (error: any) {
       alert(`추가 실패: ${error.message}`);
