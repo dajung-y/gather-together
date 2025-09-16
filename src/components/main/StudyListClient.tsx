@@ -6,6 +6,7 @@ import Pagination from "../common/Pagination";
 import CardList from "./CardList";
 import { Study } from "@/types/study";
 import SearchBar from "./SearchBar";
+import CategoryFilter from "./CategoryFilter";
 
 export default function StudyListClient() {
 
@@ -14,12 +15,15 @@ export default function StudyListClient() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [currentPage, setCurrentpage] = useState<number>(1);
   const [totalPage, setTotalPage] = useState<number>(1);
+  const [searchInput, setSearchInput] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>(""); // api 호출 시 사용할 값
+  const [category, setCategory] = useState<string>("");
 
   useEffect(() => {
     const fetchStudies = async () => {
       setIsLoading(true);
       try{
-        const res = await fetch(`/api/study?isRecruiting=${isRecruiting}&page=${currentPage}`);
+        const res = await fetch(`/api/study?isRecruiting=${isRecruiting}&page=${currentPage}&category=${category}&search=${encodeURIComponent(searchQuery)}`);
         const data = await res.json();
         console.log("받은 데이터: ",data);
         setStudies(data.data);
@@ -31,7 +35,7 @@ export default function StudyListClient() {
       }
     };
     fetchStudies();
-  }, [isRecruiting, currentPage]);
+  }, [isRecruiting, currentPage, searchQuery, category]);
 
   return (
     <div>
@@ -44,16 +48,25 @@ export default function StudyListClient() {
             onToggle = {() => setIsRecruiting(prev => !prev)}
             />
           </div>
+          <div className="w-full h-full md:w-auto">
+            <CategoryFilter
+              value={category}
+              onChange={setCategory}
+              />
+          </div>
           <div className="w-full md:flex-1 md:max-w-md">
-            <SearchBar />
+            <SearchBar 
+              value={searchInput} 
+              onChange={setSearchInput}
+              onSubmit= {() => setSearchQuery(searchInput)} />
           </div>
         </div>
       </section>
       {/* 카드 리스트 */}
       <section className="my-8">
         { isLoading ? (
-          <div>
-            로딩 중...
+          <div className="flex justify-center items-center h-64">
+            <span className="animate-pulse text-gray-500 text-lg">로딩 중...</span>
           </div>
         ) : (
           <CardList 
