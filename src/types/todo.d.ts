@@ -1,11 +1,12 @@
 export type Check = {
   userId: string;
+  userNickname: string;
   checked: boolean;
 };
 
 export type Todo = {
   _id: string;
-  groupId: string;
+  studyId: string;
   date: string;
   task: string;
   checks: Check[];

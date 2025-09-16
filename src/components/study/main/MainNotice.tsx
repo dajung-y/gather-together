@@ -1,3 +1,5 @@
+"use client"
+
 import { useEffect, useState } from 'react';
 import { Notice } from '@/types/notice';
 import { Pen, Check, X } from 'lucide-react';
@@ -29,6 +31,7 @@ export default function MainNotice({ studyId, mainNotice }: MainNoticeProps) {
         console.error("저장 실패:", data.error);
         return;
       }
+
 
       setIsEditing(false);
       window.location.reload();
