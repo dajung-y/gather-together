@@ -31,3 +31,17 @@ export async function POST(req: Request) {
     );
   }
 }
+
+export async function GET(req: Request) {
+  const groupId = new URL(req.url).searchParams.get("groupId");
+  if (!groupId) return NextResponse.json({ error: "groupId 필요" }, { status: 400 });
+
+  const db = (await clientPromise).db();
+  const notices = await db
+    .collection("notices")
+    .find({ groupId })
+    .sort({ createdAt: -1 })
+    .toArray();
+
+  return NextResponse.json({ success: true, data: notices.map(n => ({ ...n, _id: n._id.toString() })) });
+}

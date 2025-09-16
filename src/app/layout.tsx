@@ -6,6 +6,7 @@ import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
 import Providers from "@/components/providers/SessionProvider";
 import FloatingButtons from "@/components/common/FloatingButtons";
+import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: "모여모여",
@@ -23,6 +24,10 @@ export default function RootLayout({
       <body>
         <Providers>
           <Header />
+          <Toaster
+            position="top-center"
+            reverseOrder={false}
+          />
           {children}
           <Footer />
           <FloatingButtons />
