@@ -2,11 +2,8 @@
 import TodoForm from "@/components/study/todo/TodoForm";
 import TodoList from "@/components/study/todo/TodoList";
 
-type TodoPageProps = {
-  params: { id: string };
-}
-
-export default function page({ params }: TodoPageProps) {
+export default async function page({ params }: { params: { id: string } }) {
+  const studyId = params.id;
 
   return (
     <>
@@ -17,11 +14,9 @@ export default function page({ params }: TodoPageProps) {
         md:px-6 md:py-3        
         lg:px-8 lg:py-4 
       ">
-        <TodoForm />
+        <TodoForm studyId={studyId} />
         {/* 일정 */}
-
-        <TodoList />
-
+        <TodoList studyId={studyId} />
       </div >
     </>
   )
