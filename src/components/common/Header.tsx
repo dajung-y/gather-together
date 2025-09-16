@@ -6,8 +6,12 @@ import Button from "./Button";
 import Link from "next/link";
 import LoginModal from "./LoginModal";
 import { signOut, useSession } from "next-auth/react";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
+
+  const router = useRouter();
 
   // NextAuth 세션 사용
   const {data: session, status} = useSession(); 
@@ -23,8 +27,10 @@ export default function Header() {
   }
 
   // 로그아웃 핸들러
-  const handleLogout = () => {
-    signOut({callbackUrl: '/'}); // NextAuth 로그 아웃
+  const handleLogout = async () => {
+    await signOut({redirect: false}); // NextAuth 로그 아웃
+    toast.success("로그아웃 되었습니다", { duration: 2000});
+    router.push('/');
   }
 
   // 로그인 성공 핸들러
