@@ -2,24 +2,30 @@
 import Button from "@/components/common/Button";
 import InputField from "@/components/common/form/InputField";
 import { useForm } from 'react-hook-form';
+import { useSession } from "next-auth/react";
+import { useStudyStore } from "@/store/study";
 
-export default function TodoForm() {
+export default function TodoForm({ studyId }: { studyId: string }) {
   const { register, control, handleSubmit, formState: { errors } } = useForm();
 
+  const { data: session } = useSession();
+  const { studyData } = useStudyStore();
+
   const onSubmit = async (data: any) => {
-    console.log('폼 데이터:', data);
     try {
-      const groupId = "1";
-      const userIds = ["u1", "u2", "u3", "u4"];
+      console.log(studyData);
+      const userIds = studyData?.members?.map(member => member.userId) || [];
+      const userNickname = studyData?.members?.map(member => member.nickname) || [];
 
       const res = await fetch("/api/todo", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          groupId,
+          studyId,
           date: data.todoDate,
           task: data.task,
-          userIds
+          userIds,
+          userNickname
         })
       });
 
@@ -28,34 +34,43 @@ export default function TodoForm() {
       if (!res.ok) {
         alert(`추가 실패: ${result.error || result.message}`);
       }
+      else {
+        window.location.reload();
+      }
     } catch (error: any) {
       alert(`추가 실패: ${error.message}`);
     }
   };
 
   return (
-    <div className="my-4" >
-      <p className="headline3 text-primary-500">할 일 추가</p>
+    <div className='my-4'>
+      <p className='headline3 text-primary-500'>할 일 추가</p>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="flex gap-2 my-2">
-          <InputField
-            name="todoDate"
-            type="date"
-            placeholder="날짜 선택"
-            register={register}
-            error={errors?.todoDate?.message as string}
+        <div className='flex gap-2 my-2 items-center'>
+          <input
+            type='date'
+            {...register('todoDate', { required: '날짜를 선택해주세요' })}
+            placeholder='날짜 선택'
+            className='border rounded px-2 py-1 border-gray-400'
           />
-          <InputField
-            name="task"
-            type="text"
-            placeholder="할 일 입력"
-            register={register}
-            error={errors?.task?.message as string}
+          {errors.todoDate && (
+            <span className='text-red-500 text-sm'>{errors.todoDate.message as string}</span>
+          )}
+
+          <input
+            type='text'
+            {...register('task', { required: '할 일을 입력해주세요' })}
+            placeholder='할 일 입력'
+            className='border rounded px-2 py-1 border-gray-400'
           />
-          <Button type="submit">추가</Button>
+          {errors.task && (
+            <span className='text-red-500 text-sm'>{errors.task.message as string}</span>
+          )}
+
+          <Button type='submit' className='text-center'>추가</Button>
         </div>
       </form>
-
     </div>
+
   )
 }
