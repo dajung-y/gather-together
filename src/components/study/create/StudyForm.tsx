@@ -8,31 +8,43 @@ import z from "zod";
 import { studyFormSchema } from "@/lib/validation/studyFormSchema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
 type FormData = z.infer<typeof studyFormSchema>;
 
-export default function StudyForm() {
+interface StudyFormProps {
+  defaultValues?: Partial<FormData>;
+}
+
+export default function StudyForm({defaultValues}: StudyFormProps) {
   const {register, handleSubmit, control, formState: {errors}} = useForm<FormData>({
     resolver: zodResolver(studyFormSchema),
     defaultValues:{
-      weekdays: []
+      weekdays: [],
+      ...defaultValues,
     }
   });
 
   const router = useRouter();
+  const pathname = usePathname();
+  const isEdit = pathname.includes('/edit');
 
   const handleCancel = () => {
-    alert("글 작성을 취소하시겠습니까?");
-    router.push('/');
+    // 수정페이지
+    if(isEdit){
+      router.push(`study/${pathname.split("/")[2]}/about`); // 상세페이지로 이동
+    } else {
+      router.push('/');
+    }
   }
 
+  // 메소드에 따라 POST, PUT
   const onSubmit = async (data: FormData) => {
     console.log("입력정보 저장: " ,data);
     try{
-      const res = await fetch('/api/study', {
-        method: "POST",
+      const res = await fetch(isEdit ? `/api/study/${pathname.split("/")[2]}` : '/api/study', {
+        method: isEdit ? "PUT" : "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify(data)
       });
@@ -41,16 +53,16 @@ export default function StudyForm() {
 
       if(res.ok && result.success) {
         // toast 알람
-        toast.success("스터디가 생성되었습니다!", {duration:1500});
+        toast.success(isEdit ? "스터디가 수정되었습니다!" : "스터디가 생성되었습니다!", {duration:1500});
         setTimeout(() => {
-          router.push(`/study/${result.studyId}/about`);
+          router.push(`/study/${result.studyId || pathname.split("/")[2]}/about`);
         }, 1500);
       } else {
-        alert(result.error || "스터디 생성 중 오류가 발생했습니다");
+        alert(result.error || "오류가 발생했습니다");
       }
     } catch(err) {
       console.error(err);
-      alert("스터디 생성 중 오류가 발생했습니다");
+      alert("오류가 발생했습니다");
     }
   };
 
@@ -92,7 +104,7 @@ export default function StudyForm() {
                   className="w-full"
                   type="submit"
                   >
-            등록
+            { isEdit ? "수정" : "등록"}
           </Button>    
         </div>
       </div>

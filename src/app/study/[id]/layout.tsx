@@ -29,7 +29,7 @@ const menuItems: MenuItem[] = [
 
 export default function Layout({ children }: { children: React.ReactNode; }) {
   const pathname = usePathname();
-  const hideSidebar = pathname.includes('/about');
+  const hideSidebar = pathname.includes('/about') || pathname.includes('/edit');
   return (
     <div>
       {!hideSidebar && (
