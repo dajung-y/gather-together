@@ -39,7 +39,7 @@ export default function Header() {
 
   return(
     <>
-      <header className="bg-white shadow">
+      <header className="bg-white shadow sticky top-0 z-50">
         {/* 실제 헤더 body 보일 영역 PC, 태블릿, 모바일 */}
         <div className="
           max-w-[1280px] mx-auto 

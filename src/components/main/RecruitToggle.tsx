@@ -14,7 +14,7 @@ export default function RecruitToggle ({isRecruiting, onToggle} : RecruitToggleP
         size="md"
         variant={isRecruiting ? "primary" : "outline"}
         onClick={onToggle}>
-          모집중만 보기
+          { isRecruiting? "모집중만 보기" : "모집마감"}
         </Button>
     </div>
   )
