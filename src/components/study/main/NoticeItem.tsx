@@ -1,8 +1,10 @@
 "use client"
 import { useState } from "react";
 import { Pen, Trash } from 'lucide-react';
+import { Notice } from "@/types/notice";
 
-export default function Notice() {
+
+export default function NoticeItem() {
   const [showDetail, setShowDetail] = useState(false);
 
   return (
