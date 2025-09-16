@@ -1,5 +1,6 @@
 export type Notice = {
-  groupId: string;
+  _id?: string;
+  studyId: string;
   title: string;
   content: string;
   createdAt: Date;

@@ -9,13 +9,13 @@ export async function GET(req: Request) {
     const db = client.db();
 
     const url = new URL(req.url);
-    const groupId = url.searchParams.get("groupId");
+    const studyId = url.searchParams.get("studyId");
 
-    if (!groupId) {
-      return NextResponse.json({ success: false, error: "groupId 필요" }, { status: 400 });
+    if (!studyId) {
+      return NextResponse.json({ success: false, error: "studyId 필요" }, { status: 400 });
     }
 
-    const todos = await db.collection("todos").find({ groupId }).toArray();
+    const todos = await db.collection("todos").find({ studyId }).toArray();
 
     console.log("가져온 투두" + todos);
 
@@ -34,15 +34,15 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { groupId, date, task, userIds } = body;
+    const { studyId, date, task, userIds, userNickname } = body;
 
     const client = await clientPromise;
     const db = client.db();
 
-    const checks: Check[] = userIds.map((id: string) => ({ userId: id, checked: false }))
+    const checks: Check[] = userIds.map((id: string) => ({ userId: id, userNickname: userNickname, checked: false }))
 
     const todoData = {
-      groupId,
+      studyId,
       date,
       task,
       checks,
