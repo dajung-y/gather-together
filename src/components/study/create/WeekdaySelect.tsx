@@ -71,15 +71,6 @@ export default function WeekdaySelect({
           </span>
         )
       }
-
-      {/* 에러 메세지 */}
-      {
-        error && (
-          <span className="block my-1 caption text-red-500">
-            {error}
-          </span>
-        )
-      }
     </div>
   )
 }

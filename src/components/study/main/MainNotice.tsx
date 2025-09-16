@@ -1,24 +1,46 @@
-"use client"
-
+import { useEffect, useState } from 'react';
+import { Notice } from '@/types/notice';
 import { Pen, Check, X } from 'lucide-react';
-import { useState } from 'react';
 
-export default function MainNotice() {
-  const [mainNotice, setMainNotice] = useState("");
+type MainNoticeProps = {
+  studyId: string;
+  mainNotice?: Notice;
+};
+
+export default function MainNotice({ studyId, mainNotice }: MainNoticeProps) {
   const [tempNotice, setTempNotice] = useState("");
   const [isEditing, setIsEditing] = useState(false);
 
-  const handleSave = () => {
-    setMainNotice(tempNotice);
-    setIsEditing(false);
+  // mainNotice 바뀔 때 tempNotice 초기화
+  useEffect(() => {
+    setTempNotice(mainNotice?.content || "");
+  }, [mainNotice]);
+
+  const handleSave = async () => {
+    try {
+      const res = await fetch(`/api/study/${studyId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: "메인 공지", content: tempNotice }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        console.error("저장 실패:", data.error);
+        return;
+      }
+
+      setIsEditing(false);
+      window.location.reload();
+    } catch (error) {
+      console.error("저장 중 오류 발생:", error);
+    }
   };
 
   const handleCancel = () => {
-    setTempNotice(mainNotice); // 원래대로 복원
+    setTempNotice(mainNotice?.content || "");
     setIsEditing(false);
   };
-
-  const testNotice = "안녕하세요, 스터디 그룹 여러분.\n이번 주 모임에 대해 안내드립니다.\n이번 모임은 토요일 오후 2시에 강남역 인근 카페에서 진행될 예정입니다."
 
   return (
     <div className="flex-1 flex gap-8">
@@ -26,29 +48,30 @@ export default function MainNotice() {
         {isEditing ? (
           <div>
             <div className="flex">
-              <p className="headline2 text-primary-500 mb-4 ">수정 중...</p>
-              <div className='flex ml-auto gap-8'>
+              <p className="headline2 text-primary-500 mb-4">수정 중...</p>
+              <div className="flex ml-auto gap-8">
                 <Check size={20} onClick={handleSave} />
-                <X size={20} onClick={handleSave} />
+                <X size={20} onClick={handleCancel} />
               </div>
-
-
             </div>
             <textarea
               value={tempNotice}
               onChange={(e) => setTempNotice(e.target.value)}
-              className="w-full h-60 resize-none p-4" />
+              className="w-full h-60 resize-none p-4"
+            />
           </div>
         ) : (
           <div>
             <div className="flex">
-              <p className="headline2 text-primary-500 mb-4 ">메인 공지</p>
+              <p className="headline2 text-primary-500 mb-4">메인 공지</p>
               <Pen size={20} className="ml-auto" onClick={() => setIsEditing(true)} />
             </div>
-            <p className="whitespace-pre-line">{mainNotice}</p>
+            <p className="whitespace-pre-line">
+              {mainNotice?.content || "공지를 작성해주세요!"}
+            </p>
           </div>
         )}
       </div>
     </div>
-  )
+  );
 }

@@ -32,8 +32,8 @@ export default function Layout({ children }: { children: React.ReactNode; }) {
   const hideSidebar = pathname.includes('/about');
   return (
     <div>
-      { !hideSidebar && (
-        <div className="fixed top-20 left-0">
+      {!hideSidebar && (
+        <div className="fixed top-2 left-0 z-[100]">
           {/* 아래 수정필요! */}
           <Sidebar title="1일 1영어" menuItems={menuItems} />
         </div>

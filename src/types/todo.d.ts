@@ -4,6 +4,7 @@ export type Check = {
 };
 
 export type Todo = {
+  _id: string;
   groupId: string;
   date: string;
   task: string;

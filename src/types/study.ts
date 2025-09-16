@@ -1,4 +1,5 @@
 import { ObjectId } from "mongodb";
+import { Notice } from "./notice";
 
 export interface Study {
   _id: string | ObjectId;
@@ -22,6 +23,11 @@ export interface Study {
     nickname: string;
     role: string;
     joinedAt: Date;
+    attendance?: {
+      present: number;   // 출석
+      late: number;      // 지각
+      absent: number;    // 결석
+    };
   }[];
   applicants: {
     userId: string;
@@ -30,4 +36,12 @@ export interface Study {
     status: "pending" | "approved" | "rejected" | "canceled";
     createdAt: Date;
   }[];
+  mainNotice?: Notice;
+}
+
+export interface StudyData extends Study {
+  description: string;
+  weekdays: string[];
+  createdAt: Date;
+  updatedAt?: Date;
 }
