@@ -23,7 +23,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div>
       {!hideSidebar && (
-        <div className="fixed top-2 left-0 z-[100]">
+        <div className="flex justify-center 2xl:fixed 2xl:top-20 2xl:left-0 z-[100]">
           <Sidebar title={`Study Room`} menuItems={menuItems} />
         </div>
       )}
