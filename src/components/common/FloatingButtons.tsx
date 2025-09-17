@@ -75,7 +75,7 @@ export default function FloatingButtons() {
               w-10 h-10
               md:w-12 md:h-12
               bg-primary-50 shadow-md rounded-full
-              flex items-center justify-between
+              flex items-center justify-between cursor-pointer
             ">
               <ChevronUp 
                 className="w-full h-full p-2 text-primary-700"/>
@@ -91,7 +91,7 @@ export default function FloatingButtons() {
               p-2
               md:text-lg md: px-4
               bg-primary-500 text-white
-              rounded-4xl border-2 border-white shadow-md
+              rounded-4xl border-2 border-white shadow-md cursor-pointer
           ">
             스터디 만들기
           </button>

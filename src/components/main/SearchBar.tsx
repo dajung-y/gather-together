@@ -37,7 +37,7 @@ export default function SearchBar({
         <button 
           type='button'
           onClick={handleClear}
-          className='flex items-center justify-between p-1 bg-primary-50'>
+          className='flex items-center justify-between p-1 bg-primary-50 cursor-pointer'>
           <X className='p-1 bg-gray-400 rounded-full w-5 h-5'/>
         </button>
       )}
