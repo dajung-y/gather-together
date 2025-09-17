@@ -1,12 +1,26 @@
 "use client"
+import { useStudyStore } from '@/store/study';
+import { StudyData } from '@/types/study';
 import { Todo } from '@/types/todo';
 import { useEffect, useState } from 'react';
 
-export default function TodoList() {
+export default function TodoList({ studyId }: { studyId: string }) {
   const [todos, setTodos] = useState<Todo[]>([]);
+  const { studyData, setStudyData } = useStudyStore();
 
+  //스터디 데이터
   useEffect(() => {
-    fetch(`/api/todo?groupId=1`, { cache: "no-store" })
+    if (!studyData || studyData._id !== studyId) {
+      fetch(`/api/study/${studyId}`)
+        .then((res) => res.json())
+        .then((data: StudyData) => setStudyData(data))
+        .catch((err) => console.error(err));
+    }
+  }, [studyId]);
+
+  //todo 데이터
+  useEffect(() => {
+    fetch(`/api/todo?studyId=${studyId}`, { cache: "no-store" })
       .then((res) => res.json())
       .then((result) => setTodos(result.data));
   }, []);
@@ -43,9 +57,9 @@ export default function TodoList() {
         </div>
 
         <div className="flex">
-          {todos[0]?.checks?.map((user, index) => (
-            <div key={index} className="flex w-20 justify-center">
-              <span>{user.userId}</span>
+          {todos[0]?.checks?.map((user) => (
+            <div key={user.userId} className="flex w-30 justify-center">
+              <span>{user.userNickname}</span>
             </div>
           ))}
         </div>
@@ -62,7 +76,7 @@ export default function TodoList() {
           {/* 오른쪽 체크박스 영역 */}
           <div className="flex">
             {todo.checks.map((check, checkIndex) => (
-              <div key={checkIndex} className="flex w-20 justify-center">
+              <div key={checkIndex} className="flex w-30 justify-center">
                 <input
                   type="checkbox"
                   checked={check.checked}

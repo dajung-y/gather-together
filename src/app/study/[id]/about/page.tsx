@@ -1,11 +1,14 @@
 // app/study/[id]/about/page.tsx
 // 스터디 상세페이지
 
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import BackButton from "@/components/study/about/BackButton";
+import DropdownMenu from "@/components/study/about/DropdownMenu";
 import JoinButton from "@/components/study/about/JoinButton";
 import clientPromise from "@/lib/mongodb";
 import { getCategoryLabel } from "@/utils/category";
 import { ObjectId } from "mongodb";
+import { getServerSession } from "next-auth";
 
 interface PageProps{
   params: {id: string}
@@ -38,7 +41,12 @@ interface Study {
 }
 
 
-export default async function page({params}: PageProps) {
+export default async function Page({params}: PageProps) {
+
+  const session = await getServerSession(authOptions);
+
+  console.log("params: ",params);
+  const studyId = params.id;
 
   // mongoDB 연결
   const client = await clientPromise;
@@ -46,8 +54,11 @@ export default async function page({params}: PageProps) {
 
   // study 문서 가져오기
   const studyDoc = await db.collection<Study>('studies').findOne({
-    _id: new ObjectId(params.id)  // 문자열 -> Object로 변환
+    _id: new ObjectId(studyId)  // 문자열 -> Object로 변환
   })
+
+  const creatorId = studyDoc?.creator.userId;
+  const isCreator = session?.user.id === creatorId;
 
   if(!studyDoc){
     return (
@@ -97,14 +108,19 @@ export default async function page({params}: PageProps) {
           </h1>
           
           {/* 작성자 정보 */}
-          <div className="flex items-center gap-2 text-gray-500">
-            <span className="body-sb text-gray-700">{studyData.creator.nickname}</span>
-            <span>|</span>
-            { studyData.updatedAt ? (
-              <span>{formatDateTime(studyData.updatedAt)} (수정됨)</span>
-            ) : (
-              <span>{formatDateTime(studyData.createdAt)}</span>
-            )}
+          <div className="flex items-center justify-between text-gray-500">
+            <div className="space-x-2">
+              <span className="body-sb text-gray-700">{studyData.creator.nickname}</span>
+              <span>|</span>
+              { studyData.updatedAt ? (
+                <span>{formatDateTime(studyData.updatedAt)} (수정됨)</span>
+              ) : (
+                <span>{formatDateTime(studyData.createdAt)}</span>
+              )}
+            </div>
+            <div>
+              { isCreator && <DropdownMenu params={studyData._id.toString()} />}
+            </div>
           </div>
         </section>
 
