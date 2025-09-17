@@ -8,7 +8,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const params = useParams();
   const studyId = params?.id;
 
-  const hideSidebar = pathname.includes('/about');
+  const hideSidebar = pathname.includes('/about') || pathname.includes('/edit');
 
   const menuItems: MenuItem[] = [
     // 링크 이동

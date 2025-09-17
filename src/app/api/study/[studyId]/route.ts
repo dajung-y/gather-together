@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import clientPromise from "@/lib/mongodb";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { Notice } from "@/types/notice";
 
 export async function GET(
@@ -46,4 +46,31 @@ export async function PATCH(
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
+}
+
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: {studyId : string }}
+) {
+    try{
+      const data = await request.json();
+      const client = await clientPromise;
+      const db = client.db();
+
+      const result = await db.collection("studies").updateOne(
+        { _id: new ObjectId(params.studyId)},
+        { $set: { ...data, updatedAt: new Date(),}}
+      );
+
+      if(result.matchedCount === 0) {
+        return NextResponse.json({ error: "해당 스터디 없음 "}, { status: 404});
+      }
+
+      return NextResponse.json({
+        success: true,
+        studyId: params.studyId
+      });
+    } catch(err: any) {
+      return NextResponse.json({ error: err.message }, { status: 500 });
+    }
 }
