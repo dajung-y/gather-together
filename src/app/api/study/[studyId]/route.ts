@@ -7,6 +7,8 @@ export async function GET(
   req: Request,
   { params }: { params: { studyId: string } }
 ) {
+  // 콘솔로 캐싱처리 되는지 확인
+
   try {
     const client = await clientPromise;
     const db = client.db();

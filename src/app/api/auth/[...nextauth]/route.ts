@@ -5,6 +5,13 @@ import GoogleProvider from 'next-auth/providers/google'
 import { MongoDBAdapter } from '@auth/mongodb-adapter'
 import clientPromise from '@/lib/mongodb';
 import { User } from 'next-auth';
+import { MongoClient } from 'mongodb';
+
+// db 커넥션은 한번만
+let dbClient: MongoClient | undefined ;
+( async ()  => {
+  dbClient = await clientPromise;
+})();
 
 export const authOptions = {
   adapter: {
@@ -13,8 +20,13 @@ export const authOptions = {
     async createUser(user: any) {
       console.log("새 사용자 생성: ",user.email);
       
-      const client = await clientPromise;
-      const db = client.db();
+      // const client = await clientPromise;
+      if(!dbClient) {
+        console.error("db 연결 오류");
+        return;
+      }
+      // const db = client.db();
+      const db = dbClient.db();
 
       const userWithNickname = {
         ...user,

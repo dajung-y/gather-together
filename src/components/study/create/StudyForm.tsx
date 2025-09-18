@@ -10,6 +10,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { usePathname, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { useState } from "react";
+import AlertModal from "@/components/common/AlertModal";
 
 type FormData = z.infer<typeof studyFormSchema>;
 
@@ -29,14 +31,18 @@ export default function StudyForm({defaultValues}: StudyFormProps) {
   const router = useRouter();
   const pathname = usePathname();
   const isEdit = pathname.includes('/edit');
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+  const handleConfirm = () => {
+    if(isEdit){
+      router.push(`/study/${pathname.split("/")[2]}/about`); // 상세페이지로 이동
+    } else {
+      router.push('/'); // 메인페이지로 이동
+    }
+  }
 
   const handleCancel = () => {
-    // 수정페이지
-    if(isEdit){
-      router.push(`study/${pathname.split("/")[2]}/about`); // 상세페이지로 이동
-    } else {
-      router.push('/');
-    }
+    setIsModalOpen(true);
   }
 
   // 메소드에 따라 POST, PUT
@@ -67,47 +73,56 @@ export default function StudyForm({defaultValues}: StudyFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <StudyOperationSection 
-        register={register}
-        control={control}
-        errors={{
-          category: errors.category?.message,
-          capacity: errors.capacity?.message,
-          startDate: errors.startDate?.message,
-          endDate: errors.endDate?.message,
-          startTime: errors.startTime?.message,
-          endTime: errors.endTime?.message,
-          weekdays: errors.weekdays?.message,
-          studyName: errors.studyName?.message,
-        }}  
-      />
-      <StudyIntroductionSection
-        register={register}
-        errors={{
-          title: errors.title?.message,
-          description:errors.description?.message
-        }}
-      />
-      {/* 취소, 등록 */}
-      <div className="flex justify-center mt-12 mb-8 w-full">
-        <div className="flex justify-center w-1/2 md:w-1/3 gap-4">
-        
-          <Button size="md"
-                  variant="outline"
-                  className="w-full"
-                  onClick={handleCancel}
-                  >
-            취소
-          </Button>
-          <Button size="md"
-                  className="w-full"
-                  type="submit"
-                  >
-            { isEdit ? "수정" : "등록"}
-          </Button>    
+    <>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <StudyOperationSection 
+          register={register}
+          control={control}
+          errors={{
+            category: errors.category?.message,
+            capacity: errors.capacity?.message,
+            startDate: errors.startDate?.message,
+            endDate: errors.endDate?.message,
+            startTime: errors.startTime?.message,
+            endTime: errors.endTime?.message,
+            weekdays: errors.weekdays?.message,
+            studyName: errors.studyName?.message,
+          }}  
+        />
+        <StudyIntroductionSection
+          register={register}
+          errors={{
+            title: errors.title?.message,
+            description:errors.description?.message
+          }}
+        />
+        {/* 취소, 등록 */}
+        <div className="flex justify-center mt-12 mb-8 w-full">
+          <div className="flex justify-center w-1/2 md:w-1/3 gap-4">
+          
+            <Button size="md"
+                    variant="outline"
+                    className="w-full"
+                    onClick={handleCancel}
+                    >
+              취소
+            </Button>
+            <Button size="md"
+                    className="w-full"
+                    type="submit"
+                    >
+              { isEdit ? "수정" : "등록"}
+            </Button>    
+          </div>
         </div>
-      </div>
-    </form>
+      </form>
+      <AlertModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={isEdit? "글 수정을 취소하시겠습니까?" : "글 작성을 취소하시겠습니까?"}
+        subtitle="작성중인 내용은 저장되지 않습니다"
+        onConfirm={handleConfirm}
+        />
+    </>
   )
 }
