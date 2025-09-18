@@ -27,7 +27,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <Sidebar title={`Study Room`} menuItems={menuItems} />
         </div>
       )}
-      <div>{children}</div>
+      <div className="min-h-screen">{children}</div>
     </div>
   );
 }

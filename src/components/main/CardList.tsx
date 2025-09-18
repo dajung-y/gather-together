@@ -19,7 +19,7 @@ export default function CardList ({studies}: CardListProps) {
         <article key={study._id.toString()}
                  className='flex justify-center w-full h-full items-stretch'>
           <StudyCard 
-            variant={study.isRecruiting ? "mainOpen" : "memberClosed"}
+            variant={study.isRecruiting ? "mainOpen" : "mainClosed"}
             studyId={study._id.toString()}
             name={study.studyName}
             title={study.title}

@@ -2,7 +2,7 @@ import z from "zod";
 
 export const studyFormSchema = z.object({
   category: z.string().nonempty("카테고리를 선택하세요"),
-  capacity: z.string().nonempty("모집인원을 선택하세요"),
+  capacity: z.coerce.number().min(2, "모집인원을 선택하세요"),
   startDate: z.string().nonempty("시작일을 선택하세요"),
   endDate: z.string().nonempty("종료일을 선택하세요"),
   startTime: z.string().nonempty("시작시간을 선택하세요"),

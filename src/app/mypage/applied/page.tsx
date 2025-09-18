@@ -76,7 +76,7 @@ export default function Page() {
             tag: s.category,
         };
     };
-
+  
     useEffect(() => {
         (async () => {
             setLoading(true);
@@ -141,7 +141,7 @@ export default function Page() {
 
                     {!loading && !error && (
                         <>
-                            {/* 승인완료 */}
+                          {/* 승인완료 */}
                             <div>
                                 <h1 className="text-lg sm:text-xl mb-2">승인완료</h1>
                                 <hr className="mt-2 mb-4 sm:mb-6 w-full border-t border-gray-300" />

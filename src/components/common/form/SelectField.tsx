@@ -8,7 +8,7 @@ interface SelectOption {
   label: string;
 }
 
-interface SelectFieldProps {
+interface SelectFieldProps<T> {
   label?: string;
   name: string;
   options: SelectOption[];
@@ -18,7 +18,7 @@ interface SelectFieldProps {
   className?: string;
 }
 
-export default function SelectField({
+export default function SelectField<T>({
   label,
   name,
   options,
@@ -26,7 +26,7 @@ export default function SelectField({
   register,
   error,
   className = ''
-}: SelectFieldProps){
+}: SelectFieldProps<T>){
   return(
     <div className={`space-y-2 ${className}`}>
       {/* 라벨 표기 */}

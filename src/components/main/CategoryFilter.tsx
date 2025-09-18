@@ -29,7 +29,7 @@ export default function CategoryFilter({
     <select
       value={value}
       onChange={(e) => onChange?.(e.target.value)}
-      className="px-2 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500">
+      className="px-2 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 cursor-pointer">
         <option value="">카테고리 전체</option>
         {categoryOptions.map((c) => (
           <option key={c.value} value={c.value}>

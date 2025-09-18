@@ -8,7 +8,7 @@ export default function BackButton() {
     router.push('/');
   }
   return (
-    <button className='flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100'
+    <button className='flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100 cursor-pointer'
             onClick={handleBack}>
       <ChevronLeft className='w-full h-full text-primary-700' />
     </button>

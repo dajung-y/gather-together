@@ -8,7 +8,7 @@ export interface Study {
   startDate: string;
   endDate: string;
   startTime: string;
-  endTime?: string;
+  endTime: string;
   capacity: number;
   currentMembers: number;
   category: string;
@@ -23,11 +23,6 @@ export interface Study {
     nickname: string;
     role: string;
     joinedAt: Date;
-    attendance?: {
-      present: number;   // 출석
-      late: number;      // 지각
-      absent: number;    // 결석
-    };
   }[];
   applicants: {
     userId: string;
@@ -44,4 +39,14 @@ export interface StudyData extends Study {
   weekdays: string[];
   createdAt: Date;
   updatedAt?: Date;
+}
+
+export type Attendance = {
+  _id: string;
+  studyId: string;
+  userId: string;
+  lastAttendance: Date; //마지막 출석일
+  present: number;   // 출석
+  late: number;      // 지각
+  absent: number;    // 결석
 }

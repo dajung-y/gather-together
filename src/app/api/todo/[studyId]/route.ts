@@ -1,23 +1,21 @@
 import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 import { Check, Todo } from "@/types/todo";
+import { ObjectId } from "mongodb";
 
 
-export async function GET(req: Request) {
+export async function GET(
+  req: Request,
+  { params }: { params: { studyId: string } }
+) {
   try {
     const client = await clientPromise;
     const db = client.db();
 
-    const url = new URL(req.url);
-    const studyId = url.searchParams.get("studyId");
-
-    if (!studyId) {
-      return NextResponse.json({ success: false, error: "studyId 필요" }, { status: 400 });
-    }
-
+    const { studyId } = await params;
     const todos = await db.collection("todos").find({ studyId }).toArray();
 
-    console.log("가져온 투두" + todos);
+    console.log("가져온 투두", todos);
 
     return NextResponse.json(
       { success: true, data: todos },
@@ -34,12 +32,19 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { studyId, date, task, userIds, userNickname } = body;
+    const { studyId, date, task } = body;
 
     const client = await clientPromise;
     const db = client.db();
 
-    const checks: Check[] = userIds.map((id: string) => ({ userId: id, userNickname: userNickname, checked: false }))
+    const study = await db.collection("studies").findOne({ _id: new ObjectId(studyId) });
+    if (!study) return NextResponse.json({ error: "스터디 없음" }, { status: 404 });
+
+    const checks = study.members.map((m: any) => ({
+      userId: m.userId,
+      userNickname: m.nickname,
+      checked: false
+    }));
 
     const todoData = {
       studyId,
