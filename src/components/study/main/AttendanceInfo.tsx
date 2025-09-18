@@ -70,8 +70,9 @@ export default function AttendanceInfo({
             </span>
           </div>
           <div className="flex flex-col">
-            <span className=" text-gray-400">참여일수</span>
-            <span className=" text-status-info">1/{count}</span>
+            <span className=" text-gray-400">일수</span>
+            <span className=" text-status-info">{
+              attendance.present + attendance.late + attendance.absent} /{count}</span>
           </div>
         </div>
         <div className="flex">
