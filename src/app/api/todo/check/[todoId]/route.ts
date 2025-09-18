@@ -7,23 +7,29 @@ import clientPromise from "@/lib/mongodb";
 export async function PATCH(req: Request, { params }: { params: { todoId: string } }) {
   try {
     const session = await getServerSession(authOptions);
-    console.log("세션" + session);
     if (!session?.user?.id) {
       console.log("유저 아이디필요");
-
       return NextResponse.json({ error: "로그인 필요" }, { status: 401 });
     } else {
       console.log("유저 아이디" + session.user.id);
     }
-
+    const userId = String(session.user.id);
+    const { todoId } = await params;
     const { checked } = await req.json();
-    if (typeof checked !== "boolean") return NextResponse.json({ error: "checked 필요" }, { status: 400 });
+    console.log("유저 아이디: " + session.user.id);
 
-    const db = (await clientPromise).db();
+    console.log("투두 체크: " + checked);
+    if (typeof checked !== "boolean") {
+      return NextResponse.json({ error: "checked 필요" }, { status: 400 });
+    }
+
+    const client = await clientPromise;
+    const db = client.db();
+
     const result = await db.collection("todos").updateOne(
-      { _id: new ObjectId(params.todoId) },
-      { $set: { "checks.$[c].checked": checked, updatedAt: new Date() } },
-      { arrayFilters: [{ "c.userId": session.user.id }] }
+      { _id: new ObjectId(todoId) },
+      { $set: { "checks.$[c].checked": checked } },
+      { arrayFilters: [{ "c.userId": userId }] }
     );
 
     return NextResponse.json({ success: result.modifiedCount > 0 });

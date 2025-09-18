@@ -1,21 +1,13 @@
-
-import Button from "@/components/common/Button";
 import Attendance from "@/components/study/main/Attendance";
 import AttendanceInfo from "@/components/study/main/AttendanceInfo";
 import MainNotice from "@/components/study/main/MainNotice";
 import NoticeForm from "@/components/study/main/NoticeForm";
 import NoticeList from "@/components/study/main/NoticeList";
-import { useStudyStore } from "@/store/study";
 import { Notice } from "@/types/notice";
 import { StudyData } from "@/types/study";
-import { formatDate, getNextStudyDate } from "@/utils/date";
-import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
 
 export default async function page({ params }: { params: { id: string } }) {
-  const studyId = params.id;
-
-  console.log("studyId:", studyId);
+  const studyId = await params.id;
 
   const studyRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/study/${studyId}`);
   if (!studyRes.ok) {
@@ -30,12 +22,7 @@ export default async function page({ params }: { params: { id: string } }) {
   const data: { data: Notice[] } = await noticeRes.json();
   const notices = data.data;
 
-
   if (!studyData) return <p>Loading...</p>;
-
-  const nextDate = getNextStudyDate(studyData.startDate, studyData.endDate, studyData.weekdays);
-
-
 
   return (
     <>
