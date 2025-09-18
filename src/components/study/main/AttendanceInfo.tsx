@@ -64,15 +64,18 @@ export default function AttendanceInfo({
             <span className=" text-gray-400">요일</span>
             <span className="">
               {labels.map((label, index) => (
-                <span key={index}>{label}, </span>
+                <span key={index}>
+                  {label}
+                  {index < labels.length - 1 ? ", " : ""}
+                </span>
               ))}
-
             </span>
           </div>
           <div className="flex flex-col">
             <span className=" text-gray-400">일수</span>
             <span className=" text-status-info">{
-              attendance.present + attendance.late + attendance.absent} /{count}</span>
+              attendance ?
+                (attendance.present + attendance.late + attendance.absent) : 0} /{count}</span>
           </div>
         </div>
         <div className="flex">

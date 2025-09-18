@@ -53,7 +53,7 @@ const getCapacity = (s: any) =>
 const getCategory = (s: any) => String(s?.category ?? "");
 
 export default function Page() {
-    const { data: session, status } = useSession(); // ✅ 세션에서 user.id 사용
+    const { data: session, status } = useSession();
     const [isNickOpen, setIsNickOpen] = useState(false);
     const [active, setActive] = useState<"open" | "closed">("open");
     const [data, setData] = useState<SplitResp>({ recruiting: [], completed: [] });
@@ -68,7 +68,7 @@ export default function Page() {
         { label: "닉네임 변경", onClick: () => setIsNickOpen(true) },
     ];
 
-    const mapToCard = (s: any): CardDTO => {
+     const mapToCard = (s: any): CardDTO => {
         const status = getStatus(s);
         const variant = status === "RECRUITING" ? ("leaderOpen" as const) : ("leaderClosed" as const);
 
@@ -369,3 +369,4 @@ function NicknameForm({ onClose }: { onClose: () => void }) {
         </form>
     );
 }
+
