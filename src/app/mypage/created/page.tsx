@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 import StudyCard from "@/components/common/StudyCard";
 import Sidebar from "@/components/common/Sidebar";
 import Modal from "@/components/common/Modal";
@@ -25,6 +26,7 @@ type CardDTO = {
     currentMembers: number;
     maxMembers: number;
     tag: string;
+    isRecruiting?: boolean;
     applicants?: Applicant[];
 };
 
@@ -51,6 +53,7 @@ const getCapacity = (s: any) =>
 const getCategory = (s: any) => String(s?.category ?? "");
 
 export default function Page() {
+    const { data: session, status } = useSession(); // ✅ 세션에서 user.id 사용
     const [isNickOpen, setIsNickOpen] = useState(false);
     const [active, setActive] = useState<"open" | "closed">("open");
     const [data, setData] = useState<SplitResp>({ recruiting: [], completed: [] });
@@ -83,27 +86,38 @@ export default function Page() {
             currentMembers: getCurrentMembers(s),
             maxMembers: getCapacity(s),
             tag: getCategory(s),
-            // applicants: s.applicants?.map(...)
+            isRecruiting: status === "RECRUITING",
+            // applicants: s.applicants?.map()
         };
     };
 
-    const fetchData = async () => {
+    const fetchData = async (creatorId: string) => {
         setLoading(true);
         setError(null);
         try {
+            const qsOpen = new URLSearchParams({
+                isRecruiting: "true",
+                creatorId,
+            }).toString();
+
+            const qsClosed = new URLSearchParams({
+                isRecruiting: "false",
+                creatorId,
+            }).toString();
+
             const [openRes, closedRes] = await Promise.all([
-                fetch("/api/mypage/groups?isRecruiting=true", { cache: "no-store" }),
-                fetch("/api/mypage/groups?isRecruiting=false", { cache: "no-store" }),
+                fetch(`/api/mypage/groups?${qsOpen}`, { cache: "no-store", credentials: "include" }),
+                fetch(`/api/mypage/groups?${qsClosed}`, { cache: "no-store", credentials: "include" }),
             ]);
 
             if (!openRes.ok) {
                 const t = await openRes.text().catch(() => "");
-                console.error("OPEN /api/mypage/groups error:", openRes.status, t);
+                console.error("OPEN /api/group error:", openRes.status, t);
                 throw new Error(`API error(open): ${openRes.status}`);
             }
             if (!closedRes.ok) {
                 const t = await closedRes.text().catch(() => "");
-                console.error("CLOSED /api/mypage/groups error:", closedRes.status, t);
+                console.error("CLOSED /api/group error:", closedRes.status, t);
                 throw new Error(`API error(closed): ${closedRes.status}`);
             }
 
@@ -112,7 +126,7 @@ export default function Page() {
 
             setData({
                 recruiting: pickList(openJson).map(mapToCard),
-                completed:  pickList(closedJson).map(mapToCard),
+                completed: pickList(closedJson).map(mapToCard),
             });
         } catch (e) {
             const msg = e instanceof Error ? e.message : "데이터 로드 실패";
@@ -122,14 +136,20 @@ export default function Page() {
         }
     };
 
-
     useEffect(() => {
-        fetchData();
-    }, []);
+        if (status === "loading") return;
+        const userId = (session as any)?.user?.id;
+        if (!userId) {
+            setLoading(false);
+            setError(null);
+            setData({ recruiting: [], completed: [] });
+            return;
+        }
+        fetchData(userId);
+    }, [status, session?.user?.id]);
 
-    // 승인 거절 로직 필요
-
-   const toCardProps = (c: CardDTO) => ({
+    const toCardProps = (c: CardDTO) => ({
+        studyId: c.id,
         variant: c.variant,
         name: c.name,
         title: c.title,
@@ -139,6 +159,7 @@ export default function Page() {
         currentMembers: c.currentMembers,
         maxMembers: c.maxMembers,
         tag: c.tag,
+        isRecruiting: c.isRecruiting,
     });
 
     const list = active === "open" ? data.recruiting : data.completed;
@@ -176,79 +197,68 @@ export default function Page() {
                         {loading && <p>불러오는 중...</p>}
                         {error && <p className="text-red-500">에러: {error}</p>}
 
-                        {/* 모집중 */}
-                        {!loading && !error && active === "open" ? (
-                            <div className="mt-4 md:mt-6 space-y-4 md:space-y-6 mb-10">
-                                {list.map((c) => {
-                                    const applicants = c.applicants ?? [];
-                                    return (
-                                        <div
-                                            key={`recruiting-${c.id}`}
-                                            className="border border-gray-300 rounded-lg p-4 bg-white
-                                 flex flex-col lg:flex-row items-start lg:items-stretch
-                                 gap-4 lg:gap-8"
-                                        >
-                                            <div className="w-full lg:w-[clamp(240px,35%,320px)]">
-                                                <StudyCard {...toCardProps(c)} />
-                                            </div>
+                        {/* 모집중 / 모집마감 */}
+                        {!loading && !error && (
+                            active === "open" ? (
+                                <div className="mt-4 md:mt-6 space-y-4 md:space-y-6 mb-10">
+                                    {list.map((c) => {
+                                        const applicants = c.applicants ?? [];
+                                        return (
+                                            <div
+                                                key={`recruiting-${c.id}`}
+                                                className="border border-gray-300 rounded-lg p-4 bg-white
+                        flex flex-col lg:flex-row items-start lg:items-stretch
+                        gap-4 lg:gap-8"
+                                            >
+                                                <div className="w-full lg:w-[clamp(240px,35%,320px)]">
+                                                    <StudyCard {...toCardProps(c)} />
+                                                </div>
 
-                                            {/* 지원자 리스트 */}
-                                            <div className="w-full lg:flex-1 flex flex-col justify-center gap-3 lg:gap-4 min-w-0">
-                                                {applicants.length === 0 ? (
-                                                    <p className="text-gray-500">대기 중인 지원자가 없어요.</p>
-                                                ) : (
-                                                    applicants.map((a, i) => (
-                                                        <div
-                                                            key={`${c.id}-applicant-${i}`}
-                                                            className="flex flex-col md:grid md:grid-cols-[1fr_auto] md:items-center gap-3 py-3"
-                                                        >
-                                                            <div className="flex items-start gap-3 flex-1 min-w-0">
-                                                                <span className="h-6 w-[2px] bg-green-800 rounded-full" />
-                                                                <span className="text-gray-700 whitespace-nowrap shrink-0">
-                                  {a.name}
-                                </span>
-                                                                <span className="text-gray-300 shrink-0">|</span>
-                                                                <span
-                                                                    className="text-gray-700 break-keep whitespace-pre-wrap"
-                                                                    style={{ wordBreak: "keep-all" }}
-                                                                >
-                                  {a.msg ?? "메시지 없음"}
-                                </span>
+                                                <div className="w-full lg:flex-1 flex flex-col justify-center gap-3 lg:gap-4 min-w-0">
+                                                    {applicants.length === 0 ? (
+                                                        <p className="text-gray-500">대기 중인 지원자가 없어요.</p>
+                                                    ) : (
+                                                        applicants.map((a, i) => (
+                                                            <div
+                                                                key={`${c.id}-applicant-${i}`}
+                                                                className="flex flex-col md:grid md:grid-cols-[1fr_auto] md:items-center gap-3 py-3"
+                                                            >
+                                                                <div className="flex items-start gap-3 flex-1 min-w-0">
+                                                                    <span className="h-6 w-[2px] bg-green-800 rounded-full" />
+                                                                    <span className="text-gray-700 whitespace-nowrap shrink-0">
+                                    {a.name}
+                                  </span>
+                                                                    <span className="text-gray-300 shrink-0">|</span>
+                                                                    <span
+                                                                        className="text-gray-700 break-keep whitespace-pre-wrap"
+                                                                        style={{ wordBreak: "keep-all" }}
+                                                                    >
+                                    {a.msg ?? "메시지 없음"}
+                                  </span>
+                                                                </div>
+                                                                <div className="flex gap-2 shrink-0 md:self-auto w-full md:w-auto">
+                                                                    <button className="bg-green-900 text-white px-4 py-2 rounded w-full md:w-auto" disabled>
+                                                                        승인
+                                                                    </button>
+                                                                    <button className="border border-green-900 text-green-900 px-4 py-2 rounded w-full md:w-auto" disabled>
+                                                                        거절
+                                                                    </button>
+                                                                </div>
                                                             </div>
-                                                            <div className="flex gap-2 shrink-0 md:self-auto w-full md:w-auto">
-                                                                <button
-                                                                    className="bg-green-900 text-white px-4 py-2 rounded w-full md:w-auto"
-                                                                    disabled={!a.userId}
-                                                                    onClick={() => a.userId && handleApprove(c.id, a.userId)}
-                                                                >
-                                                                    승인
-                                                                </button>
-                                                                <button
-                                                                    className="border border-green-900 text-green-900 px-4 py-2 rounded w-full md:w-auto"
-                                                                    disabled={!a.userId}
-                                                                    onClick={() => a.userId && handleReject(c.id, a.userId)}
-                                                                >
-                                                                    거절
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    ))
-                                                )}
+                                                        ))
+                                                    )}
+                                                </div>
                                             </div>
-                                        </div>
-                                    );
-                                })}
-                                {list.length === 0 && (
-                                    <p className="text-sm text-gray-500">모집중인 스터디가 없어요.</p>
-                                )}
-                            </div>
-                        ) : (
-                            // 모집마감
-                            !loading &&
-                            !error && (
+                                        );
+                                    })}
+                                    {list.length === 0 && (
+                                        <p className="text-sm text-gray-500">모집중인 스터디가 없어요.</p>
+                                    )}
+                                </div>
+                            ) : (
                                 <div
                                     className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3
-                               gap-4 sm:gap-6 lg:gap-8 mx-0 sm:mx-5 my-5"
+                  gap-4 sm:gap-6 lg:gap-8 mx-0 sm:mx-5 my-5"
                                 >
                                     {list.map((c) => (
                                         <StudyCard key={`completed-${c.id}`} {...toCardProps(c)} />

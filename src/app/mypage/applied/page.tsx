@@ -46,16 +46,9 @@ type ApiResp = {
 
 export default function Page() {
     const [isNickOpen, setIsNickOpen] = useState(false);
-    const [data, setData] = useState<ApiResp>({
-        approved: [],
-        pending: [],
-        rejected: [],
-    });
+    const [data, setData] = useState<ApiResp>({ approved: [], pending: [], rejected: [] });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-
-    const DEV_ID = process.env.NEXT_PUBLIC_DEV_USER_ID ?? "68c6fc2e127eec1b9624297c";
-    const withUid = (url: string) => `${url}${url.includes("?") ? "&" : "?"}userId=${DEV_ID}`;
 
     const menuItems = [
         { label: "내가 지원한 스터디", path: "/mypage/applied" },
@@ -90,9 +83,9 @@ export default function Page() {
             setError(null);
             try {
                 const [aRes, pRes, rRes] = await Promise.all([
-                    fetch(withUid("/api/mypage/applied?status=approved"), { cache: "no-store" }),
-                    fetch(withUid("/api/mypage/applied?status=pending"), { cache: "no-store" }),
-                    fetch(withUid("/api/mypage/applied?status=rejected"), { cache: "no-store" }),
+                    fetch("/api/mypage/applied?status=approved", { cache: "no-store", credentials: "include" }),
+                    fetch("/api/mypage/applied?status=pending", { cache: "no-store", credentials: "include" }),
+                    fetch("/api/mypage/applied?status=rejected", { cache: "no-store", credentials: "include" }),
                 ]);
 
                 if (!aRes.ok || !pRes.ok || !rRes.ok) {
@@ -123,6 +116,7 @@ export default function Page() {
     }, []);
 
     const toCardProps = (c: CardDTO) => ({
+        studyId: c.id,
         variant: c.variant,
         name: c.name,
         title: c.title,
@@ -155,7 +149,9 @@ export default function Page() {
                                     {data.approved.map((c) => (
                                         <StudyCard key={`approved-${c.id}`} {...toCardProps(c)} />
                                     ))}
-                                    {data.approved.length === 0 && <p className="text-sm text-gray-500">승인완료 스터디가 없어요.</p>}
+                                    {data.approved.length === 0 && (
+                                        <p className="text-sm text-gray-500">승인완료 스터디가 없어요.</p>
+                                    )}
                                 </div>
                             </div>
 
@@ -167,7 +163,9 @@ export default function Page() {
                                     {data.pending.map((c) => (
                                         <StudyCard key={`pending-${c.id}`} {...toCardProps(c)} />
                                     ))}
-                                    {data.pending.length === 0 && <p className="text-sm text-gray-500">대기 중인 스터디가 없어요.</p>}
+                                    {data.pending.length === 0 && (
+                                        <p className="text-sm text-gray-500">대기 중인 스터디가 없어요.</p>
+                                    )}
                                 </div>
                             </div>
 
@@ -179,7 +177,9 @@ export default function Page() {
                                     {data.rejected.map((c) => (
                                         <StudyCard key={`rejected-${c.id}`} {...toCardProps(c)} />
                                     ))}
-                                    {data.rejected.length === 0 && <p className="text-sm text-gray-500">거절된 스터디가 없어요.</p>}
+                                    {data.rejected.length === 0 && (
+                                        <p className="text-sm text-gray-500">거절된 스터디가 없어요.</p>
+                                    )}
                                 </div>
                             </div>
                         </>
