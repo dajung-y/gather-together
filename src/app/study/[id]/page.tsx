@@ -1,44 +1,41 @@
-"use client";
-
-import Button from "@/components/common/Button";
-import StudyCard from "@/components/common/StudyCard";
+import AttendanceTimer from "@/components/study/main/AttendanceTimer";
 import AttendanceInfo from "@/components/study/main/AttendanceInfo";
 import MainNotice from "@/components/study/main/MainNotice";
 import NoticeForm from "@/components/study/main/NoticeForm";
-import NoticeItem from "@/components/study/main/NoticeItem";
 import NoticeList from "@/components/study/main/NoticeList";
-import { useStudyStore } from "@/store/study";
 import { Notice } from "@/types/notice";
-import { StudyData } from "@/types/study";
-import { formatDate, getNextStudyDate } from "@/utils/date";
-import { useEffect, useState } from "react";
+import { Attendance, StudyData } from "@/types/study";
+import { redirect } from "next/navigation";
+import AlertModal from "@/components/common/AlertModal";
+import { getUserIdFromSession } from "@/lib/session";
+import clientPromise from "@/lib/mongodb";
+import { ObjectId } from "mongodb";
 
-export default function page({ params }: { params: { id: string } }) {
-  const studyId = params.id;
-  const { studyData, setStudyData } = useStudyStore();
-  const [notices, setNotices] = useState<Notice[]>([]);
+export default async function page({ params }: { params: { id: string } }) {
+  const param = await params;
+  const studyId = await param.id;
 
-  //스터디 데이터
-  useEffect(() => {
-    if (!studyData || studyData._id !== studyId) {
-      fetch(`/api/study/${studyId}`)
-        .then((res) => res.json())
-        .then((data: StudyData) => setStudyData(data))
-        .catch((err) => console.error(err));
-    }
-  }, [studyId]);
+  //SSR에서 api fetch 쓰면 getSession 정보 읽기 불가능
+  //SSR에서는 바로 호출이 나음
+  const userId = await getUserIdFromSession();
+  if (!userId) {
+    redirect('/login');
+  }
 
-  //공지 데이터
-  useEffect(() => {
-    fetch(`/api/notice?studyId=${studyId}`)
-      .then((res) => res.json())
-      .then((data: { data: Notice[] }) => setNotices(data.data))
-      .catch((err) => console.error(err));
-  }, [studyId]);
+  const client = await clientPromise;
+  const db = client.db();
 
-  if (!studyData) return <p>Loading...</p>;
+  const study = await db.collection("studies").findOne({ _id: new ObjectId(studyId) });
+  const studyData = JSON.parse(JSON.stringify(study));
 
-  const nextDate = getNextStudyDate(studyData.startDate, studyData.endDate, studyData.weekdays);
+  const notices = await db.collection("notices").find({ studyId }).toArray();
+  const noticeData = JSON.parse(JSON.stringify(notices));
+
+  const attendance = await db.collection("attendances").findOne({
+    studyId: studyId,
+    userId: userId
+  });
+  const attendanceData = JSON.parse(JSON.stringify(attendance));
 
   return (
     <>
@@ -54,16 +51,10 @@ export default function page({ params }: { params: { id: string } }) {
         <div className="flex gap-8 mt-8">
           <div className="flex flex-col justify-center gap-4">
             {/* 타이머 */}
-            <div className="flex flex-col w-full items-center justify-center h-44 border border-primary-300
-          rounded-lg">
-              <p className="text-primary-300">{nextDate ? formatDate(nextDate) : "-"}</p>
-              <p className="headline2 pb-4">{studyData.startTime} - {studyData.endTime}</p>
-              <div>
-                <Button size="lg">출석하기</Button>
-              </div>
-            </div>
+            <AttendanceTimer studyId={studyId} {...studyData} />
             <div>
-              <AttendanceInfo startDate={studyData.startDate} endDate={studyData.endDate} weekdays={studyData.weekdays} />
+              <AttendanceInfo startDate={studyData.startDate} endDate={studyData.endDate}
+                weekdays={studyData.weekdays} attendance={attendanceData} />
             </div>
           </div>
           {/* 메인공지 */}
@@ -73,7 +64,7 @@ export default function page({ params }: { params: { id: string } }) {
         {/* 공지 추가*/}
         <NoticeForm studyId={studyId} />
         {/* 일반 공지 */}
-        <NoticeList notices={notices} />
+        <NoticeList notices={noticeData} />
       </div>
     </>
   )

@@ -1,17 +1,14 @@
 "use client"
 
+import { Attendance } from '@/types/study';
 import { Circle, X, Triangle, Pen, Trash } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 type AttendanceInfoProps = {
-  startDate: string,
-  endDate: string,
-  weekdays: string[],
-  attendance?: {
-    present: number;
-    late: number;
-    absent: number;
-  };
+  startDate: string;
+  endDate: string;
+  weekdays: string[];
+  attendance: Attendance;
 }
 
 const WEEKDAY_MAP: Record<string, number> = {
@@ -73,8 +70,9 @@ export default function AttendanceInfo({
             </span>
           </div>
           <div className="flex flex-col">
-            <span className=" text-gray-400">참여일수</span>
-            <span className=" text-status-info">1/{count}</span>
+            <span className=" text-gray-400">일수</span>
+            <span className=" text-status-info">{
+              attendance.present + attendance.late + attendance.absent} /{count}</span>
           </div>
         </div>
         <div className="flex">
