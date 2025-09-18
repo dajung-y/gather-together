@@ -19,7 +19,7 @@ if(process.env.NODE_ENV === 'development'){
     global._mongoClientPromise = client.connect();
 
     global._mongoClientPromise.then(client => {
-      console.log('연결된 데이터베이스: ',client.db().databaseName);
+      // console.log('연결된 데이터베이스: ',client.db().databaseName);
     }).catch (err => {
       console.error('MongoDB 연결 실패: ',err);
     })

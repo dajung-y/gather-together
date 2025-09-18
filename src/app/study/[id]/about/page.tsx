@@ -45,7 +45,6 @@ export default async function Page({params}: PageProps) {
 
   const session = await getServerSession(authOptions);
 
-  console.log("params: ",params);
   const studyId = params.id;
 
   // mongoDB 연결

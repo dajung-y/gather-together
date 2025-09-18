@@ -26,7 +26,6 @@ export default function StudyListClient() {
         // 캐시처리 추가하기
         const res = await fetch(`/api/study?isRecruiting=${isRecruiting}&page=${currentPage}&category=${category}&search=${encodeURIComponent(searchQuery)}`);
         const data = await res.json();
-        console.log("받은 데이터: ",data);
         setStudies(data.data);
         setTotalPage(data.totalPage || 1);
       } catch(error) {
