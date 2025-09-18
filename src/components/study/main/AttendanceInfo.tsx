@@ -1,17 +1,14 @@
 "use client"
 
+import { Attendance } from '@/types/study';
 import { Circle, X, Triangle, Pen, Trash } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 type AttendanceInfoProps = {
-  startDate: string,
-  endDate: string,
-  weekdays: string[],
-  attendance?: {
-    present: number;
-    late: number;
-    absent: number;
-  };
+  startDate: string;
+  endDate: string;
+  weekdays: string[];
+  attendance: Attendance;
 }
 
 const WEEKDAY_MAP: Record<string, number> = {

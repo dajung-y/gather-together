@@ -1,28 +1,41 @@
-import Attendance from "@/components/study/main/Attendance";
+import AttendanceTimer from "@/components/study/main/AttendanceTimer";
 import AttendanceInfo from "@/components/study/main/AttendanceInfo";
 import MainNotice from "@/components/study/main/MainNotice";
 import NoticeForm from "@/components/study/main/NoticeForm";
 import NoticeList from "@/components/study/main/NoticeList";
 import { Notice } from "@/types/notice";
-import { StudyData } from "@/types/study";
+import { Attendance, StudyData } from "@/types/study";
+import { redirect } from "next/navigation";
+import AlertModal from "@/components/common/AlertModal";
+import { getUserIdFromSession } from "@/lib/session";
+import clientPromise from "@/lib/mongodb";
+import { ObjectId } from "mongodb";
 
 export default async function page({ params }: { params: { id: string } }) {
-  const studyId = await params.id;
+  const param = await params;
+  const studyId = await param.id;
 
-  const studyRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/study/${studyId}`);
-  if (!studyRes.ok) {
-    throw new Error("스터디 정보를 불러오는 데 실패했습니다.");
+  //SSR에서 api fetch 쓰면 getSession 정보 읽기 불가능
+  //SSR에서는 바로 호출이 나음
+  const userId = await getUserIdFromSession();
+  if (!userId) {
+    redirect('/login');
   }
-  const studyData: StudyData = await studyRes.json();
 
-  const noticeRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/notice?studyId=${studyId}`);
-  if (!noticeRes.ok) {
-    throw new Error("공지사항을 불러오는 데 실패했습니다.");
-  }
-  const data: { data: Notice[] } = await noticeRes.json();
-  const notices = data.data;
+  const client = await clientPromise;
+  const db = client.db();
 
-  if (!studyData) return <p>Loading...</p>;
+  const study = await db.collection("studies").findOne({ _id: new ObjectId(studyId) });
+  const studyData = JSON.parse(JSON.stringify(study));
+
+  const notices = await db.collection("notices").find({ studyId }).toArray();
+  const noticeData = JSON.parse(JSON.stringify(notices));
+
+  const attendance = await db.collection("attendances").findOne({
+    studyId: studyId,
+    userId: userId
+  });
+  const attendanceData = JSON.parse(JSON.stringify(attendance));
 
   return (
     <>
@@ -38,9 +51,10 @@ export default async function page({ params }: { params: { id: string } }) {
         <div className="flex gap-8 mt-8">
           <div className="flex flex-col justify-center gap-4">
             {/* 타이머 */}
-            <Attendance studyId={studyId} {...studyData} />
+            <AttendanceTimer studyId={studyId} {...studyData} />
             <div>
-              <AttendanceInfo startDate={studyData.startDate} endDate={studyData.endDate} weekdays={studyData.weekdays} />
+              <AttendanceInfo startDate={studyData.startDate} endDate={studyData.endDate}
+                weekdays={studyData.weekdays} attendance={attendanceData} />
             </div>
           </div>
           {/* 메인공지 */}
@@ -50,7 +64,7 @@ export default async function page({ params }: { params: { id: string } }) {
         {/* 공지 추가*/}
         <NoticeForm studyId={studyId} />
         {/* 일반 공지 */}
-        <NoticeList notices={notices} />
+        <NoticeList notices={noticeData} />
       </div>
     </>
   )

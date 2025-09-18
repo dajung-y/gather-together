@@ -1,6 +1,7 @@
 "use client"
 
 import Button from '@/components/common/Button';
+import { Attendance } from '@/types/study';
 import { formatDate, getNextStudyDate } from '@/utils/date';
 import React from 'react'
 
@@ -14,7 +15,7 @@ type AttendanceProps = {
 }
 
 
-export default function Attendance({
+export default function AttendanceTimer({
   studyId,
   startDate,
   endDate,

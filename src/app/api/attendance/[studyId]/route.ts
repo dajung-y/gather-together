@@ -1,7 +1,45 @@
 // app/api/attendance/[studyId]/[userId]/route.ts
-import clientPromise from "@/lib/mongodb";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { getUserIdFromSession } from "@/lib/session";
 import { NextResponse } from "next/server";
+import clientPromise from "@/lib/mongodb";
+
+
+export async function GET(
+  req: Request,
+  { params }: { params: { studyId: string } }
+) {
+  try {
+
+    const userId = await getUserIdFromSession();
+    if (!userId) {
+      return NextResponse.json({ error: "로그인 필요" }, { status: 401 });
+    }
+
+    const { studyId } = await params;
+
+    const client = await clientPromise;
+    const db = client.db();
+
+    const attendance = await db.collection("attendances").findOne({
+      studyId: studyId,
+      userId: userId
+    });
+
+    console.log("가져온 출석", attendance);
+
+    return NextResponse.json(
+      { success: true, data: attendance },
+      { status: 200, }
+    );
+  } catch (error: any) {
+    return NextResponse.json(
+      { message: "불러오기 실패: ", error: error.message },
+      { status: 500 }
+    );
+  }
+}
 
 export async function PATCH(
   req: Request,
