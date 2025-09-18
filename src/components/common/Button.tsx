@@ -1,10 +1,11 @@
 type ButtonProps = {
   size?: "sm" | "md" | "lg";
-  variant?: "primary" | "secondary" | "outline";
+  variant?: "primary" | "secondary" | "outline" | "disabled";
   type?: "button" | "submit" | "reset";
   onClick?: () => void;
   children?: React.ReactNode;
   className?: string;
+  disabled?: boolean;
 }
 
 export default function Button({
@@ -13,13 +14,22 @@ export default function Button({
   type = "button",
   onClick,
   children,
-  className
+  className,
+  disabled = false
 }: ButtonProps) {
+  const isDisabled = variant === "disabled" || disabled;
   return (
     <button
-      className={`button-base button-${variant} button-${size} flex justify-center ${className && className}`}
+      className={`
+        button-base 
+        button-${variant} 
+        button-${size} 
+        flex justify-center
+        ${disabled ? "cursor-not-allowed" : "hover:brightness-95 cursor-pointer"} 
+        ${className && className}`}
       type={type}
       onClick={onClick}
+      disabled={isDisabled}
     >
       {children}
     </button>

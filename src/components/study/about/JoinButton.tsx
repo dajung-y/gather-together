@@ -75,7 +75,9 @@ export default function JoinButton({
     <>
     <Button 
       size="lg"
-      className={`px-12 ${hasApplied ? "cursor-not-allowed" : "" }`}
+      className="px-12"
+      disabled={hasApplied}
+      variant={hasApplied ? "disabled" : "primary"}
       onClick={() => {
         if(!userId){
           setIsLoginModalOpen(true); // 로그인 X : 로그인 모달
