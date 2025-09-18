@@ -23,7 +23,10 @@ export default function MainNotice({ studyId, mainNotice }: MainNoticeProps) {
       const res = await fetch(`/api/study/${studyId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: "메인 공지", content: tempNotice }),
+        body: JSON.stringify({
+          action: "updateNotice",
+          payload: tempNotice,
+        }),
       });
 
       if (!res.ok) {
@@ -31,7 +34,6 @@ export default function MainNotice({ studyId, mainNotice }: MainNoticeProps) {
         console.error("저장 실패:", data.error);
         return;
       }
-
 
       setIsEditing(false);
       window.location.reload();

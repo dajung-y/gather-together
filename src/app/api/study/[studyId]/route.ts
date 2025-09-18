@@ -2,6 +2,7 @@ import { ObjectId } from "mongodb";
 import clientPromise from "@/lib/mongodb";
 import { NextRequest, NextResponse } from "next/server";
 import { Notice } from "@/types/notice";
+import { Member } from "@/types/study";
 
 export async function GET(
   req: Request,
@@ -36,14 +37,30 @@ export async function PATCH(
   { params }: { params: { studyId: string } }
 ) {
   try {
-    const notice: Partial<Notice> = await req.json();
+    // const notice: Partial<Notice> = await req.json();
+
+    const { action, payload } = await req.json();
     const client = await clientPromise;
     const db = client.db();
 
-    await db.collection("studies").updateOne(
-      { _id: new ObjectId(params.studyId) },
-      { $set: { mainNotice: { ...notice, updatedAt: new Date() } } }
-    );
+    // await db.collection("studies").updateOne(
+    //   { _id: new ObjectId(params.studyId) },
+    //   { $set: { mainNotice: { ...notice, updatedAt: new Date() } } }
+    // );
+
+    if (action === "updateNotice") {
+      await db.collection("studies").updateOne(
+        { _id: new ObjectId(params.studyId) },
+        { $set: { mainNotice: { ...payload.content, updatedAt: new Date() } } }
+      );
+    }
+
+    if (action === "removeMember") {
+      await db.collection<{ members: Member[] }>("studies").updateOne(
+        { _id: new ObjectId(params.studyId) },
+        { $pull: { members: { userId: payload.userId } } }
+      );
+    }
 
     return NextResponse.json({ success: true });
   } catch (err: any) {
@@ -77,3 +94,4 @@ export async function PUT(
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
+
