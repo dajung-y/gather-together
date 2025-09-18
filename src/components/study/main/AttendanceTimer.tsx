@@ -68,6 +68,8 @@ export default function AttendanceTimer({
     } catch (err: any) {
       alert(err.message);
     }
+
+    window.location.reload();
   }
 
   return (
