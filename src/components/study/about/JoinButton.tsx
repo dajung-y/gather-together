@@ -9,6 +9,7 @@ import { useState } from "react";
 import JoinModal from "./JoinModal";
 import LoginModal from "@/components/common/LoginModal";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 interface JoinButtonProps {
   creatorId: string;
@@ -26,6 +27,7 @@ export default function JoinButton({
   studyId,
   applicants
 }: JoinButtonProps) {
+  const router = useRouter();
   const { data: session } = useSession();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(false);
@@ -64,6 +66,7 @@ export default function JoinButton({
       }
       toast.success("스터디 참여 신청이 완료되었습니다!", {duration: 1000});
       setIsModalOpen(false);
+      router.push(`/study/${studyId}/about`);
     } catch(error){
       console.error(error);
     } finally {
