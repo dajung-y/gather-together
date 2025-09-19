@@ -12,7 +12,20 @@ type MemberListProps = {
 export default function MemberList({ studyId, memberData }: MemberListProps) {
   const [members, setMembers] = useState(memberData);
 
-  const handleKick = async (userId: string) => {
+  const handleKick = (userId: string, isLeader: boolean) => {
+    if (isLeader) {
+      alert("방장은 강퇴할 수 없습니다");
+      return;
+    }
+
+    if (confirm("정말 이 멤버를 강퇴하시겠습니까?")) {
+      kickUser(userId);
+    } else {
+      console.log("강퇴 취소");
+    }
+  }
+
+  const kickUser = async (userId: string) => {
     setMembers(prev => prev.filter(m => m.userId !== userId));
     try {
 
@@ -36,11 +49,15 @@ export default function MemberList({ studyId, memberData }: MemberListProps) {
     }
   }
 
+
   return (
     <div className="flex gap-2">
       {members.map((member, index) => (
-        <div key={index} onClick={() => handleKick(member.userId)}>
-          <UserDelete name={member.nickname} />
+        <div key={index} onClick={() => handleKick(member.userId, member.role == "leader")}>
+          <UserDelete
+            name={member.nickname}
+            isLeader={member.role == "leader"}
+          />
         </div>
       ))}
     </div>

@@ -1,30 +1,21 @@
 "use client"
 
 import React from 'react'
-import { Circle, X, Triangle } from 'lucide-react';
+import { Circle, X, Triangle, Crown } from 'lucide-react';
 import AlertModal from '@/components/common/AlertModal';
 
 type UserDeleteProps = {
   name: string;
+  isLeader: boolean;
 }
 
-export default function UserDelete({ name }: UserDeleteProps) {
-
-  const handleKick = () => {
-    if (confirm("정말로 강퇴하시겠습니까?")) {
-
-      console.log("네");
-    } else {
-
-      console.log("취소");
-    }
-  }
+export default function UserDelete({ name, isLeader }: UserDeleteProps) {
   return (
     <div className='flex justify-center items-center w-max border rounded-full px-3 gap-2
     border-primary-500'
     >
       <span className="mt-0.5 body">{name}</span>
-      <X size={16} className='ml-auto' />
+      {isLeader ? <Crown size={16} className='ml-auto text-yellow-500' /> : <X size={16} className='ml-auto' />}
     </div>
   )
 }

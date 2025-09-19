@@ -32,7 +32,7 @@ export default async function Layout({ children, params }: LayoutProps) {
   // 메뉴 생성
   return (
     <div className="min-h-screen flex flex-col lg:flex-row max-w-[1280px] mx-auto">
-      <StudySidebar studyId={studyId} studyTitle={studyTitle} isLeader={isLeader} />
+      <StudySidebar studyId={studyId} userId={userId} studyTitle={studyTitle} isLeader={isLeader} />
       <div className="flex-1 flex justify-center">
         <div className="w-full p-4 flex flex-col">
           {children}

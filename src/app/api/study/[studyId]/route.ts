@@ -37,29 +37,41 @@ export async function PATCH(
   { params }: { params: { studyId: string } }
 ) {
   try {
-    // const notice: Partial<Notice> = await req.json();
 
+    const { studyId } = await params;
     const { action, payload } = await req.json();
     const client = await clientPromise;
     const db = client.db();
 
-    // await db.collection("studies").updateOne(
-    //   { _id: new ObjectId(params.studyId) },
-    //   { $set: { mainNotice: { ...notice, updatedAt: new Date() } } }
-    // );
-
     if (action === "updateNotice") {
       await db.collection("studies").updateOne(
-        { _id: new ObjectId(params.studyId) },
+        { _id: new ObjectId(studyId) },
         { $set: { mainNotice: { ...payload.content, updatedAt: new Date() } } }
       );
     }
 
     if (action === "removeMember") {
       await db.collection<{ members: Member[] }>("studies").updateOne(
-        { _id: new ObjectId(params.studyId) },
+        { _id: new ObjectId(studyId) },
         { $pull: { members: { userId: payload.userId } } }
       );
+
+      const study = await db
+        .collection<{ members: Member[] }>("studies")
+        .findOne({ _id: new ObjectId(studyId) });
+
+      // 멤버가 0이면 스터디 삭제 아니면 방장 넘기기
+      if (study && study.members.length === 0) {
+        await db.collection("studies").deleteOne({ _id: new ObjectId(studyId) });
+      } else if (study) {
+        const hasLeader = study.members.some((m) => m.role === "leader");
+        if (!hasLeader) {
+          await db.collection("studies").updateOne(
+            { _id: new ObjectId(studyId), "members.userId": study.members[0].userId },
+            { $set: { "members.$.role": "leader" } }
+          );
+        }
+      }
     }
 
     return NextResponse.json({ success: true });
