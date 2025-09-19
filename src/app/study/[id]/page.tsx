@@ -19,23 +19,23 @@ export default async function page({ params }: { params: { id: string } }) {
   //SSR에서는 바로 호출이 나음
   const userId = await getUserIdFromSession();
   if (!userId) {
-    redirect('/login');
+    redirect('/');
   }
 
   const client = await clientPromise;
   const db = client.db();
 
   const study = await db.collection("studies").findOne({ _id: new ObjectId(studyId) });
-  const studyData = JSON.parse(JSON.stringify(study));
+  const studyData: StudyData = JSON.parse(JSON.stringify(study));
 
   const notices = await db.collection("notices").find({ studyId }).toArray();
-  const noticeData = JSON.parse(JSON.stringify(notices));
+  const noticeData: Notice[] = JSON.parse(JSON.stringify(notices));
 
   const attendance = await db.collection("attendances").findOne({
     studyId: studyId,
     userId: userId
   });
-  const attendanceData = JSON.parse(JSON.stringify(attendance));
+  const attendanceData: Attendance = JSON.parse(JSON.stringify(attendance));
 
   return (
     <>
