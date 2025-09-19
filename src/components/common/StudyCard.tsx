@@ -48,10 +48,18 @@ export default function StudyCard({
     route.push(`/study/${studyId}/about`);
   }
 
+  const handleStudyEnter = () => {
+    route.push(`/study/${studyId}`);
+  }
+
   return (
-    <div className="flex flex-col gap-4 w-full h-full cursor-pointer" onClick={handleClick}>
-      <div className={`flex flex-col gap-4 w-full h-full p-4 border border-gray-300 shadow-lg rounded-lg
-      ${style.isDisabled ? "bg-gray-100 opacity-60" : "bg-white"}`}>
+    <div className="flex flex-col gap-4 w-full h-full cursor-pointer">
+      <div className={`
+            flex flex-col gap-4 w-full h-full p-4 border border-gray-300 shadow-lg rounded-lg
+            ${style.isDisabled ? "bg-gray-100 opacity-60" : "bg-white"}
+          `}
+          onClick={handleClick}
+        >
         <div className="flex">
           <span className="bg-primary-500 text-white px-2 ">{name}</span>
           {style.canDelete && <X className="ml-auto" />}
@@ -87,7 +95,12 @@ export default function StudyCard({
 
         </div>
       </div>
-      {style.canEnter && <Button>스터디 입장하기</Button>}
+      {style.canEnter && 
+        <Button
+          onClick={handleStudyEnter}>
+          스터디 입장하기
+        </Button>
+      }
     </div >
   )
 }
