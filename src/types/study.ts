@@ -18,12 +18,7 @@ export interface Study {
     nickname: string;
     email: string;
   };
-  members?: {
-    userId: string;
-    nickname: string;
-    role: string;
-    joinedAt: Date;
-  }[];
+  members: Member[];
   applicants: {
     userId: string;
     nickname: string;
@@ -49,4 +44,11 @@ export type Attendance = {
   present: number;   // 출석
   late: number;      // 지각
   absent: number;    // 결석
+}
+
+export type Member = {
+  userId: string;
+  nickname: string;
+  role: string;
+  joinedAt: Date;
 }

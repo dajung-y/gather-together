@@ -53,12 +53,14 @@ const getCapacity = (s: any) =>
 const getCategory = (s: any) => String(s?.category ?? "");
 
 export default function Page() {
-    const { data: session, status } = useSession(); // ✅ 세션에서 user.id 사용
+    const { data: session, status } = useSession();
     const [isNickOpen, setIsNickOpen] = useState(false);
     const [active, setActive] = useState<"open" | "closed">("open");
     const [data, setData] = useState<SplitResp>({ recruiting: [], completed: [] });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    const [mutatingKey, setMutatingKey] = useState<string | null>(null);
 
     const menuItems = [
         { label: "내가 지원한 스터디", path: "/mypage/applied" },
@@ -66,7 +68,7 @@ export default function Page() {
         { label: "닉네임 변경", onClick: () => setIsNickOpen(true) },
     ];
 
-    const mapToCard = (s: any): CardDTO => {
+     const mapToCard = (s: any): CardDTO => {
         const status = getStatus(s);
         const variant = status === "RECRUITING" ? ("leaderOpen" as const) : ("leaderClosed" as const);
 
@@ -87,8 +89,60 @@ export default function Page() {
             maxMembers: getCapacity(s),
             tag: getCategory(s),
             isRecruiting: status === "RECRUITING",
-            // applicants: s.applicants?.map()
+            applicants: (s.applicants ?? []).map((a: any) => ({
+                userId: a?.userId ?? a?._id ?? a?.id ?? "",
+                name: a?.nickname ?? a?.name ?? "지원자",
+                msg: a?.msg ?? a?.message ?? "",
+            })),
         };
+    };
+
+    const decideApplicant = async (
+        studyId: string,
+        applicantId: string,
+        action: "approve" | "reject"
+    ) => {
+        const key = `${studyId}:${applicantId}:${action}`;
+        setMutatingKey(key);
+        try {
+            const res = await fetch(`/api/mypage/groups/${studyId}/applicants`, {
+                method: "PATCH",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ applicantId, action }),
+            });
+            if (!res.ok) {
+                const t = await res.text().catch(() => "");
+                console.error("PATCH /api/mypage/groups/[id]/applicants error:", res.status, t);
+                throw new Error(`fail ${action}`);
+            }
+
+            setData((prev) => {
+                const bump = (list: CardDTO[]) =>
+                    list.map((c) => {
+                        if (c.id !== studyId) return c;
+                        const nextApplicants = (c.applicants ?? []).filter((a) => a.userId !== applicantId);
+                        if (action === "approve") {
+                            const nextMembers = c.currentMembers + 1;
+                            const reached = nextMembers >= c.maxMembers;
+                            return {
+                                ...c,
+                                applicants: nextApplicants,
+                                currentMembers: nextMembers,
+                                isRecruiting: reached ? false : c.isRecruiting,
+                                variant: reached ? "leaderClosed" : c.variant,
+                            };
+                        }
+                        // reject
+                        return { ...c, applicants: nextApplicants };
+                    });
+
+                return { recruiting: bump(prev.recruiting), completed: bump(prev.completed) };
+            });
+        } catch (e) {
+        } finally {
+            setMutatingKey(null);
+        }
     };
 
     const fetchData = async (creatorId: string) => {
@@ -112,12 +166,12 @@ export default function Page() {
 
             if (!openRes.ok) {
                 const t = await openRes.text().catch(() => "");
-                console.error("OPEN /api/group error:", openRes.status, t);
+                console.error("OPEN /api/mypage/groups error:", openRes.status, t);
                 throw new Error(`API error(open): ${openRes.status}`);
             }
             if (!closedRes.ok) {
                 const t = await closedRes.text().catch(() => "");
-                console.error("CLOSED /api/group error:", closedRes.status, t);
+                console.error("CLOSED /api/mypage/groups error:", closedRes.status, t);
                 throw new Error(`API error(closed): ${closedRes.status}`);
             }
 
@@ -237,10 +291,18 @@ export default function Page() {
                                   </span>
                                                                 </div>
                                                                 <div className="flex gap-2 shrink-0 md:self-auto w-full md:w-auto">
-                                                                    <button className="bg-green-900 text-white px-4 py-2 rounded w-full md:w-auto" disabled>
+                                                                    <button
+                                                                        className="bg-green-900 text-white px-4 py-2 rounded w-full md:w-auto"
+                                                                        disabled={mutatingKey === `${c.id}:${a.userId}:approve`}
+                                                                        onClick={() => a.userId && decideApplicant(c.id, a.userId, "approve")}
+                                                                    >
                                                                         승인
                                                                     </button>
-                                                                    <button className="border border-green-900 text-green-900 px-4 py-2 rounded w-full md:w-auto" disabled>
+                                                                    <button
+                                                                        className="border border-green-900 text-green-900 px-4 py-2 rounded w-full md:w-auto"
+                                                                        disabled={mutatingKey === `${c.id}:${a.userId}:reject`}
+                                                                        onClick={() => a.userId && decideApplicant(c.id, a.userId, "reject")}
+                                                                    >
                                                                         거절
                                                                     </button>
                                                                 </div>
@@ -307,3 +369,4 @@ function NicknameForm({ onClose }: { onClose: () => void }) {
         </form>
     );
 }
+

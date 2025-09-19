@@ -1,61 +1,73 @@
-// 내가 만든 스터디
-
-
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
-import clientPromise from "@/lib/mongodb";
 import { NextRequest, NextResponse } from "next/server";
+import clientPromise from "@/lib/mongodb";
+import { ObjectId } from "mongodb";
 
-export async function GET(request: NextRequest) {
+type StudyDoc = any;
+
+function toCardDTO(s: StudyDoc) {
+    const startDate = s?.period?.startDate ?? s?.startDate ?? "";
+    const endDate   = s?.period?.endDate   ?? s?.endDate   ?? "";
+    const startTime = s?.schedule?.startTime ?? s?.startTime ?? "";
+    const endTime   = s?.schedule?.endTime   ?? s?.endTime   ?? "";
+
+    const applicants = (s?.applicants ?? []).map((a: any) => ({
+        userId: String(a?.userId ?? ""),
+        name:   String(a?.nickname ?? a?.name ?? ""),
+        msg:    String(a?.introduction ?? a?.msg ?? ""),
+    }));
+
+    return {
+        id: String(s?._id ?? s?.id ?? ""),
+        name: String(s?.studyName ?? s?.name ?? ""),
+        title: String(s?.title ?? ""),
+        startDate,
+        endDate,
+        time: [startTime, endTime].filter(Boolean).join(" ~ "),
+        currentMembers:
+            typeof s?.currentMembers === "number"
+                ? s.currentMembers
+                : (s?.members?.length ?? 0),
+        maxMembers: Number(s?.capacity ?? 0),
+        tag: String(s?.category ?? ""),
+        isRecruiting: Boolean(
+            s?.status ? s.status === "RECRUITING" : s?.isRecruiting ?? false
+        ),
+        applicants,
+    };
+}
+
+export async function GET(req: NextRequest) {
     try {
-        const url = new URL(request.url);
+        const { searchParams } = new URL(req.url);
+        const isRecruiting = searchParams.get("isRecruiting");
+        const creatorId = searchParams.get("creatorId")?.trim();
 
-        const page = Number.parseInt(url.searchParams.get("page") ?? "1", 10);
-        const limit = Number.parseInt(url.searchParams.get("limit") ?? "16", 10);
-        const isRecruitingParam = url.searchParams.get("isRecruiting");
-        const creatorId = url.searchParams.get("creatorId");
-
-        const query: any = {};
-        if (isRecruitingParam !== null) {
-            query.isRecruiting = isRecruitingParam === "true";
+        if (!creatorId) {
+            return NextResponse.json({ items: [] }, { status: 200 });
         }
-        if (creatorId) {
-            query["creator.userId"] = creatorId;
-        }
+        const recFlag =
+            isRecruiting === "true" ? true : isRecruiting === "false" ? false : undefined;
 
-        // DB 연결
         const client = await clientPromise;
         const db = client.db();
+        const col = db.collection("studies");
 
-        // 총 개수
-        const total = await db.collection("studies").countDocuments(query);
+        const query: any = { "creator.userId": creatorId };
+        if (typeof recFlag === "boolean") query.isRecruiting = recFlag;
 
-        // 목록 조회
-        const studies = await db
-            .collection("studies")
+        const list = await col
             .find(query)
-            .skip((page - 1) * limit)
-            .limit(limit)
             .sort({ createdAt: -1 })
             .toArray();
 
-        const data = studies.map((s: any) => ({ ...s, _id: String(s._id) }));
-
         return NextResponse.json({
-            data,
-            page,
-            limit,
-            total,
-            totalPage: Math.ceil(total / limit),
+            items: list.map(toCardDTO),
         });
-    } catch (err: any) {
-        console.error("[GET /api/study] error:", err);
-        return NextResponse.json(
-            {
-                error: "스터디 목록 조회 중 오류 발생",
-                detail: String(err?.message ?? err),
-            },
-            { status: 500 }
-        );
+    } catch (e: any) {
+        console.error("[GET /api/mypage/groups] error:", e);
+        return NextResponse.json({ error: "failed" }, { status: 500 });
     }
 }
