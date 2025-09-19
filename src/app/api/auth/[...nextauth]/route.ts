@@ -18,7 +18,7 @@ export const authOptions = {
     ...MongoDBAdapter(clientPromise),
     // createUser 메서드 오버라이드
     async createUser(user: any) {
-      console.log("새 사용자 생성: ",user.email);
+      // console.log("새 사용자 생성: ",user.email);
       
       // const client = await clientPromise;
       if(!dbClient) {
@@ -53,7 +53,7 @@ export const authOptions = {
       user: User
       account: Account | null
     }): Promise<boolean>{
-      console.log('로그인 시도: ',user.email);
+      // console.log('로그인 시도: ',user.email);
       return true
     },
 
@@ -61,7 +61,7 @@ export const authOptions = {
       session: Session
       user: User
     }): Promise<Session> {
-      console.log('세션 생성: ',session.user?.email)
+      // console.log('세션 생성: ',session.user?.email)
       if(session.user){
         session.user.id = user.id;
         session.user.nickname = user.nickname;

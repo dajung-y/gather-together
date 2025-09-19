@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
 
     if(!studyId || !introduction){
       return NextResponse.json(
-        { message: "필요한 정보가 없습니다" },
+        { message: "소개는 50자 이하로 작성해주세요" },
         { status: 400 }
       )
     }

@@ -1,5 +1,4 @@
 export type Check = {
-  userId: string;
   userNickname: string;
   checked: boolean;
 };

@@ -20,14 +20,35 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     { label: '탈퇴하기', onClick: handleLeaveRoom },
   ];
 
-  return (
-    <div>
-      {!hideSidebar && (
-        <div className="flex justify-center 2xl:fixed 2xl:top-20 2xl:left-0 z-[100]">
-          <Sidebar title={`Study Room`} menuItems={menuItems} />
+  return(
+    <>
+    {hideSidebar ? (
+      <div className="min-h-screen flex flex-col">{children}</div>
+    ) : (
+      <div className="min-h-screen flex flex-col lg:flex-row max-w-[1280px] mx-auto">
+        {/* Sidebar */}
+        <div className="w-full lg:w-64">
+          <Sidebar menuItems={menuItems} title="Study Room" />
         </div>
-      )}
-      <div>{children}</div>
-    </div>
-  );
+        {/* Main content */}
+        <div className="flex-1 flex justify-center">
+          <div className="w-full p-4 flex flex-col">
+            {children}
+          </div>
+        </div>
+      </div>
+    )}
+  </>
+  )
+
+  // return (
+  //   <div>
+  //     {!hideSidebar && (
+  //       <div className="flex justify-center 2xl:fixed 2xl:top-20 2xl:left-0 z-[100]">
+  //         <Sidebar title={`Study Room`} menuItems={menuItems} />
+  //       </div>
+  //     )}
+  //     <div className="min-h-screen">{children}</div>
+  //   </div>
+  // );
 }
