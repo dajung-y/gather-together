@@ -1,26 +1,33 @@
 
 import TodoForm from "@/components/study/todo/TodoForm";
 import TodoList from "@/components/study/todo/TodoList";
+import clientPromise from "@/lib/mongodb";
+import { getUserIdFromSession } from "@/lib/session";
 import { StudyData } from "@/types/study";
 import { Todo } from "@/types/todo";
+import { ObjectId } from "mongodb";
+import { redirect } from "next/navigation";
 
 export default async function page({ params }: { params: { id: string } }) {
   const param = await params;
   const studyId = await param.id;
 
-  const studyRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/study/${studyId}`);
-  if (!studyRes.ok) {
-    throw new Error("스터디 정보를 불러오는 데 실패했습니다.");
-  }
-  const studyData: StudyData = await studyRes.json();
-
-  const todoRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/todo/${studyId}`);
-  if (!todoRes.ok) {
-    throw new Error("todo 정보를 불러오는 데 실패했습니다.");
+  const userId = await getUserIdFromSession();
+  if (!userId) {
+    redirect('/');
   }
 
-  const resJson: { success: boolean; data: Todo[] } = await todoRes.json();
-  const todos: Todo[] = resJson.data || [];
+  const client = await clientPromise;
+  const db = client.db();
+
+  const study = await db.collection("studies").findOne({ _id: new ObjectId(studyId) });
+  const studyData: StudyData = JSON.parse(JSON.stringify(study));
+
+  const todos = await db.collection("todos").find({ studyId }).toArray();
+  const todoData: Todo[] = JSON.parse(JSON.stringify(todos));
+
+  const isLeader = studyData.members.some(
+    (m) => m.userId === userId && m.role === "leader");
 
   return (
     <>
@@ -31,9 +38,11 @@ export default async function page({ params }: { params: { id: string } }) {
         md:px-6 md:py-3        
         lg:px-8 lg:py-4 
       ">
-        <TodoForm studyId={studyId} studyData={studyData} />
+        <p className='headline3 text-primary-500'>할 일</p>
+        {/* 일정 추가 */}
+        {isLeader && <TodoForm studyId={studyId} studyData={studyData} />}
         {/* 일정 */}
-        <TodoList todos={todos} />
+        <TodoList todos={todoData} />
       </div >
     </>
   )
