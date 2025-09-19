@@ -2,7 +2,7 @@
 
 import Button from "@/components/common/Button"
 import Modal from "@/components/common/Modal"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface JoinModalProps {
   isOpen: boolean;
@@ -16,7 +16,22 @@ export default function JoinModal({
   onConfirm
 }: JoinModalProps) {
   const [introduction, setIntroduction] = useState<string>("");
+  const [error, setError] = useState<string>("");
+
+  // 모달 닫히면 입력값 초기화
+  useEffect(() => {
+    if(!isOpen){
+      setIntroduction("");
+    }
+  },[isOpen]);
+
   const handleConfirm = () => {
+
+    if(introduction.trim().length <2 || introduction.trim().length>50){
+      setError("자기소개는 2~50자 사이로 작성 가능합니다");
+      return;
+    }
+    setError("");
     onConfirm({introduction});
   }
   return (
@@ -35,11 +50,17 @@ export default function JoinModal({
                   placeholder="자기소개를 입력하세요 (최대50자)"
                   value={introduction}
                   maxLength={50}
-                  onChange={(e) =>setIntroduction(e.target.value)}
+                  onChange={(e) => {
+                    const input = e.target.value;
+                    if( [...input].length<=50){
+                      setIntroduction(input)
+                    }
+                  }}
                 />
                 <span className="pt-2 text-end">
-                  {introduction.length}/50
+                  {[...introduction].length}/50
                 </span>
+                { error && <span className="my-1 text-red-500 text-sm">{error}</span>}
               </div>
               {/* button */}
               <div className="flex justify-center w-full md:w-1/2 my-4 space-x-4">
