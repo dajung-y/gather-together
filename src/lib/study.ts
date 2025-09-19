@@ -17,6 +17,6 @@ export const getStudyData = unstable_cache(
   },
   ['study'],
   {
-    revalidate: 300, // 5분 캐시
+    revalidate: 60, // 1분 캐시
   }
 );

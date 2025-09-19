@@ -34,6 +34,11 @@ export default function NoticeItem({ notice, isLeader }: NoticeItemProps) {
     }
   };
 
+  const handleEdit = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowDetail(true);
+  };
+
   if (deleted) return null;
 
   return (
@@ -45,9 +50,9 @@ export default function NoticeItem({ notice, isLeader }: NoticeItemProps) {
         <span className="body-sb text-primary-500">NEW</span>
         {isLeader &&
           <div className="flex gap-2 items-center">
-            <Pen size={20} className="ml-4" />
+            <Pen size={20} className="ml-4 cursor-pointer" onClick={handleEdit} />
             <span>|</span>
-            <Trash size={20} onClick={handleDelete} />
+            <Trash size={20} className="cursor-pointer" onClick={handleDelete} />
           </div>
         }
       </div>
@@ -57,6 +62,7 @@ export default function NoticeItem({ notice, isLeader }: NoticeItemProps) {
             {notice.content}</div>
         </div>
       }
+
     </>
   )
 }
