@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import StudyCard from "@/components/common/StudyCard";
 import Sidebar from "@/components/common/Sidebar";
 import Modal from "@/components/common/Modal";
+import { getCategoryLabel } from "@/utils/category";
 
 type StudyItem = {
     studyId: string;
@@ -125,7 +126,7 @@ export default function Page() {
         time: c.time,
         currentMembers: c.currentMembers,
         maxMembers: c.maxMembers,
-        tag: c.tag,
+        tag: getCategoryLabel(c.tag),
     });
 
     return (
