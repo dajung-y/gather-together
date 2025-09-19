@@ -6,9 +6,10 @@ import { formatDate } from "@/utils/date";
 
 type NoticeItemProps = {
   notice: Notice;
+  isLeader: boolean;
 }
 
-export default function NoticeItem({ notice }: NoticeItemProps) {
+export default function NoticeItem({ notice, isLeader }: NoticeItemProps) {
   const [showDetail, setShowDetail] = useState(false)
   const [deleted, setDeleted] = useState(false);
 
@@ -42,9 +43,13 @@ export default function NoticeItem({ notice }: NoticeItemProps) {
         <span className="flex-1 headline4">{notice.title}</span>
         <span>{formatDate(notice.createdAt)}</span>
         <span className="body-sb text-primary-500">NEW</span>
-        <Pen size={20} className="ml-4" />
-        <span>|</span>
-        <Trash size={20} onClick={handleDelete} />
+        {isLeader &&
+          <div className="flex gap-2 items-center">
+            <Pen size={20} className="ml-4" />
+            <span>|</span>
+            <Trash size={20} onClick={handleDelete} />
+          </div>
+        }
       </div>
       {showDetail &&
         <div className="bg-gray-100 p-4 rounded-lg">

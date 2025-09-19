@@ -5,7 +5,11 @@ import TextareaField from "@/components/common/form/TextareaField";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-export default function NoticeForm({ studyId }: { studyId: string }) {
+type NoticeFormProps = {
+  studyId: string;
+  isLeader: boolean
+}
+export default function NoticeForm({ studyId, isLeader }: NoticeFormProps) {
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
 
   const [showInput, setShowInput] = useState(false);
@@ -44,7 +48,7 @@ export default function NoticeForm({ studyId }: { studyId: string }) {
       {/* 공지 */}
       <div className="flex justify-between items-center">
         <p className="headline3 text-primary-500 my-4">일반 공지</p>
-        {!showInput && <Button size="md" onClick={() => setShowInput(!showInput)}>공지 추가</Button>}
+        {!showInput && isLeader && <Button size="md" onClick={() => setShowInput(!showInput)}>공지 추가</Button>}
       </div>
       {/* 일반 공지 추가 */}
       {showInput &&

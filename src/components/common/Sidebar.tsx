@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronsDown, ChevronsLeft, ChevronsRight, ChevronsUp } from "lucide-react";
 import { useState } from "react";
+import { useStudySidebarStore } from "@/store/studySidebar";
 
 type SidebarProps = {
   menuItems: MenuItem[];
@@ -13,18 +14,18 @@ type SidebarProps = {
 export const handleLeaveRoom = () => {
   alert("방 나가기");
 }
+
 export default function Sidebar({ menuItems, title }: SidebarProps) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(true);
 
   return (
-
     <div className="w-full  max-w-[1280px] lg:w-max h-max bg-primary-50 lg:rounded-r-2xl p-4">
       {isOpen ?
         <div>
           <div className="flex items-center gap-4">
             <p className="text-primary-900 headline4">{title}</p>
-            <ChevronsRight className="text-gray-500 hidden 2xl:block" onClick={() => setIsOpen(!isOpen)} />
+            <ChevronsLeft className="text-gray-500 hidden 2xl:block" onClick={() => setIsOpen(!isOpen)} />
             <ChevronsUp className="text-gray-500 2xl:hidden ml-auto" onClick={() => setIsOpen(!isOpen)} />
           </div>
           <hr className=" border-primary-100 my-2" />
@@ -45,7 +46,7 @@ export default function Sidebar({ menuItems, title }: SidebarProps) {
         :
         <div>
           <div className="flex items-center gap-4">
-            <p className="text-primary-900 headline4">{title}</p>
+            <p className="text-primary-900 headline4 2xl:hidden">{title}</p>
             <ChevronsRight className="text-gray-500 hidden 2xl:block" onClick={() => setIsOpen(!isOpen)} />
             <ChevronsDown className="text-gray-500 2xl:hidden ml-auto" onClick={() => setIsOpen(!isOpen)} />
 
