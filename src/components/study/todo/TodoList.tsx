@@ -15,7 +15,7 @@ export default function TodoList({ todos }: { todos: Todo[] }) {
         </div>
 
         <div className="flex">
-          {todos[0]?.checks?.map((user, userIndex) => (
+          {todos && todos[todos.length - 1]?.checks?.map((user, userIndex) => (
             <div key={userIndex} className="flex w-30 justify-center">
               <span>{user.userNickname}</span>
             </div>

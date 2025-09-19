@@ -10,6 +10,7 @@ import AlertModal from "@/components/common/AlertModal";
 import { getUserIdFromSession } from "@/lib/session";
 import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
+import { getStudyData } from "@/lib/study";
 
 export default async function page({ params }: { params: { id: string } }) {
   const param = await params;
@@ -25,8 +26,7 @@ export default async function page({ params }: { params: { id: string } }) {
   const client = await clientPromise;
   const db = client.db();
 
-  const study = await db.collection("studies").findOne({ _id: new ObjectId(studyId) });
-  const studyData: StudyData = JSON.parse(JSON.stringify(study));
+  const studyData: StudyData = await getStudyData(studyId);
 
   const notices = await db.collection("notices").find({ studyId }).toArray();
   const noticeData: Notice[] = JSON.parse(JSON.stringify(notices));
@@ -36,6 +36,10 @@ export default async function page({ params }: { params: { id: string } }) {
     userId: userId
   });
   const attendanceData: Attendance = JSON.parse(JSON.stringify(attendance));
+
+  //방장인지
+  const isLeader = studyData.members.some(
+    (m) => m.userId === userId && m.role === "leader");
 
   return (
     <>
@@ -58,13 +62,13 @@ export default async function page({ params }: { params: { id: string } }) {
             </div>
           </div>
           {/* 메인공지 */}
-          <MainNotice studyId={studyId} mainNotice={studyData.mainNotice} />
+          <MainNotice studyId={studyId} mainNotice={studyData.mainNotice} isLeader={isLeader} />
         </div>
 
         {/* 공지 추가*/}
-        <NoticeForm studyId={studyId} />
+        <NoticeForm studyId={studyId} isLeader={isLeader} />
         {/* 일반 공지 */}
-        <NoticeList notices={noticeData} />
+        <NoticeList notices={noticeData} isLeader={isLeader} />
       </div>
     </>
   )

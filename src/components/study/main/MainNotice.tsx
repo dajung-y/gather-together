@@ -7,9 +7,10 @@ import { Pen, Check, X } from 'lucide-react';
 type MainNoticeProps = {
   studyId: string;
   mainNotice?: Notice;
+  isLeader: boolean
 };
 
-export default function MainNotice({ studyId, mainNotice }: MainNoticeProps) {
+export default function MainNotice({ studyId, mainNotice, isLeader }: MainNoticeProps) {
   const [tempNotice, setTempNotice] = useState("");
   const [isEditing, setIsEditing] = useState(false);
 
@@ -69,7 +70,7 @@ export default function MainNotice({ studyId, mainNotice }: MainNoticeProps) {
           <div>
             <div className="flex">
               <p className="headline2 text-primary-500 mb-4">메인 공지</p>
-              <Pen size={20} className="ml-auto" onClick={() => setIsEditing(true)} />
+              {isLeader && <Pen size={20} className="ml-auto" onClick={() => setIsEditing(true)} />}
             </div>
             <p className="whitespace-pre-line">
               {mainNotice?.content || "공지를 작성해주세요!"}
