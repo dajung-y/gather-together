@@ -47,7 +47,11 @@ type ApiResp = {
 
 export default function Page() {
     const [isNickOpen, setIsNickOpen] = useState(false);
-    const [data, setData] = useState<ApiResp>({ approved: [], pending: [], rejected: [] });
+    const [data, setData] = useState<ApiResp>({
+        approved: [],
+        pending: [],
+        rejected: [],
+    });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -57,12 +61,22 @@ export default function Page() {
         { label: "닉네임 변경", onClick: () => setIsNickOpen(true) },
     ];
 
-    const mapToCard = (s: StudyItem): CardDTO => {
+    /** 승인완료 강제 지정 */
+    const mapToCard = (
+        s: StudyItem,
+        section: "approved" | "pending" | "rejected"
+    ): CardDTO => {
         const startDate = s.period?.startDate ?? (s as any).startDate ?? "";
         const endDate = s.period?.endDate ?? (s as any).endDate ?? "";
         const startTime = s.schedule?.startTime ?? (s as any).startTime ?? "";
         const endTime = s.schedule?.endTime ?? (s as any).endTime ?? "";
-        const variant = s.isRecruiting ? ("memberOpen" as const) : ("memberClosed" as const);
+
+        const variant =
+            section === "approved"
+                ? ("memberOpen" as const)
+                : section === "pending"
+                    ? (s.isRecruiting ? "memberOpen" : "memberClosed")
+                    : ("memberClosed" as const); // rejected
 
         return {
             id: s.studyId,
@@ -77,36 +91,50 @@ export default function Page() {
             tag: s.category,
         };
     };
-  
+
     useEffect(() => {
         (async () => {
             setLoading(true);
             setError(null);
             try {
                 const [aRes, pRes, rRes] = await Promise.all([
-                    fetch("/api/mypage/applied?status=approved", { cache: "no-store", credentials: "include" }),
-                    fetch("/api/mypage/applied?status=pending", { cache: "no-store", credentials: "include" }),
-                    fetch("/api/mypage/applied?status=rejected", { cache: "no-store", credentials: "include" }),
+                    fetch("/api/mypage/applied?status=approved", {
+                        cache: "no-store",
+                        credentials: "include",
+                    }),
+                    fetch("/api/mypage/applied?status=pending", {
+                        cache: "no-store",
+                        credentials: "include",
+                    }),
+                    fetch("/api/mypage/applied?status=rejected", {
+                        cache: "no-store",
+                        credentials: "include",
+                    }),
                 ]);
 
                 if (!aRes.ok || !pRes.ok || !rRes.ok) {
                     const at = await aRes.text().catch(() => "");
                     const pt = await pRes.text().catch(() => "");
                     const rt = await rRes.text().catch(() => "");
-                    console.error("APPLIED fetch error:", aRes.status, at, pRes.status, pt, rRes.status, rt);
+                    console.error(
+                        "APPLIED fetch error:",
+                        aRes.status,
+                        at,
+                        pRes.status,
+                        pt,
+                        rRes.status,
+                        rt
+                    );
                     throw new Error("applied api error");
                 }
 
-                const [aJson, pJson, rJson]: [ApiListResp, ApiListResp, ApiListResp] = await Promise.all([
-                    aRes.json(),
-                    pRes.json(),
-                    rRes.json(),
-                ]);
+                const [aJson, pJson, rJson]: [ApiListResp, ApiListResp, ApiListResp] =
+                    await Promise.all([aRes.json(), pRes.json(), rRes.json()]);
 
                 setData({
-                    approved: (aJson.items ?? []).map(mapToCard),
-                    pending: (pJson.items ?? []).map(mapToCard),
-                    rejected: (rJson.items ?? []).map(mapToCard),
+                    approved: (aJson.items ?? []).map((s) => mapToCard(s, "approved")),
+                    pending: (pJson.items ?? []).map((s) => mapToCard(s, "pending")),
+                    rejected: (rJson.items ?? []).map((s) => mapToCard(s, "rejected")),
                 });
             } catch (e: any) {
                 setError(e?.message ?? "데이터 로드 실패");
@@ -142,7 +170,7 @@ export default function Page() {
 
                     {!loading && !error && (
                         <>
-                          {/* 승인완료 */}
+                            {/* 승인완료 */}
                             <div>
                                 <h1 className="text-lg sm:text-xl mb-2">승인완료</h1>
                                 <hr className="mt-2 mb-4 sm:mb-6 w-full border-t border-gray-300" />
@@ -151,7 +179,9 @@ export default function Page() {
                                         <StudyCard key={`approved-${c.id}`} {...toCardProps(c)} />
                                     ))}
                                     {data.approved.length === 0 && (
-                                        <p className="text-sm text-gray-500">승인완료 스터디가 없어요.</p>
+                                        <p className="text-sm text-gray-500">
+                                            승인완료 스터디가 없어요.
+                                        </p>
                                     )}
                                 </div>
                             </div>
@@ -165,7 +195,9 @@ export default function Page() {
                                         <StudyCard key={`pending-${c.id}`} {...toCardProps(c)} />
                                     ))}
                                     {data.pending.length === 0 && (
-                                        <p className="text-sm text-gray-500">대기 중인 스터디가 없어요.</p>
+                                        <p className="text-sm text-gray-500">
+                                            대기 중인 스터디가 없어요.
+                                        </p>
                                     )}
                                 </div>
                             </div>
@@ -179,7 +211,9 @@ export default function Page() {
                                         <StudyCard key={`rejected-${c.id}`} {...toCardProps(c)} />
                                     ))}
                                     {data.rejected.length === 0 && (
-                                        <p className="text-sm text-gray-500">거절된 스터디가 없어요.</p>
+                                        <p className="text-sm text-gray-500">
+                                            거절된 스터디가 없어요.
+                                        </p>
                                     )}
                                 </div>
                             </div>
@@ -215,10 +249,17 @@ function NicknameForm({ onClose }: { onClose: () => void }) {
                 onChange={(e) => setNickname(e.target.value)}
             />
             <div className="flex justify-end gap-2">
-                <button type="button" className="px-3 py-2 rounded-md border" onClick={onClose}>
+                <button
+                    type="button"
+                    className="px-3 py-2 rounded-md border"
+                    onClick={onClose}
+                >
                     취소
                 </button>
-                <button type="submit" className="px-3 py-2 rounded-md bg-[#264B1D] text-white">
+                <button
+                    type="submit"
+                    className="px-3 py-2 rounded-md bg-[#264B1D] text-white"
+                >
                     저장
                 </button>
             </div>
