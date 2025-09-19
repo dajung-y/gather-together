@@ -9,7 +9,6 @@ interface CardListProps {
 }
 
 export default function CardList ({studies}: CardListProps) {
-  console.log('CardList로 넘어온 studies: ',studies);
   return(
     <div className="
       grid grid-cols-1 gap-8

@@ -19,7 +19,7 @@ export default function Sidebar({ menuItems, title }: SidebarProps) {
 
   return (
 
-    <div className="w-full  max-w-[1280px] 2xl:w-max h-max bg-primary-50 2xl:rounded-r-2xl p-4">
+    <div className="w-full  max-w-[1280px] lg:w-max h-max bg-primary-50 lg:rounded-r-2xl p-4">
       {isOpen ?
         <div>
           <div className="flex items-center gap-4">

@@ -2,6 +2,7 @@
 import Button from "@/components/common/Button";
 import { useForm } from 'react-hook-form';
 import { StudyData } from "@/types/study";
+import { useState } from "react";
 
 type TodoFormProps = {
   studyId: string;
@@ -12,6 +13,7 @@ export default function TodoForm({
   studyId,
   studyData }: TodoFormProps) {
   const { register, handleSubmit, formState: { errors } } = useForm();
+  const [open, setOpen] = useState<boolean>(false);
 
   const onSubmit = async (data: any) => {
     try {
@@ -43,33 +45,71 @@ export default function TodoForm({
   return (
     <div className='my-4'>
       <p className='headline3 text-primary-500'>할 일 추가</p>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className='flex flex-col justify-center'>
-          <div className='flex gap-2 my-2 items-center'>
+      {/* 모바일 화면 */}
+      <div className="mt-4 mb-8 w-full md:hidden">
+        <Button 
+          size="md"
+          variant={open? "secondary" : "primary"}
+          className="w-full"
+          onClick={() => setOpen(!open)}>
+          {open? "입력 닫기" : "할 일 추가"}
+        </Button>
+
+        { open && (
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col w-full mt-4 space-y-4">
+            <div className="w-full">
+              <input
+                type='date'
+                {...register('todoDate', { required: '날짜를 선택해주세요' })}
+                placeholder='날짜 선택'
+                className='border rounded px-2 py-1 border-gray-400'
+              />
+              {errors.todoDate && (
+                <p className='text-red-500 text-sm'>{errors.todoDate.message as string}</p>
+              )}
+            </div>
+            <div>
+              <input
+                type='text'
+                {...register('task', { required: '할 일을 입력해주세요' })}
+                placeholder='할 일 입력'
+                className='border rounded px-2 py-1 border-gray-400'
+              />
+              {errors.task && (
+                <p className='text-red-500 text-sm'>{errors.task.message as string}</p>
+              )}
+              </div>
+
+              <Button type='submit' className='text-center'>추가</Button>
+          </form>
+        )}
+      </div>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="hidden md:flex gap-2 my-2 items-start">
+          <div>
             <input
               type='date'
               {...register('todoDate', { required: '날짜를 선택해주세요' })}
               placeholder='날짜 선택'
               className='border rounded px-2 py-1 border-gray-400'
             />
+            {errors.todoDate && (
+              <p className='text-red-500 text-sm'>{errors.todoDate.message as string}</p>
+            )}
+          </div>
+          <div>
             <input
               type='text'
               {...register('task', { required: '할 일을 입력해주세요' })}
               placeholder='할 일 입력'
               className='border rounded px-2 py-1 border-gray-400'
             />
-            <Button type='submit' className='text-center'>추가</Button>
-          </div>
-          <div className="flex gap-13">
-            {errors.todoDate && (
-              <span className='text-red-500 text-sm'>{errors.todoDate.message as string}</span>
-            )}
             {errors.task && (
-              <span className='text-red-500 text-sm'>{errors.task.message as string}</span>
+              <p className='text-red-500 text-sm'>{errors.task.message as string}</p>
             )}
           </div>
-        </div>
-      </form>
+          <Button type='submit' className='text-center'>추가</Button>
+        </form>
     </div>
 
   )

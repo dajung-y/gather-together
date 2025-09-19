@@ -7,7 +7,6 @@ export async function POST(request: NextRequest) {
 
   try{
     const session = await getServerSession(authOptions);
-    console.log('세션 확인: ',session?.user?.email)
 
     if(!session?.user?.id){
       return NextResponse.json(

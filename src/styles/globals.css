@@ -64,12 +64,12 @@ body {
 /* 버튼 */
 /* 기본 */
 .button-base {
-  @apply text-base transition cursor-pointer
+  @apply text-base transition
 }
 
-.button-base:hover {
+/* .button-base:hover {
   @apply brightness-95
-}
+} */
 
 .button-primary {
   @apply text-primary-50 border bg-primary-500
@@ -78,6 +78,10 @@ body {
 
 .button-secondary {
   @apply text-primary-700 bg-primary-50
+}
+
+.button-disabled {
+  @apply text-gray-700 bg-gray-200
 }
 
 .button-outline {
