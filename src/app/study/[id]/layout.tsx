@@ -1,5 +1,6 @@
 // app/study/[id]/layout.tsx
 import Sidebar from "@/components/common/Sidebar";
+import MemberCheck from "@/components/study/main/MemberCheck";
 import StudySidebar from "@/components/study/StudySidebar";
 import clientPromise from "@/lib/mongodb";
 import { getUserIdFromSession } from "@/lib/session";
@@ -27,7 +28,8 @@ export default async function Layout({ children, params }: LayoutProps) {
   const studyData: StudyData = await getStudyData(studyId);
 
   const studyTitle = studyData.studyName;
-  const isLeader = studyData.members.some((m) => m.userId === userId && m.role === "leader");
+  const isMember = studyData.members.some(member => String(member.userId) == String(userId));
+  const isLeader = studyData.members.some(member => member.role === "leader") && isMember;
 
   // 메뉴 생성
   return (
@@ -38,6 +40,7 @@ export default async function Layout({ children, params }: LayoutProps) {
           {children}
         </div>
       </div>
+      <MemberCheck isMember={isMember} />
     </div>
 
   );

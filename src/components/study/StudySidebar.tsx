@@ -55,7 +55,7 @@ export default function StudySidebar({ studyId, userId, studyTitle, isLeader }: 
     { label: "메인", path: `/study/${studyId}` },
     { label: "일정", path: `/study/${studyId}/todo` },
     ...(isLeader ? [{ label: "설정", path: `/study/${studyId}/setting` }] : []),
-    { label: "탈퇴하기", onClick: () => handleLeaveRoom() },
+    ...(!isLeader ? [{ label: "탈퇴하기", onClick: () => handleLeaveRoom() }] : []),
   ];
 
   return (
