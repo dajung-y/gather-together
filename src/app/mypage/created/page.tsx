@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import StudyCard from "@/components/common/StudyCard";
@@ -6,7 +7,6 @@ import Sidebar from "@/components/common/Sidebar";
 import Modal from "@/components/common/Modal";
 
 type ApiListResp = { items?: any[]; data?: any[] };
-
 type Applicant = { userId?: string; name: string; msg?: string };
 
 type CardDTO = {
@@ -26,21 +26,17 @@ type CardDTO = {
     currentMembers: number;
     maxMembers: number;
     tag: string;
-    isRecruiting?: boolean;
+    isRecruiting: boolean;
     applicants?: Applicant[];
 };
 
-type SplitResp = {
-    recruiting: CardDTO[];
-    completed: CardDTO[];
-};
+type SplitResp = { recruiting: CardDTO[]; completed: CardDTO[] };
 
 const pickList = (j: ApiListResp): any[] => j.items ?? j.data ?? [];
-
 const getStartDate = (s: any) => s?.period?.startDate ?? s?.startDate ?? "";
-const getEndDate = (s: any) => s?.period?.endDate ?? s?.endDate ?? "";
+const getEndDate   = (s: any) => s?.period?.endDate   ?? s?.endDate   ?? "";
 const getStartTime = (s: any) => s?.schedule?.startTime ?? s?.startTime ?? "";
-const getEndTime = (s: any) => s?.schedule?.endTime ?? s?.endTime ?? "";
+const getEndTime   = (s: any) => s?.schedule?.endTime   ?? s?.endTime   ?? "";
 const getStatus = (s: any): "RECRUITING" | "CLOSED" =>
     s?.status ?? (s?.isRecruiting ? "RECRUITING" : "CLOSED");
 const getCurrentMembers = (s: any) =>
@@ -50,7 +46,6 @@ const getName = (s: any) => String(s?.studyName ?? s?.name ?? "");
 const getTitle = (s: any) => String(s?.title ?? "");
 const getCapacity = (s: any) =>
     typeof s?.capacity === "number" ? s.capacity : Number(s?.capacity ?? 0);
-const getCategory = (s: any) => String(s?.category ?? "");
 
 export default function Page() {
     const { data: session, status } = useSession();
@@ -59,8 +54,16 @@ export default function Page() {
     const [data, setData] = useState<SplitResp>({ recruiting: [], completed: [] });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-
     const [mutatingKey, setMutatingKey] = useState<string | null>(null);
+
+    // 승인/거절 확인 모달
+    const [confirm, setConfirm] = useState<{
+        studyId: string;
+        applicantId: string;
+        applicantName?: string;
+        title?: string;
+        action: "approve" | "reject";
+    } | null>(null);
 
     const menuItems = [
         { label: "내가 지원한 스터디", path: "/mypage/applied" },
@@ -68,14 +71,17 @@ export default function Page() {
         { label: "닉네임 변경", onClick: () => setIsNickOpen(true) },
     ];
 
-     const mapToCard = (s: any): CardDTO => {
+    const mapToCard = (s: any): CardDTO => {
         const status = getStatus(s);
         const variant = status === "RECRUITING" ? ("leaderOpen" as const) : ("leaderClosed" as const);
 
         const startDate = getStartDate(s);
         const endDate = getEndDate(s);
-        const startTime = getStartTime(s);
-        const endTime = getEndTime(s);
+        const time =
+            typeof s?.time === "string" && s.time.trim().length > 0
+                ? s.time
+                : [getStartTime(s), getEndTime(s)].filter(Boolean).join(" ~ ");
+        const tag = String(s?.tag ?? s?.category ?? "");
 
         return {
             id: getId(s),
@@ -84,10 +90,10 @@ export default function Page() {
             title: getTitle(s),
             startDate,
             endDate,
-            time: [startTime, endTime].filter(Boolean).join(" ~ "),
+            time,
             currentMembers: getCurrentMembers(s),
             maxMembers: getCapacity(s),
-            tag: getCategory(s),
+            tag,
             isRecruiting: status === "RECRUITING",
             applicants: (s.applicants ?? []).map((a: any) => ({
                 userId: a?.userId ?? a?._id ?? a?.id ?? "",
@@ -97,90 +103,27 @@ export default function Page() {
         };
     };
 
-    const decideApplicant = async (
-        studyId: string,
-        applicantId: string,
-        action: "approve" | "reject"
-    ) => {
-        const key = `${studyId}:${applicantId}:${action}`;
-        setMutatingKey(key);
-        try {
-            const res = await fetch(`/api/mypage/groups/${studyId}/applicants`, {
-                method: "PATCH",
-                credentials: "include",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ applicantId, action }),
-            });
-            if (!res.ok) {
-                const t = await res.text().catch(() => "");
-                console.error("PATCH /api/mypage/groups/[id]/applicants error:", res.status, t);
-                throw new Error(`fail ${action}`);
-            }
-
-            setData((prev) => {
-                const bump = (list: CardDTO[]) =>
-                    list.map((c) => {
-                        if (c.id !== studyId) return c;
-                        const nextApplicants = (c.applicants ?? []).filter((a) => a.userId !== applicantId);
-                        if (action === "approve") {
-                            const nextMembers = c.currentMembers + 1;
-                            const reached = nextMembers >= c.maxMembers;
-                            return {
-                                ...c,
-                                applicants: nextApplicants,
-                                currentMembers: nextMembers,
-                                isRecruiting: reached ? false : c.isRecruiting,
-                                variant: reached ? "leaderClosed" : c.variant,
-                            };
-                        }
-                        // reject
-                        return { ...c, applicants: nextApplicants };
-                    });
-
-                return { recruiting: bump(prev.recruiting), completed: bump(prev.completed) };
-            });
-        } catch (e) {
-        } finally {
-            setMutatingKey(null);
-        }
-    };
-
     const fetchData = async (creatorId: string) => {
         setLoading(true);
         setError(null);
         try {
-            const qsOpen = new URLSearchParams({
-                isRecruiting: "true",
-                creatorId,
-            }).toString();
-
-            const qsClosed = new URLSearchParams({
-                isRecruiting: "false",
-                creatorId,
-            }).toString();
+            const qsOpen = new URLSearchParams({ isRecruiting: "true",  creatorId }).toString();
+            const qsClosed = new URLSearchParams({ isRecruiting: "false", creatorId }).toString();
 
             const [openRes, closedRes] = await Promise.all([
-                fetch(`/api/mypage/groups?${qsOpen}`, { cache: "no-store", credentials: "include" }),
+                fetch(`/api/mypage/groups?${qsOpen}`,   { cache: "no-store", credentials: "include" }),
                 fetch(`/api/mypage/groups?${qsClosed}`, { cache: "no-store", credentials: "include" }),
             ]);
 
-            if (!openRes.ok) {
-                const t = await openRes.text().catch(() => "");
-                console.error("OPEN /api/mypage/groups error:", openRes.status, t);
-                throw new Error(`API error(open): ${openRes.status}`);
-            }
-            if (!closedRes.ok) {
-                const t = await closedRes.text().catch(() => "");
-                console.error("CLOSED /api/mypage/groups error:", closedRes.status, t);
-                throw new Error(`API error(closed): ${closedRes.status}`);
-            }
+            if (!openRes.ok)   throw new Error(`API error(open): ${openRes.status}`);
+            if (!closedRes.ok) throw new Error(`API error(closed): ${closedRes.status}`);
 
-            const openJson: ApiListResp = await openRes.json();
+            const openJson: ApiListResp   = await openRes.json();
             const closedJson: ApiListResp = await closedRes.json();
 
             setData({
                 recruiting: pickList(openJson).map(mapToCard),
-                completed: pickList(closedJson).map(mapToCard),
+                completed:  pickList(closedJson).map(mapToCard),
             });
         } catch (e) {
             const msg = e instanceof Error ? e.message : "데이터 로드 실패";
@@ -216,7 +159,76 @@ export default function Page() {
         isRecruiting: c.isRecruiting,
     });
 
+    const decideApplicant = async (
+        studyId: string,
+        applicantId: string,
+        action: "approve" | "reject"
+    ) => {
+        const key = `${studyId}:${applicantId}:${action}`;
+        setMutatingKey(key);
+
+        const all   = [...data.recruiting, ...data.completed];
+        const cur   = all.find((c) => c.id === studyId);
+        const reach = action === "approve" && cur
+            ? cur.currentMembers + 1 >= cur.maxMembers
+            : false;
+
+        try {
+            setData((prev) => {
+                const updateCard = (c: CardDTO): CardDTO => {
+                    if (c.id !== studyId) return c;
+                    const nextApplicants = (c.applicants ?? []).filter((a) => a.userId !== applicantId);
+                    if (action === "approve") {
+                        const nextMembers = c.currentMembers + 1;
+                        const reached     = nextMembers >= c.maxMembers;
+                        return {
+                            ...c,
+                            applicants: nextApplicants,
+                            currentMembers: nextMembers,
+                            isRecruiting: reached ? false : c.isRecruiting,
+                            variant: reached ? "leaderClosed" : c.variant,
+                        };
+                    }
+                    return { ...c, applicants: nextApplicants };
+                };
+
+                let recruiting = prev.recruiting.map(updateCard);
+                let completed  = prev.completed.map(updateCard);
+
+                if (reach) {
+                    const next = recruiting.find((x) => x.id === studyId);
+                    if (next) {
+                        recruiting = recruiting.filter((x) => x.id !== studyId);
+                        completed  = [next, ...completed.filter((x) => x.id !== studyId)];
+                    }
+                }
+                return { recruiting, completed };
+            });
+
+            const res = await fetch(`/api/mypage/groups/${studyId}/applicants`, {
+                method: "PATCH",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ applicantId, action }),
+            });
+            if (!res.ok) {
+                const t = await res.text().catch(() => "");
+                console.error("PATCH /api/mypage/groups/[id]/applicants error:", res.status, t);
+                throw new Error(`fail ${action}`);
+            }
+        } catch (e) {
+            const userId = (session as any)?.user?.id;
+            if (userId) await fetchData(userId);
+            alert("신청 처리에 실패했어요.");
+        } finally {
+            setMutatingKey(null);
+        }
+    };
+
     const list = active === "open" ? data.recruiting : data.completed;
+
+    const confirmKey =
+        confirm ? `${confirm.studyId}:${confirm.applicantId}:${confirm.action}` : null;
 
     return (
         <div className="min-h-screen flex flex-col">
@@ -261,8 +273,7 @@ export default function Page() {
                                             <div
                                                 key={`recruiting-${c.id}`}
                                                 className="border border-gray-300 rounded-lg p-4 bg-white
-                        flex flex-col lg:flex-row items-start lg:items-stretch
-                        gap-4 lg:gap-8"
+                                   flex flex-col lg:flex-row items-start lg:items-stretch gap-4 lg:gap-8"
                                             >
                                                 <div className="w-full lg:w-[clamp(240px,35%,320px)]">
                                                     <StudyCard {...toCardProps(c)} />
@@ -290,18 +301,42 @@ export default function Page() {
                                     {a.msg ?? "메시지 없음"}
                                   </span>
                                                                 </div>
+
+                                                                {/* 승인/거절 확인 모달 */}
                                                                 <div className="flex gap-2 shrink-0 md:self-auto w-full md:w-auto">
                                                                     <button
-                                                                        className="bg-green-900 text-white px-4 py-2 rounded w-full md:w-auto"
+                                                                        className="bg-green-900 text-white px-4 py-2 rounded w-full md:w-auto disabled:opacity-50"
                                                                         disabled={mutatingKey === `${c.id}:${a.userId}:approve`}
-                                                                        onClick={() => a.userId && decideApplicant(c.id, a.userId, "approve")}
+                                                                        onClick={(e) => {
+                                                                            e.preventDefault();
+                                                                            e.stopPropagation();
+                                                                            a.userId &&
+                                                                            setConfirm({
+                                                                                studyId: c.id,
+                                                                                applicantId: a.userId,
+                                                                                applicantName: a.name,
+                                                                                title: c.title,
+                                                                                action: "approve",
+                                                                            });
+                                                                        }}
                                                                     >
                                                                         승인
                                                                     </button>
                                                                     <button
-                                                                        className="border border-green-900 text-green-900 px-4 py-2 rounded w-full md:w-auto"
+                                                                        className="border border-green-900 text-green-900 px-4 py-2 rounded w-full md:w-auto disabled:opacity-50"
                                                                         disabled={mutatingKey === `${c.id}:${a.userId}:reject`}
-                                                                        onClick={() => a.userId && decideApplicant(c.id, a.userId, "reject")}
+                                                                        onClick={(e) => {
+                                                                            e.preventDefault();
+                                                                            e.stopPropagation();
+                                                                            a.userId &&
+                                                                            setConfirm({
+                                                                                studyId: c.id,
+                                                                                applicantId: a.userId,
+                                                                                applicantName: a.name,
+                                                                                title: c.title,
+                                                                                action: "reject",
+                                                                            });
+                                                                        }}
                                                                     >
                                                                         거절
                                                                     </button>
@@ -320,7 +355,7 @@ export default function Page() {
                             ) : (
                                 <div
                                     className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3
-                  gap-4 sm:gap-6 lg:gap-8 mx-0 sm:mx-5 my-5"
+                             gap-4 sm:gap-6 lg:gap-8 mx-0 sm:mx-5 my-5"
                                 >
                                     {list.map((c) => (
                                         <StudyCard key={`completed-${c.id}`} {...toCardProps(c)} />
@@ -336,6 +371,41 @@ export default function Page() {
                     <div className="p-6">
                         <h3 className="text-lg font-semibold mb-4">닉네임 변경</h3>
                         <NicknameForm onClose={() => setIsNickOpen(false)} />
+                    </div>
+                </Modal>
+
+                {/* 승인/거절 확인 모달 */}
+                <Modal isOpen={!!confirm} onClose={() => setConfirm(null)}>
+                    <div className="p-6">
+                        <h3 className="text-lg font-semibold mb-3">
+                            {confirm?.action === "approve" ? "신청 승인" : "신청 거절"}
+                        </h3>
+                        <p className="text-sm text-gray-700">
+                            {confirm?.applicantName ?? "지원자"}님의 신청을{" "}
+                            <b>{confirm?.action === "approve" ? "승인" : "거절"}</b>하시겠습니까?
+                        </p>
+
+                        <div className="mt-5 flex justify-end gap-2">
+                            <button
+                                type="button"
+                                className="px-3 py-2 rounded-md border"
+                                onClick={() => setConfirm(null)}
+                            >
+                                취소
+                            </button>
+                            <button
+                                type="button"
+                                className="px-3 py-2 rounded-md bg-[#264B1D] text-white disabled:opacity-60"
+                                disabled={!!confirmKey && mutatingKey === confirmKey}
+                                onClick={async () => {
+                                    if (!confirm) return;
+                                    await decideApplicant(confirm.studyId, confirm.applicantId, confirm.action);
+                                    setConfirm(null);
+                                }}
+                            >
+                                확인
+                            </button>
+                        </div>
                     </div>
                 </Modal>
             </main>
@@ -369,4 +439,3 @@ function NicknameForm({ onClose }: { onClose: () => void }) {
         </form>
     );
 }
-
