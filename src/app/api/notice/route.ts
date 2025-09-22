@@ -48,11 +48,39 @@ export async function GET(req: Request) {
 }
 
 export async function DELETE(req: Request) {
-  const { id } = (await req.json()) as { id: string }; // 문자열로 명시
+  const { id } = (await req.json()) as { id: string };
   if (!id) return NextResponse.json({ error: "id 필요" }, { status: 400 });
 
   const db = (await clientPromise).db();
   const result = await db.collection("notices").deleteOne({ _id: new ObjectId(id) });
 
   return NextResponse.json({ success: result.deletedCount === 1 });
+}
+
+
+export async function PATCH(req: Request) {
+  try {
+    const body = await req.json();
+    const { noticeId, title, content } = body;
+
+    const client = await clientPromise;
+    const db = client.db();
+
+    await db.collection("notices").updateOne(
+      { _id: new ObjectId(noticeId) },
+      {
+        $set: {
+          title: title,
+          content: content
+        },
+      }
+    );
+
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    return NextResponse.json(
+      { message: "수정 실패", error: error.message },
+      { status: 500 }
+    );
+  }
 }
