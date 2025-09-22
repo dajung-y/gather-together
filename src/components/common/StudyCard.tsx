@@ -81,7 +81,7 @@ export default function StudyCard({
           </span> */}
           
           {(variant === "mainOpen" || variant === "mainClosed") && (
-            <span className={`px-3 rounded-full ml-auto self-center
+            <span className={`px-3 rounded-full ml-auto self-center 
               ${isRecruiting ? "bg-primary-50 text-primary-500" : "bg-gray-300 text-gray-700"}`}>
               {isRecruiting ? "모집중" : "모집마감"}
             </span>
