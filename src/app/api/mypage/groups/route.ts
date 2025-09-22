@@ -3,7 +3,8 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
-import { ObjectId } from "mongodb";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../auth/[...nextauth]/route";
 
 type StudyDoc = any;
 
@@ -27,27 +28,24 @@ function toCardDTO(s: StudyDoc) {
         endDate,
         time: [startTime, endTime].filter(Boolean).join(" ~ "),
         currentMembers:
-            typeof s?.currentMembers === "number"
-                ? s.currentMembers
-                : (s?.members?.length ?? 0),
+            typeof s?.currentMembers === "number" ? s.currentMembers : (s?.members?.length ?? 0),
         maxMembers: Number(s?.capacity ?? 0),
         tag: String(s?.category ?? ""),
-        isRecruiting: Boolean(
-            s?.status ? s.status === "RECRUITING" : s?.isRecruiting ?? false
-        ),
+        isRecruiting: Boolean(s?.status ? s.status === "RECRUITING" : s?.isRecruiting ?? false),
         applicants,
     };
 }
 
 export async function GET(req: NextRequest) {
     try {
+        const session = await getServerSession(authOptions);
+        const myId = ((session?.user as any)?.id || (session?.user as any)?.email || "").trim();
+        if (!myId) {
+            return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
+        }
+
         const { searchParams } = new URL(req.url);
         const isRecruiting = searchParams.get("isRecruiting");
-        const creatorId = searchParams.get("creatorId")?.trim();
-
-        if (!creatorId) {
-            return NextResponse.json({ items: [] }, { status: 200 });
-        }
         const recFlag =
             isRecruiting === "true" ? true : isRecruiting === "false" ? false : undefined;
 
@@ -55,17 +53,13 @@ export async function GET(req: NextRequest) {
         const db = client.db();
         const col = db.collection("studies");
 
-        const query: any = { "creator.userId": creatorId };
+        const ownerFilter = { $or: [{ "creator.userId": myId }, { creatorId: myId }] } as const;
+        const query: any = { ...ownerFilter };
         if (typeof recFlag === "boolean") query.isRecruiting = recFlag;
 
-        const list = await col
-            .find(query)
-            .sort({ createdAt: -1 })
-            .toArray();
+        const list = await col.find(query).sort({ createdAt: -1 }).toArray();
 
-        return NextResponse.json({
-            items: list.map(toCardDTO),
-        });
+        return NextResponse.json({ items: list.map(toCardDTO) });
     } catch (e: any) {
         console.error("[GET /api/mypage/groups] error:", e);
         return NextResponse.json({ error: "failed" }, { status: 500 });
