@@ -28,11 +28,11 @@ export default function DropdownMenu({params} : DropdownMenuProps) {
             수정
           </button>
         </MenuItem>
-        <MenuItem>
+        {/* <MenuItem>
           <button className='flex w-full items-center gap-2 rounded-lg px-4 py-1.5 text-red-500 hover:bg-gray-100'>
             삭제
           </button>
-        </MenuItem>
+        </MenuItem> */}
       </MenuItems>
     </Menu>
   )

@@ -1,16 +1,8 @@
 export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
-
-export async function GET(
-    _req: NextRequest,
-    { params }: { params: { id: string } }
-) {
-    return NextResponse.json({ ok: true, route: "applicants", id: params.id });
-}
 
 export async function PATCH(
     request: NextRequest,
@@ -31,29 +23,28 @@ export async function PATCH(
         const db = client.db();
         const col = db.collection("studies");
 
-        const study: any = await col.findOne({ _id });
+        const study = await col.findOne({ _id });
         if (!study) return NextResponse.json({ error: "not found" }, { status: 404 });
 
         if (action === "approve") {
             const capacity = Number(study.capacity ?? 0);
-            const currentMembers = Number(
-                study.currentMembers ?? (study.members?.length ?? 0)
-            );
-            if (capacity && currentMembers >= capacity) {
-                return NextResponse.json(
-                    { error: "capacity reached" },
-                    { status: 400 }
-                );
+            const currentMembers = Number(study.currentMembers ?? (study.members?.length ?? 0));
+            if (currentMembers >= capacity) {
+                return NextResponse.json({ error: "capacity reached" }, { status: 400 });
             }
 
             const applicant =
-                (study.applicants ?? []).find((a: any) => String(a?.userId) === String(applicantId)) ??
-                null;
+                (study.applicants ?? []).find((a: any) => a?.userId === applicantId) ?? null;
             if (!applicant) {
                 return NextResponse.json({ error: "applicant not found" }, { status: 404 });
             }
 
-            const willBeClosed = capacity ? currentMembers + 1 >= capacity : false;
+            const willBeClosed = currentMembers + 1 >= capacity;
+
+            await col.updateOne(
+                { _id, "applicants.userId": applicantId },
+                { $set: { "applicants.$.status": "approved", "applicants.$.decidedAt": new Date() } }
+            );
 
             await col.updateOne(
                 { _id },
@@ -74,11 +65,19 @@ export async function PATCH(
             return NextResponse.json({ ok: true, action: "approve", closed: willBeClosed });
         }
 
-        // 거절
-        await col.updateOne(
-            { _id },
-            { $pull: { applicants: { userId: applicantId } } }
+        const res = await col.updateOne(
+            { _id, "applicants.userId": applicantId },
+            {
+                $set: {
+                    "applicants.$.status": "rejected",
+                    "applicants.$.decidedAt": new Date(),
+                },
+            }
         );
+
+        if (res.matchedCount === 0) {
+            return NextResponse.json({ error: "applicant not found" }, { status: 404 });
+        }
 
         return NextResponse.json({ ok: true, action: "reject" });
     } catch (err: any) {

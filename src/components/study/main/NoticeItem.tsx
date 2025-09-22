@@ -46,6 +46,7 @@ export default function NoticeItem({ notice, isLeader }: NoticeItemProps) {
 
   const handleEdit = async (e: React.MouseEvent) => {
     e.stopPropagation();
+
     setIsEditing(true);
   };
 
@@ -78,11 +79,13 @@ export default function NoticeItem({ notice, isLeader }: NoticeItemProps) {
   };
 
 
+
   if (deleted) return null;
 
 
   return (
     <>
+
       {!isEditing ?
         <div>
           <div className="flex gap-2 p-4 border rounded-lg items-center"
@@ -97,6 +100,7 @@ export default function NoticeItem({ notice, isLeader }: NoticeItemProps) {
                 <Trash size={20} className="cursor-pointer" onClick={handleDelete} />
               </div>
             }
+
           </div>
           {showDetail &&
             <div className="bg-gray-100 p-4 rounded-lg">
@@ -143,6 +147,7 @@ export default function NoticeItem({ notice, isLeader }: NoticeItemProps) {
           </form>
         </div>
       }
+
     </>
   )
 }
