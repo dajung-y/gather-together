@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import StudyCard from "@/components/common/StudyCard";
 import Sidebar from "@/components/common/Sidebar";
 import Modal from "@/components/common/Modal";
+import { getCategoryLabel } from "@/utils/category";
 
 type ApiListResp = { items?: any[]; data?: any[] };
 type Applicant = { userId?: string; name: string; msg?: string };
@@ -155,7 +156,7 @@ export default function Page() {
         time: c.time,
         currentMembers: c.currentMembers,
         maxMembers: c.maxMembers,
-        tag: c.tag,
+        tag: getCategoryLabel(c.tag),
         isRecruiting: c.isRecruiting,
     });
 
