@@ -84,11 +84,8 @@ export default function NoticeForm({ studyId, isLeader }: NoticeFormProps) {
               />
               {errors.content && <span className="text-red-500 text-sm">{errors.content.message as string}</span>}
             </div>
-
           </div>
         </form>
-
-
       }
     </>
   )
