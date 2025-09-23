@@ -46,8 +46,28 @@ const getCurrentMembers = (s: any) =>
 const getId = (s: any) => String(s?.studyId ?? s?._id ?? s?.id ?? "");
 const getName = (s: any) => String(s?.studyName ?? s?.name ?? "");
 const getTitle = (s: any) => String(s?.title ?? "");
-const getCapacity = (s: any) =>
-    typeof s?.capacity === "number" ? s.capacity : Number(s?.capacity ?? 0);
+
+const getCapacity = (s: any) => {
+    const candidates = [
+        s?.capacity,
+        s?.maxMembers,
+        s?.memberLimit,
+        s?.limit,
+        s?.recruitment?.capacity,
+        s?.recruitment?.maxMembers,
+    ];
+    for (const v of candidates) {
+        if (typeof v === "number" && Number.isFinite(v)) return v;
+        if (typeof v === "string") {
+            const m = v.match(/\d+/);
+            if (m) {
+                const n = Number(m[0]);
+                if (Number.isFinite(n)) return n;
+            }
+        }
+    }
+    return 0;
+};
 
 export default function Page() {
     const { data: session, status } = useSession();
@@ -294,8 +314,6 @@ export default function Page() {
             e.stopPropagation();
         }
     };
-
-    // 현재 탭 리스트
     const list = active === "open" ? data.recruiting : data.completed;
 
     const confirmKey =
@@ -310,7 +328,6 @@ export default function Page() {
                     </div>
 
                     <section className="flex-1 flex flex-col text-[#666] space-y-4 sm:space-y-6">
-                        {/* 탭 토글 */}
                         <div className="inline-flex w-full rounded-xl bg-gray-100 p-1">
                             <button
                                 onClick={() => setActive("open")}
@@ -330,7 +347,6 @@ export default function Page() {
                             </button>
                         </div>
 
-                        {/* 상태 표시 */}
                         {loading && <p>불러오는 중...</p>}
                         {error && <p className="text-red-500">에러: {error}</p>}
 
@@ -437,7 +453,6 @@ export default function Page() {
                                             className="relative"
                                             data-study-id={c.id}
                                             data-recruiting={String(c.isRecruiting)}
-                                            // ✅ 토글 완전 차단: 클릭/키보드 모두 캡처 단계에서 먹음
                                             onClickCapture={blockSwitchCapture}
                                             onKeyDownCapture={blockSwitchCapture}
                                             aria-disabled="true"
