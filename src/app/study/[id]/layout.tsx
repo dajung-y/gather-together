@@ -17,7 +17,7 @@ export default async function Layout({ children, params }: LayoutProps) {
 
   const userId = await getUserIdFromSession();
   if (!userId) {
-    redirect('/');
+
   }
 
   const studyData: StudyData = await getStudyData(studyId);
