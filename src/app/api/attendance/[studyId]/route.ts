@@ -1,6 +1,3 @@
-// app/api/attendance/[studyId]/[userId]/route.ts
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { getUserIdFromSession } from "@/lib/session";
 import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
@@ -33,11 +30,9 @@ export async function GET(
       { success: true, data: attendance },
       { status: 200, }
     );
-  } catch (error: any) {
-    return NextResponse.json(
-      { message: "불러오기 실패: ", error: error.message },
-      { status: 500 }
-    );
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "알 수 없는 오류";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -85,7 +80,8 @@ export async function PATCH(
 
     return NextResponse.json({ success: true });
 
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "알 수 없는 오류";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

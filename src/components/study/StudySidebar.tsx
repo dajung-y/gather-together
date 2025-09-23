@@ -3,7 +3,7 @@
 import { MenuItem } from '@/types/sidebar';
 import React from 'react'
 import Sidebar from '../common/Sidebar';
-import { redirect, usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 type StudySidebarProps = {
   studyId: string;
@@ -13,6 +13,7 @@ type StudySidebarProps = {
 }
 
 export default function StudySidebar({ studyId, userId, studyTitle, isLeader }: StudySidebarProps) {
+  const router = useRouter();
 
   const pathname = usePathname();
   const hideSidebar = pathname.includes('/about') || pathname.includes('/edit');
@@ -26,7 +27,6 @@ export default function StudySidebar({ studyId, userId, studyTitle, isLeader }: 
     }
   }
 
-  const router = useRouter();
 
   const leave = async (userId: string) => {
     try {

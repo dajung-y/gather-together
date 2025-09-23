@@ -18,7 +18,7 @@ export default function MemberCheck({ isMember }: MemberCheckProps) {
       alert('스터디 멤버가 아닙니다.');
       router.push('/');
     }
-  }, [pathname]);
+  }, [pathname, isMember, router]);
 
   return null;
 }

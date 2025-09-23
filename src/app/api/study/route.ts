@@ -5,13 +5,13 @@ import { authOptions } from "../auth/[...nextauth]/route";
 
 export async function POST(request: NextRequest) {
 
-  try{
+  try {
     const session = await getServerSession(authOptions);
 
-    if(!session?.user?.id){
+    if (!session?.user?.id) {
       return NextResponse.json(
-        {error: '로그인이 필요합니다'},
-        {status: 401}
+        { error: '로그인이 필요합니다' },
+        { status: 401 }
       )
     }
     const formData = await request.json();
@@ -58,17 +58,14 @@ export async function POST(request: NextRequest) {
       studyId: result.insertedId.toString()
     });
 
-  } catch(error) {
-    console.error('스터디 생성 오류:', error);
-    return NextResponse.json(
-      {error: '스터디 생성중 오류 발생'},
-      {status: 500}
-    )
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "알 수 없는 오류";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
 export async function GET(request: NextRequest) {
-  try{
+  try {
     const client = await clientPromise;
     const db = client.db();
 
@@ -87,34 +84,34 @@ export async function GET(request: NextRequest) {
     const query: any = {};
 
     // 모집중 여부
-    if(isRecruiting !== null) {
+    if (isRecruiting !== null) {
       query.isRecruiting = isRecruiting === "true"
     }
 
     // 작성자
-    if(creatorId){
+    if (creatorId) {
       query["creator.userId"] = creatorId;
     }
 
     // 카테고리
-    if(category){
+    if (category) {
       query.category = category;
     }
 
     // 검색
-    if(search){
-      query.title = { $regex: search, $options: "i"};
+    if (search) {
+      query.title = { $regex: search, $options: "i" };
     }
-    
+
     // 데이터 수 계산
     const total = await db.collection("studies").countDocuments(query);
-    
+
     // 페이지네이션 적용된 데이터 가져오기
     const studies = await db.collection('studies')
       .find(query)
-      .skip((page-1)*limit)
+      .skip((page - 1) * limit)
       .limit(limit)
-      .sort({createdAt: -1})
+      .sort({ createdAt: -1 })
       .toArray();
 
     const formattedStudies = studies.map((s) => ({
@@ -122,19 +119,16 @@ export async function GET(request: NextRequest) {
       _id: s._id.toString()
     }));
 
-    
+
     return NextResponse.json({
       data: formattedStudies,
       page,
       limit,
       total,
-      totalPage: Math.ceil(total/limit)
+      totalPage: Math.ceil(total / limit)
     });
-  } catch(error) {
-    console.error("스터디 목록 조회 오류: ",error);
-    return NextResponse.json(
-      {error: "스터디 목록 조회 중 오류 발생 "},
-      {status: 500}
-    );
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "알 수 없는 오류";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

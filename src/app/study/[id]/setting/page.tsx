@@ -1,10 +1,7 @@
-import WeekdaySelect from "@/components/study/create/WeekdaySelect";
 import MemberList from "@/components/study/main/MemberList";
-import UserDelete from "@/components/study/main/UserDelete";
 import StudySchedule from "@/components/study/setting/StudySchedule";
 import clientPromise from "@/lib/mongodb";
 import { getUserIdFromSession } from "@/lib/session";
-import { getStudyData } from "@/lib/study";
 import { StudyData } from "@/types/study";
 import { ObjectId } from "mongodb";
 import { redirect } from "next/navigation";

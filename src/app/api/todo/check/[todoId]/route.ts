@@ -1,5 +1,3 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
@@ -7,14 +5,6 @@ import { getUserIdFromSession } from "@/lib/session";
 
 export async function PATCH(req: Request, { params }: { params: { todoId: string } }) {
   try {
-    // const session = await getServerSession(authOptions);
-    // if (!session?.user?.id) {
-    //   console.log("유저 아이디필요");
-    //   return NextResponse.json({ error: "로그인 필요" }, { status: 401 });
-    // } else {
-    //   console.log("유저 아이디" + session.user.id);
-    // }
-    // const userId = String(session.user.id);
 
     const userId = await getUserIdFromSession();
     if (!userId) {
@@ -39,7 +29,8 @@ export async function PATCH(req: Request, { params }: { params: { todoId: string
     );
 
     return NextResponse.json({ success: result.modifiedCount > 0 });
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "알 수 없는 오류";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

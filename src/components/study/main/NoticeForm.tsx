@@ -1,7 +1,6 @@
 "use client"
 import Button from "@/components/common/Button";
-import InputField from "@/components/common/form/InputField";
-import TextareaField from "@/components/common/form/TextareaField";
+import { Notice } from "@/types/notice";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -9,12 +8,13 @@ type NoticeFormProps = {
   studyId: string;
   isLeader: boolean
 }
+
 export default function NoticeForm({ studyId, isLeader }: NoticeFormProps) {
-  const { register, handleSubmit, formState: { errors }, reset } = useForm();
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<Notice>();
 
   const [showInput, setShowInput] = useState(false);
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: Notice) => {
     try {
 
       const res = await fetch("/api/notice", {
@@ -38,8 +38,9 @@ export default function NoticeForm({ studyId, isLeader }: NoticeFormProps) {
         window.location.reload();
 
       }
-    } catch (error: any) {
-      alert(`추가 실패: ${error.message}`);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "알 수 없는 오류";
+      alert(message);
     }
   };
 

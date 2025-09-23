@@ -9,16 +9,18 @@ type TodoFormProps = {
   studyData: StudyData;
 }
 
+type Todo = {
+  todoDate: string;
+  task: string;
+}
+
 export default function TodoForm({
-  studyId,
-  studyData }: TodoFormProps) {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  studyId }: TodoFormProps) {
+  const { register, handleSubmit, formState: { errors } } = useForm<Todo>();
   const [open, setOpen] = useState<boolean>(false);
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: Todo) => {
     try {
-      console.log(studyData);
-
       const res = await fetch(`/api/todo/${studyId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -37,8 +39,9 @@ export default function TodoForm({
       else {
         window.location.reload();
       }
-    } catch (error: any) {
-      alert(`추가 실패: ${error.message}`);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "알 수 없는 오류";
+      alert(message);
     }
   };
 

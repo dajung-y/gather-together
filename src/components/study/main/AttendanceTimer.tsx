@@ -1,7 +1,6 @@
 "use client"
 
 import Button from '@/components/common/Button';
-import { Attendance } from '@/types/study';
 import { formatDate, getNextStudyDate } from '@/utils/date';
 import React from 'react'
 
@@ -65,8 +64,9 @@ export default function AttendanceTimer({
       if (!res.ok) return alert(result.error || "출석 처리 실패");
 
       alert(type === "present" ? "출석" : type === "late" ? "지각" : "결석");
-    } catch (err: any) {
-      alert(err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "알 수 없는 오류";
+      alert(message);
     }
 
     window.location.reload();
