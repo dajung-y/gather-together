@@ -347,7 +347,6 @@ export default function Page() {
                             </button>
                         </div>
 
-                        {/* 상태 표시 */}
                         {loading && <p>불러오는 중...</p>}
                         {error && <p className="text-red-500">에러: {error}</p>}
 
