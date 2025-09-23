@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import debounce from 'lodash.debounce';
 
 const weekdayLabel = [
@@ -25,9 +25,12 @@ export default function StudySchedule({ studyId, st, et, wd }: StudyScheduleProp
   const [endTime, setEndTime] = useState(et);
   const [weekdays, setWeekdays] = useState(wd);
 
-
-  const changeSchedule = useCallback(
-    debounce(async (curStartTime: string, curEndTime: string, curWeekdays: string[]) => {
+  const changeSchedule = useMemo(() => {
+    return debounce(async (
+      curStartTime: string,
+      curEndTime: string,
+      curWeekdays: string[]
+    ) => {
       try {
         const res = await fetch(`/api/study/${studyId}/setting`, {
           method: "PATCH",
@@ -39,19 +42,19 @@ export default function StudySchedule({ studyId, st, et, wd }: StudyScheduleProp
           }),
         });
 
+        const result = await res.json();
+
         if (!res.ok) {
-          const error = await res.json();
-          throw new Error(error.error);
+          throw new Error(result.error || "서버 오류");
         }
 
-        const result = await res.json();
         return result;
-      } catch (err) {
-        alert("스케줄 변경 중 오류가 발생했습니다.");
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : "알 수 없는 오류";
+        alert(`스케줄 변경 중 오류: ${message}`);
       }
-    }, 1000),
-    [studyId]
-  )
+    }, 1000);
+  }, [studyId]);
 
   useEffect(() => {
     return () => {

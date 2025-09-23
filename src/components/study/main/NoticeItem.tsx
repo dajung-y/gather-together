@@ -16,7 +16,7 @@ export default function NoticeItem({ notice, isLeader }: NoticeItemProps) {
   const [deleted, setDeleted] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm({
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<Notice>({
     defaultValues: {
       title: notice.title,
       content: notice.content,
@@ -38,9 +38,9 @@ export default function NoticeItem({ notice, isLeader }: NoticeItemProps) {
       } else {
         alert("삭제 실패");
       }
-    } catch (err) {
-      console.error(err);
-      alert("삭제 중 오류 발생");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "알 수 없는 오류";
+      alert(message);
     }
   };
 
@@ -58,7 +58,7 @@ export default function NoticeItem({ notice, isLeader }: NoticeItemProps) {
     });
   }
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: Notice) => {
     notice.title = data.title;
     notice.content = data.content;
     setIsEditing(false);
@@ -73,15 +73,13 @@ export default function NoticeItem({ notice, isLeader }: NoticeItemProps) {
         }),
       });
 
-    } catch (err) {
-      console.error(err);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "알 수 없는 오류";
+      console.error(message);
     }
   };
 
-
-
   if (deleted) return null;
-
 
   return (
     <>

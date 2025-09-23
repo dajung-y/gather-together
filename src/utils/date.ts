@@ -24,7 +24,7 @@ export const getNextStudyDate = (startDate: string, endDate: string, weekdays: s
 
   const targetDays = weekdays.map(d => WEEKDAY_MAP[d.toLowerCase()]);
 
-  let current = today > start ? today : start;
+  const current = today > start ? today : start;
 
   while (current <= end) {
     if (targetDays.includes(current.getDay())) {

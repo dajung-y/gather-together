@@ -1,5 +1,4 @@
 import clientPromise from "@/lib/mongodb";
-import { Notice } from "@/types/notice";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 
@@ -25,11 +24,9 @@ export async function POST(req: Request) {
       { success: true, taskId: result.insertedId },
       { status: 201, }
     );
-  } catch (error: any) {
-    return NextResponse.json(
-      { message: "추가 실패: ", error: error.message },
-      { status: 500 }
-    );
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "알 수 없는 오류";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -77,10 +74,8 @@ export async function PATCH(req: Request) {
     );
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    return NextResponse.json(
-      { message: "수정 실패", error: error.message },
-      { status: 500 }
-    );
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "알 수 없는 오류";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

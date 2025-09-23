@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronsDown, ChevronsLeft, ChevronsRight, ChevronsUp } from "lucide-react";
 import { useState } from "react";
-import { useStudySidebarStore } from "@/store/studySidebar";
 
 type SidebarProps = {
   menuItems: MenuItem[];
