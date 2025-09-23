@@ -1,7 +1,6 @@
 import { ObjectId } from "mongodb";
 import clientPromise from "@/lib/mongodb";
 import { NextRequest, NextResponse } from "next/server";
-import { Notice } from "@/types/notice";
 import { Member } from "@/types/study";
 
 export async function GET(
@@ -27,8 +26,9 @@ export async function GET(
       ...study,
       _id: study._id.toString(),
     });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "알 수 없는 오류";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -43,10 +43,11 @@ export async function PATCH(
     const client = await clientPromise;
     const db = client.db();
 
+    console.log("메인공지: " + payload.content);
     if (action === "updateNotice") {
       await db.collection("studies").updateOne(
         { _id: new ObjectId(studyId) },
-        { $set: { mainNotice: { ...payload.content, updatedAt: new Date() } } }
+        { $set: { mainNotice: { content: payload.content, updatedAt: new Date() } } }
       );
     }
 
@@ -75,8 +76,9 @@ export async function PATCH(
     }
 
     return NextResponse.json({ success: true });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "알 수 없는 오류";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -102,8 +104,9 @@ export async function PUT(
       success: true,
       studyId: params.studyId
     });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "알 수 없는 오류";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 

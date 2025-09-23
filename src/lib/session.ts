@@ -5,7 +5,7 @@ export async function getUserIdFromSession() {
   const session = await getServerSession(authOptions);
 
   if (!session)
-    throw new Error("로그인 필요");
+    return null;
 
   return session.user?.id
 }

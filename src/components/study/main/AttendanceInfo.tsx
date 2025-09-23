@@ -1,7 +1,7 @@
 "use client"
 
 import { Attendance } from '@/types/study';
-import { Circle, X, Triangle, Pen, Trash } from 'lucide-react';
+import { Circle, X, Triangle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 type AttendanceInfoProps = {

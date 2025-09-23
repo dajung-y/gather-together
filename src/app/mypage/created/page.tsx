@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import StudyCard from "@/components/common/StudyCard";
 import Sidebar from "@/components/common/Sidebar";
 import Modal from "@/components/common/Modal";
+import { getCategoryLabel } from "@/utils/category";
 
 type ApiListResp = { items?: any[]; data?: any[] };
 type Applicant = { userId?: string; name: string; msg?: string };
@@ -183,7 +184,7 @@ export default function Page() {
         time: c.time,
         currentMembers: c.currentMembers,
         maxMembers: c.maxMembers,
-        tag: c.tag,
+        tag: getCategoryLabel(c.tag),
         isRecruiting: c.isRecruiting,
     });
 
@@ -313,7 +314,6 @@ export default function Page() {
             e.stopPropagation();
         }
     };
-
     const list = active === "open" ? data.recruiting : data.completed;
 
     const confirmKey =
@@ -453,7 +453,6 @@ export default function Page() {
                                             className="relative"
                                             data-study-id={c.id}
                                             data-recruiting={String(c.isRecruiting)}
-                                            // ✅ 토글 완전 차단: 클릭/키보드 모두 캡처 단계에서 먹음
                                             onClickCapture={blockSwitchCapture}
                                             onKeyDownCapture={blockSwitchCapture}
                                             aria-disabled="true"

@@ -7,26 +7,31 @@ import { redirect, usePathname, useRouter } from 'next/navigation';
 
 type StudySidebarProps = {
   studyId: string;
-  userId: string;
+  userId: string | null;
   studyTitle: string;
   isLeader: boolean;
 }
 
 export default function StudySidebar({ studyId, userId, studyTitle, isLeader }: StudySidebarProps) {
+  const router = useRouter();
 
   const pathname = usePathname();
-  const hideSidebar = pathname.includes('/about') || pathname.includes('/edit');
+  const publicURL = pathname.includes('/about') || pathname.includes('/edit');
 
-  if (hideSidebar) return null;
+  if (publicURL) return null;
+
+  if (!userId && !publicURL) {
+    redirect('/');
+  }
 
   const handleLeaveRoom = () => {
+    if (!userId)
+      return;
     if (confirm(`정말 [${studyTitle}]를 탈퇴하시겠습니까?`)) {
       leave(userId);
     } else {
     }
   }
-
-  const router = useRouter();
 
   const leave = async (userId: string) => {
     try {

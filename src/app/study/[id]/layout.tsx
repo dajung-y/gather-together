@@ -1,15 +1,10 @@
 // app/study/[id]/layout.tsx
-import Sidebar from "@/components/common/Sidebar";
 import MemberCheck from "@/components/study/main/MemberCheck";
 import StudySidebar from "@/components/study/StudySidebar";
-import clientPromise from "@/lib/mongodb";
 import { getUserIdFromSession } from "@/lib/session";
 import { getStudyData } from "@/lib/study";
-import { MenuItem } from "@/types/sidebar";
 import { StudyData } from "@/types/study";
-import { ObjectId } from "mongodb";
-import { redirect, usePathname } from "next/navigation";
-import { useRouter } from "next/router";
+import { redirect } from "next/navigation";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -22,7 +17,7 @@ export default async function Layout({ children, params }: LayoutProps) {
 
   const userId = await getUserIdFromSession();
   if (!userId) {
-    redirect('/');
+
   }
 
   const studyData: StudyData = await getStudyData(studyId);

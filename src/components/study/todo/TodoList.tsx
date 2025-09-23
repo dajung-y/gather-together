@@ -1,8 +1,5 @@
 "use client"
-import { useStudyStore } from '@/store/study';
-import { StudyData } from '@/types/study';
 import { Todo } from '@/types/todo';
-import { useEffect, useState } from 'react';
 import TodoCheck from './TodoCheck';
 
 export default function TodoList({ todos }: { todos: Todo[] }) {

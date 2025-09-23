@@ -26,7 +26,7 @@ export default function MainNotice({ studyId, mainNotice, isLeader }: MainNotice
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "updateNotice",
-          payload: tempNotice,
+          payload: { content: tempNotice },
         }),
       });
 

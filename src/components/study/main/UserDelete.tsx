@@ -1,8 +1,7 @@
 "use client"
 
 import React from 'react'
-import { Circle, X, Triangle, Crown } from 'lucide-react';
-import AlertModal from '@/components/common/AlertModal';
+import { X, Crown } from 'lucide-react';
 
 type UserDeleteProps = {
   name: string;

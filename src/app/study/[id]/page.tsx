@@ -6,10 +6,8 @@ import NoticeList from "@/components/study/main/NoticeList";
 import { Notice } from "@/types/notice";
 import { Attendance, StudyData } from "@/types/study";
 import { redirect } from "next/navigation";
-import AlertModal from "@/components/common/AlertModal";
 import { getUserIdFromSession } from "@/lib/session";
 import clientPromise from "@/lib/mongodb";
-import { ObjectId } from "mongodb";
 import { getStudyData } from "@/lib/study";
 
 export default async function page({ params }: { params: { id: string } }) {

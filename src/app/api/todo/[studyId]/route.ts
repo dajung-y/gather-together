@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
-import { Check, Todo } from "@/types/todo";
+import { Todo } from "@/types/todo";
 import { ObjectId } from "mongodb";
+import { Member } from "@/types/study";
 
 
 export async function GET(
@@ -21,11 +22,9 @@ export async function GET(
       { success: true, data: todos },
       { status: 200, }
     );
-  } catch (error: any) {
-    return NextResponse.json(
-      { message: "불러오기 실패: ", error: error.message },
-      { status: 500 }
-    );
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "알 수 없는 오류";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -40,7 +39,7 @@ export async function POST(req: Request) {
     const study = await db.collection("studies").findOne({ _id: new ObjectId(studyId) });
     if (!study) return NextResponse.json({ error: "스터디 없음" }, { status: 404 });
 
-    const checks = study.members.map((m: any) => ({
+    const checks = study.members.map((m: Member) => ({
       userId: m.userId,
       userNickname: m.nickname,
       checked: false
@@ -66,10 +65,8 @@ export async function POST(req: Request) {
       { success: true, task: newTodo },
       { status: 201, }
     );
-  } catch (error: any) {
-    return NextResponse.json(
-      { message: "추가 실패: ", error: error.message },
-      { status: 500 }
-    );
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "알 수 없는 오류";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

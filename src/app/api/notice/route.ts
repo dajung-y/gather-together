@@ -1,5 +1,4 @@
 import clientPromise from "@/lib/mongodb";
-import { Notice } from "@/types/notice";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 
@@ -25,11 +24,9 @@ export async function POST(req: Request) {
       { success: true, taskId: result.insertedId },
       { status: 201, }
     );
-  } catch (error: any) {
-    return NextResponse.json(
-      { message: "추가 실패: ", error: error.message },
-      { status: 500 }
-    );
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "알 수 없는 오류";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -48,11 +45,37 @@ export async function GET(req: Request) {
 }
 
 export async function DELETE(req: Request) {
-  const { id } = (await req.json()) as { id: string }; // 문자열로 명시
+  const { id } = (await req.json()) as { id: string };
   if (!id) return NextResponse.json({ error: "id 필요" }, { status: 400 });
 
   const db = (await clientPromise).db();
   const result = await db.collection("notices").deleteOne({ _id: new ObjectId(id) });
 
   return NextResponse.json({ success: result.deletedCount === 1 });
+}
+
+
+export async function PATCH(req: Request) {
+  try {
+    const body = await req.json();
+    const { noticeId, title, content } = body;
+
+    const client = await clientPromise;
+    const db = client.db();
+
+    await db.collection("notices").updateOne(
+      { _id: new ObjectId(noticeId) },
+      {
+        $set: {
+          title: title,
+          content: content
+        },
+      }
+    );
+
+    return NextResponse.json({ success: true });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "알 수 없는 오류";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
 }
