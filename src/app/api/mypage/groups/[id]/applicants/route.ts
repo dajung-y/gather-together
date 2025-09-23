@@ -4,87 +4,127 @@ import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 
+const COLL_STUDIES = "studies";
+const COLL_APPS    = "applications";
+
+const isHex24 = (v: string) => /^[0-9a-fA-F]{24}$/.test(v);
+const toObjectId = (v: string) => (isHex24(v) ? new ObjectId(v) : null);
+
 export async function PATCH(
     request: NextRequest,
     { params }: { params: { id: string } }
 ) {
-    try {
-        const { id } = params;
-        const body = await request.json().catch(() => ({}));
-        const applicantId = body?.applicantId as string;
-        const action = body?.action as "approve" | "reject";
+    const client = await clientPromise;
+    const session = client.startSession();
 
-        if (!id || !applicantId || !["approve", "reject"].includes(action)) {
-            return NextResponse.json({ error: "invalid params" }, { status: 400 });
+    try {
+        const { id: studyId } = params;
+        const { applicantId, action } = await request.json();
+
+        if (!studyId || !applicantId || !["approve", "reject"].includes(action)) {
+            return NextResponse.json({ ok: false, error: "INVALID_INPUT" }, { status: 400 });
         }
 
-        const _id = new ObjectId(id);
-        const client = await clientPromise;
+        const _id = new ObjectId(studyId);
         const db = client.db();
-        const col = db.collection("studies");
+        const studies = db.collection(COLL_STUDIES);
+        const apps = db.collection(COLL_APPS);
 
-        const study = await col.findOne({ _id });
-        if (!study) return NextResponse.json({ error: "not found" }, { status: 404 });
+        const applicantIdStr = String(applicantId);
+        const applicantOid = toObjectId(applicantIdStr);
+        const pullCond: any = {
+            $or: [{ userId: applicantIdStr }, { id: applicantIdStr }],
+        };
+        if (applicantOid) pullCond.$or.push({ _id: applicantOid });
 
-        if (action === "approve") {
-            const capacity = Number(study.capacity ?? 0);
-            const currentMembers = Number(study.currentMembers ?? (study.members?.length ?? 0));
-            if (currentMembers >= capacity) {
-                return NextResponse.json({ error: "capacity reached" }, { status: 400 });
-            }
+        const study = await studies.findOne(
+            { _id },
+            { projection: { title: 1, category: 1, startDate: 1, endDate: 1, capacity: 1, currentMembers: 1, members: 1, isRecruiting: 1, applicants: 1 } }
+        );
+        if (!study) return NextResponse.json({ ok: false, error: "NOT_FOUND" }, { status: 404 });
 
-            const applicant =
-                (study.applicants ?? []).find((a: any) => a?.userId === applicantId) ?? null;
-            if (!applicant) {
-                return NextResponse.json({ error: "applicant not found" }, { status: 404 });
-            }
+        const now = new Date();
 
-            const willBeClosed = currentMembers + 1 >= capacity;
+        await session.withTransaction(async () => {
+            if (action === "approve") {
+                const capacity = Number(study.capacity ?? 0);
+                const current = Number(study.currentMembers ?? (study.members?.length ?? 0));
+                if (capacity && current >= capacity) {
+                    throw new Error("CAPACITY_REACHED");
+                }
+                const willBe = current + 1;
 
-            await col.updateOne(
-                { _id, "applicants.userId": applicantId },
-                { $set: { "applicants.$.status": "approved", "applicants.$.decidedAt": new Date() } }
-            );
+                await studies.updateOne(
+                    { _id },
+                    {
+                        $pull: { applicants: pullCond },
+                        $addToSet: {
+                            members: {
+                                userId: applicantIdStr,
+                                nickname:
+                                    (study.applicants ?? []).find((a: any) => String(a?.userId ?? a?.id ?? a?._id) === applicantIdStr)?.nickname ??
+                                    (study.applicants ?? []).find((a: any) => String(a?.userId ?? a?.id ?? a?._id) === applicantIdStr)?.name ??
+                                    "",
+                                joinedAt: now,
+                            },
+                        },
+                        $inc: { currentMembers: 1 },
+                        ...(capacity && willBe >= capacity ? { $set: { isRecruiting: false } } : {}),
+                    },
+                    { session }
+                );
 
-            await col.updateOne(
-                { _id },
-                {
-                    $pull: { applicants: { userId: applicantId } },
-                    $push: {
-                        members: {
-                            userId: applicantId,
-                            nickname: applicant?.nickname ?? applicant?.name ?? "",
-                            joinedAt: new Date(),
+                await apps.updateOne(
+                    { studyId: _id, userId: applicantIdStr },
+                    {
+                        $set: {
+                            status: "approved",
+                            decidedAt: now,
+                            studyTitle: study.title ?? "",
+                            category: study.category ?? "",
+                            startDate: study.startDate ?? null,
+                            endDate: study.endDate ?? null,
+                        },
+                        $setOnInsert: { createdAt: now },
+                    },
+                    { upsert: true, session }
+                );
+            } else {
+                await studies.updateOne(
+                    { _id },
+                    { $pull: { applicants: pullCond } },
+                    { session }
+                );
+
+                await apps.updateOne(
+                    { studyId: _id, userId: applicantIdStr },
+                    {
+                        $set: {
+                            status: "rejected",
+                            decidedAt: now,
+                            studyTitle: study.title ?? "",
+                            category: study.category ?? "",
+                            startDate: study.startDate ?? null,
+                            endDate: study.endDate ?? null,
+                        },
+                        $setOnInsert: {
+                            createdAt: now,
+                            appliedAt: now,
                         },
                     },
-                    $inc: { currentMembers: 1 },
-                    ...(willBeClosed ? { $set: { isRecruiting: false } } : {}),
-                }
-            );
-
-            return NextResponse.json({ ok: true, action: "approve", closed: willBeClosed });
-        }
-
-        const res = await col.updateOne(
-            { _id, "applicants.userId": applicantId },
-            {
-                $set: {
-                    "applicants.$.status": "rejected",
-                    "applicants.$.decidedAt": new Date(),
-                },
+                    { upsert: true, session }
+                );
             }
-        );
+        });
 
-        if (res.matchedCount === 0) {
-            return NextResponse.json({ error: "applicant not found" }, { status: 404 });
-        }
-
-        return NextResponse.json({ ok: true, action: "reject" });
+        return NextResponse.json({ ok: true, action }, { status: 200 });
     } catch (err: any) {
-        console.error("[PATCH /api/mypage/groups/[id]/applicants] error:", err);
-        return NextResponse.json(
-            { error: "update failed", detail: String(err?.message ?? err) },
-            { status: 500 }
-        );
+        const msg = String(err?.message ?? err);
+        const code = msg === "CAPACITY_REACHED" ? 400 : 500;
+        if (code === 400) return NextResponse.json({ ok: false, error: msg }, { status: 400 });
+        console.error("[PATCH applicants] error:", err);
+        return NextResponse.json({ ok: false, error: "SERVER_ERROR", detail: msg }, { status: 500 });
+    } finally {
+        await session.endSession();
     }
 }
