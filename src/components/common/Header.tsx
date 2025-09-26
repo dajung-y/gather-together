@@ -30,7 +30,7 @@ export default function Header() {
   const handleLogout = async () => {
     await signOut({redirect: false}); // NextAuth 로그 아웃
     toast.success("로그아웃 되었습니다", { duration: 2000});
-    router.push('/');
+    router.replace('/');
   }
 
   // 로그인 성공 핸들러
