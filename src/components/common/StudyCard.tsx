@@ -53,7 +53,7 @@ export default function StudyCard({
   }
 
   return (
-    <div className="flex flex-col gap-4 w-full h-full cursor-pointer">
+    <div className="flex flex-col justify-between w-full h-full cursor-pointer">
       <div className={`
             flex flex-col gap-4 w-full h-full p-4 border border-gray-300 shadow-lg rounded-lg
             ${style.isDisabled ? "bg-gray-100 opacity-60" : "bg-white"}
@@ -64,10 +64,10 @@ export default function StudyCard({
           <span className="bg-primary-500 text-white px-2 ">{name}</span>
           {style.canDelete && <X className="ml-auto" />}
         </div>
-        <p className="headline3 text-primary-700 mb-2">{title}</p>
+        <p className="headline3 text-primary-700 mb-2 line-clamp-2">{title}</p>
         <div className="pb-4">
           <p className="body-m">{`${formatDate(startDate)} - ${formatDate(endDate)}`}</p>
-          <p>{time}</p>
+          <p>{time} ~</p>
           <div className="flex items-center gap-2 text-gray-500">
             <User size={20} />
             <span>{currentMembers}/{maxMembers}</span>
@@ -75,11 +75,6 @@ export default function StudyCard({
         </div>
         <div className="flex">
           <span className="border border-primary-100 text-primary-500 px-3 rounded-full self-center">#{tag}</span>
-          {/* <span className={`px-3 rounded-full ml-auto self-center
-            ${isRecruiting ? "bg-primary-50 text-primary-500" : "bg-gray-300 text-gray-700"}`}>
-              {isRecruiting ? "모집중" : "모집마감"}
-          </span> */}
-          
           {(variant === "mainOpen" || variant === "mainClosed") && (
             <span className={`px-3 rounded-full ml-auto self-center 
               ${isRecruiting ? "bg-primary-50 text-primary-500" : "bg-gray-300 text-gray-700"}`}>
