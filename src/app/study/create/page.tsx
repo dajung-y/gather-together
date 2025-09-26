@@ -1,6 +1,17 @@
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import StudyForm from "@/components/study/create/StudyForm";
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 
-export default function Page(){
+export default async function Page(){
+
+  // 로그아웃 후 접근 불가
+  const session = await getServerSession(authOptions);
+
+  if(!session){
+    redirect("/");
+  }
+
   return(
     <main className="w-full min-h-screen flex justify-center">
       <div className="w-full max-w-5xl mb-12 p-4 space-y-12">
