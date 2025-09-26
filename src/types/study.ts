@@ -26,7 +26,7 @@ export interface Study {
     status: "pending" | "approved" | "rejected" | "canceled";
     createdAt: Date;
   }[];
-  mainNotice?: Notice;
+  mainNotice?: string;
 }
 
 export interface StudyData extends Study {
