@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import clientPromise from "@/lib/mongodb";
+import { revalidateTag } from "next/cache";
 
 export async function PATCH(
   req: Request,
@@ -29,6 +30,8 @@ export async function PATCH(
         },
       }
     );
+
+    revalidateTag("study-tag");
 
     return NextResponse.json({ success: true });
   } catch (err: unknown) {
