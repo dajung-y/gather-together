@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { ObjectId } from "mongodb";
 import clientPromise from "@/lib/mongodb";
 import { revalidateTag } from "next/cache";
 
@@ -9,29 +8,25 @@ export async function PATCH(
 ) {
   try {
     const { studyId } = await params;
-    const { startTime, endTime, weekdays } = await req.json();
+    const { content } = await req.json();
 
-    if (!startTime || !endTime || !Array.isArray(weekdays)) {
+    console.log(content);
+    if (!content) {
       return NextResponse.json(
-        { error: "startTime, endTime, weekDays가 필요합니다." },
+        { error: "content가 필요합니다." },
         { status: 400 }
       );
     }
     const client = await clientPromise;
     const db = client.db();
 
-    await db.collection("studies").updateOne(
-      { _id: new ObjectId(studyId) },
-      {
-        $set: {
-          startTime,
-          endTime,
-          weekdays,
-        },
-      }
+    await db.collection("mainNotice").updateOne(
+      { studyId },
+      { $set: { content } },
+      { upsert: true } //문서가 없으면 새로 생성. insertOne
     );
 
-    revalidateTag("study-tag");
+    revalidateTag('study-tag');
 
     return NextResponse.json({ success: true });
   } catch (err: unknown) {

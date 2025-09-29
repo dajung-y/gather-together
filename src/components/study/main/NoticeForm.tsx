@@ -44,6 +44,13 @@ export default function NoticeForm({ studyId, isLeader }: NoticeFormProps) {
     }
   };
 
+  const handleCancel = () => {
+    if (confirm("⚠️ 작성 중인 공지를 취소하면 입력한 내용이 모두 삭제됩니다. 계속 진행하시겠습니까?")) {
+      reset();
+      setShowInput(!showInput);
+    }
+  }
+
   return (
     <>
       {/* 공지 */}
@@ -68,7 +75,7 @@ export default function NoticeForm({ studyId, isLeader }: NoticeFormProps) {
               </div>
 
               {/* 버튼 */}
-              <Button variant="outline" onClick={() => setShowInput(!showInput)}>
+              <Button variant="outline" onClick={() => handleCancel()}>
                 취소
               </Button>
               <Button type="submit">공지 추가</Button>

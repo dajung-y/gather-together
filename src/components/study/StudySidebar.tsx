@@ -29,7 +29,6 @@ export default function StudySidebar({ studyId, userId, studyTitle, isLeader }: 
       return;
     if (confirm(`정말 [${studyTitle}]를 탈퇴하시겠습니까?`)) {
       leave(userId);
-    } else {
     }
   }
 
