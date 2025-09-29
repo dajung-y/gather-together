@@ -31,14 +31,19 @@ export default function TodoCheck({ todoId, isChecked, canClick }: TodoCheckProp
     saveCheck(newChecked);
   }
 
-
-
   return (
-    <div>
+    <div className={`flex w-full h-full justify-center items-center
+      ${canClick ? "bg-primary-50" : ""} `}>
       <input
         type="checkbox"
         checked={checked}
         onChange={() => handleCheck()}
+        className={`w-4 h-4 border border-primary-500 rounded-xs
+          ${!canClick ? "text-gray-500" : ""} appearance-none
+        checked:bg-primary-500 bg-white
+        disabled:opacity-40 disabled:bg-gray-200
+        accent-primary-500 disabled:checked:bg-primary-300`}
+        disabled={!canClick}
       />
     </div>
   )

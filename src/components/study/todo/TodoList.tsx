@@ -16,8 +16,8 @@ export default function TodoList({ todos, members }: TodoListProps) {
     <div className="relative overflow-x-auto pb-4">
       <div className="flex">
         <div className="flex sticky left-0 bg-white z-10 border-r">
-          <span className="w-16">날짜</span>
-          <span className="w-100 mx-4">할 일</span>
+          <span className="w-16 font-bold">날짜</span>
+          <span className="w-100 mx-4 font-bold">할 일</span>
         </div>
 
         <div className="flex">
