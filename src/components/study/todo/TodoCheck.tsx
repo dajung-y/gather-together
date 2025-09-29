@@ -1,16 +1,16 @@
 "use client"
 
-import { Check } from '@/types/todo';
 import debounce from 'lodash.debounce';
 import React, { useMemo, useState } from 'react'
 
 type TodoCheckProps = {
   todoId: string;
-  check: Check;
+  isChecked: boolean;
+  canClick: boolean;
 }
 
-export default function TodoCheck({ todoId, check }: TodoCheckProps) {
-  const [checked, setChecked] = useState(check.checked);
+export default function TodoCheck({ todoId, isChecked, canClick }: TodoCheckProps) {
+  const [checked, setChecked] = useState(isChecked);
 
   //debounce 추가
   const saveCheck = useMemo(() => {
@@ -25,6 +25,7 @@ export default function TodoCheck({ todoId, check }: TodoCheckProps) {
   }, [todoId]);
 
   const handleCheck = () => {
+    if (!canClick) return;
     const newChecked = !checked;
     setChecked(newChecked);
     saveCheck(newChecked);

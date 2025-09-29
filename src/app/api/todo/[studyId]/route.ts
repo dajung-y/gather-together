@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 import { Todo } from "@/types/todo";
 import { ObjectId } from "mongodb";
-import { Member } from "@/types/study";
-
 
 export async function GET(
   req: Request,
@@ -39,17 +37,11 @@ export async function POST(req: Request) {
     const study = await db.collection("studies").findOne({ _id: new ObjectId(studyId) });
     if (!study) return NextResponse.json({ error: "스터디 없음" }, { status: 404 });
 
-    const checks = study.members.map((m: Member) => ({
-      userId: m.userId,
-      userNickname: m.nickname,
-      checked: false
-    }));
-
     const todoData = {
       studyId,
       date,
       task,
-      checks,
+      memberChecks: [],
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -57,8 +49,8 @@ export async function POST(req: Request) {
     const result = await db.collection("todos").insertOne(todoData);
 
     const newTodo: Todo = {
-      ...todoData,
       _id: result.insertedId.toString(),
+      ...todoData,
     };
 
     return NextResponse.json(

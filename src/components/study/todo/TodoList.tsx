@@ -1,8 +1,17 @@
 "use client"
 import { Todo } from '@/types/todo';
 import TodoCheck from './TodoCheck';
+import { Member } from '@/types/study';
+import { useSession } from 'next-auth/react';
 
-export default function TodoList({ todos }: { todos: Todo[] }) {
+type TodoListProps = {
+  todos: Todo[]
+  members: Member[];
+}
+export default function TodoList({ todos, members }: TodoListProps) {
+  const { data: session } = useSession();
+  const userId = session?.user?.id;
+
   return (
     <div className="relative overflow-x-auto pb-4">
       <div className="flex">
@@ -12,9 +21,9 @@ export default function TodoList({ todos }: { todos: Todo[] }) {
         </div>
 
         <div className="flex">
-          {todos && todos[todos.length - 1]?.checks?.map((user, userIndex) => (
+          {members.map((member, userIndex) => (
             <div key={userIndex} className="flex w-30 justify-center">
-              <span>{user.userNickname}</span>
+              <span>{member.nickname}</span>
             </div>
           ))}
         </div>
@@ -30,11 +39,14 @@ export default function TodoList({ todos }: { todos: Todo[] }) {
 
           {/* 오른쪽 체크박스 영역 */}
           <div className="flex">
-            {todo.checks.map((check, checkIndex) => (
-              <div key={checkIndex} className="flex w-30 justify-center">
-                <TodoCheck todoId={todo._id} check={check} />
-              </div>
-            ))}
+            {members.map((member, checkIndex) => {
+              const isChecked = todo.memberChecks.includes(member.userId);
+              return (
+                <div key={checkIndex} className="flex w-30 justify-center">
+                  <TodoCheck todoId={todo._id} isChecked={isChecked} canClick={member.userId == userId} />
+                </div>
+              )
+            })}
           </div>
         </div>
       ))}
