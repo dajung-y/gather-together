@@ -43,7 +43,8 @@ export default function TodoList({ todos, members }: TodoListProps) {
               const isChecked = todo.memberChecks.includes(member.userId);
               return (
                 <div key={checkIndex} className="flex w-30 justify-center">
-                  <TodoCheck todoId={todo._id} isChecked={isChecked} canClick={member.userId == userId} />
+                  <TodoCheck task={todo.task} todoId={todo._id}
+                    isChecked={isChecked} canClick={member.userId == userId} />
                 </div>
               )
             })}
