@@ -5,6 +5,7 @@ export const studyFormSchema = z.object({
   capacity: z.coerce.number().min(2, "모집인원을 선택하세요"),
   startDate: z.string().refine(dateStr => {
     const today = new Date();
+    today.setHours(0,0,0,0,);
     const start = new Date(dateStr);
     return start>=today;
   }, {message: "시작일은 오늘 이후로 가능합니다"}),
@@ -16,9 +17,10 @@ export const studyFormSchema = z.object({
   title: z.string().min(2, "제목을 입력하세요").max(30, "제목은 최대 30자까지 입력 가능합니다"),
   description: z.string().min(2, "설명을 입력하세요").max(200, "설명은 최대 200자까지 입력 가능합니다")
 })
-.superRefine((value, ctx) => {
-  const start = new Date(value.startDate);
-  const end = new Date(value.endDate);
+.superRefine((values, ctx) => {
+  // 기간 검증
+  const start = new Date(values.startDate);
+  const end = new Date(values.endDate);
 
   if(end<start) {
     ctx.addIssue({
@@ -26,5 +28,17 @@ export const studyFormSchema = z.object({
       path: ["endDate"],
       message: "종료일은 시작일 이후로 가능합니다",
     });
+  }
+
+  // 시간 검증
+  const startTime = values.startTime;
+  const endTime = values.endTime;
+
+  if(startTime && endTime && startTime>=endTime){
+    ctx.addIssue({
+      code: "custom",
+      path: ["endTime"],
+      message: "종료시간은 시작시간 이후여야합니다"
+    })
   }
 })
