@@ -37,7 +37,7 @@ export default function TodoCheck({ task, todoId, isChecked, canClick }: TodoChe
 
   return (
     <div className={`flex w-full h-full justify-center items-center
-      ${canClick ? "bg-primary-50" : ""} `}>
+      ${canClick ? "bg-primary-50" : ""}  border-t border-primary-100`}>
       <input
         type="checkbox"
         checked={checked}

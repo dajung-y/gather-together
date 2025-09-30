@@ -76,6 +76,7 @@ export default function TodoForm({
                 {...register('task', { required: '할 일을 입력해주세요' })}
                 placeholder='할 일 입력'
                 className='border rounded px-2 py-1 border-gray-400'
+                maxLength={100}
               />
               {errors.task && (
                 <p className='text-red-500 text-sm'>{errors.task.message as string}</p>
@@ -105,6 +106,7 @@ export default function TodoForm({
             {...register('task', { required: '할 일을 입력해주세요' })}
             placeholder='할 일 입력'
             className='border rounded px-2 py-1 border-gray-400'
+            maxLength={100}
           />
           {errors.task && (
             <p className='text-red-500 text-sm'>{errors.task.message as string}</p>
