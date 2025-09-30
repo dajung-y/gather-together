@@ -66,7 +66,11 @@ export default function StudyListClient() {
       <section className="my-8">
         { isLoading ? (
           <div className="flex justify-center items-center h-64">
-            <span className="animate-pulse text-gray-500 text-lg">로딩 중...</span>
+            <span className="animate-pulse headline2 text-primary-500">로딩 중...</span>
+          </div>
+        ) : studies.length === 0 ? (
+          <div className="flex justify-center items-center h-100">
+            <p className="headline2 text-primary-500">검색결과가 없습니다</p>
           </div>
         ) : (
           <CardList 
@@ -74,13 +78,15 @@ export default function StudyListClient() {
           />
         )}
       </section>
-      <div className="my-8 lg:mb-12">
-        <Pagination
-          totalPages={totalPage}
-          perPage={16}
-          onChangePage={setCurrentpage}
-        />
-      </div>
+      { !isLoading && studies.length>0 && (
+        <div className="my-8 lg:my-16">
+          <Pagination
+            totalPages={totalPage}
+            perPage={16}
+            onChangePage={setCurrentpage}
+          />
+        </div>
+      )}
     </div>
   )
 }
