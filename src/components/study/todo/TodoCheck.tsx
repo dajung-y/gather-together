@@ -2,14 +2,16 @@
 
 import debounce from 'lodash.debounce';
 import React, { useMemo, useState } from 'react'
+import toast from "react-hot-toast";
 
 type TodoCheckProps = {
+  task: string;
   todoId: string;
   isChecked: boolean;
   canClick: boolean;
 }
 
-export default function TodoCheck({ todoId, isChecked, canClick }: TodoCheckProps) {
+export default function TodoCheck({ task, todoId, isChecked, canClick }: TodoCheckProps) {
   const [checked, setChecked] = useState(isChecked);
 
   //debounce 추가
@@ -29,11 +31,13 @@ export default function TodoCheck({ todoId, isChecked, canClick }: TodoCheckProp
     const newChecked = !checked;
     setChecked(newChecked);
     saveCheck(newChecked);
+    if (checked == false)
+      toast.success(`${task} 완료!`, { duration: 2000 })
   }
 
   return (
     <div className={`flex w-full h-full justify-center items-center
-      ${canClick ? "bg-primary-50" : ""} `}>
+      ${canClick ? "bg-primary-50" : ""}  border-t border-primary-100`}>
       <input
         type="checkbox"
         checked={checked}
