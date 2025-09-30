@@ -20,7 +20,13 @@ interface StudyFormProps {
 }
 
 export default function StudyForm({defaultValues}: StudyFormProps) {
-  const {register, handleSubmit, control, formState: {errors}} = useForm<FormData>({
+  const {
+    register, 
+    handleSubmit, 
+    control, 
+    watch,
+    formState: {errors}
+  } = useForm<FormData>({
     resolver: zodResolver(studyFormSchema),
     defaultValues:{
       weekdays: [],
@@ -78,6 +84,7 @@ export default function StudyForm({defaultValues}: StudyFormProps) {
         <StudyOperationSection 
           register={register}
           control={control}
+          watch={watch}
           errors={{
             category: errors.category?.message,
             capacity: errors.capacity?.message,
