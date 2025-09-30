@@ -3,12 +3,13 @@ import CategorySelect from "./CategorySelect";
 import CapacitySelect from "./CapacitySelect";
 import StudyPeriodInput from "./StudyPeriodInput";
 import StudyTimeInput from "./StudyTimeInput";
-import { Controller, UseFormRegister, Control } from 'react-hook-form';
+import { Controller, UseFormRegister, Control, UseFormWatch } from 'react-hook-form';
 import StudyNameInput from "./StudyNameInput";
 import WeekdaySelect from "./WeekdaySelect";
 
 interface StudyOperationSectionProps {
   register?: UseFormRegister<any>;
+  watch: UseFormWatch<any>;
   control?: Control<any>;
   errors?: {
     category?: string;
@@ -25,6 +26,7 @@ interface StudyOperationSectionProps {
 
 export default function StudyOperationSection({
   register,
+  watch,
   control,
   errors,
 }: StudyOperationSectionProps) {
@@ -48,6 +50,7 @@ export default function StudyOperationSection({
       </div>
       <StudyPeriodInput
         register={register}
+        watch={watch}
         errors={{
           startDate: errors?.startDate,
           endDate: errors?.endDate

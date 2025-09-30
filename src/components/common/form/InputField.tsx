@@ -11,6 +11,8 @@ interface InputFieldProps {
   register?: UseFormRegister<any>;
   error?: string;
   className?: string;
+  min?: string;
+  max?: string;
 }
 
 export default function InputField({
@@ -20,7 +22,9 @@ export default function InputField({
   placeholder,
   register,
   error,
-  className = ""
+  className = "",
+  min,
+  max
 }: InputFieldProps) {
   
   return(
@@ -39,6 +43,8 @@ export default function InputField({
         type={type}
         placeholder={placeholder}
         {...register?.(name)}
+        min={min}
+        max={max}
         className={`
           w-full px-2 py-3 border border-gray-300 rounded-md
           focus:outline-none focus:ring-2 focus:ring-primary-500
