@@ -42,7 +42,7 @@ export default async function page({ params }: { params: { id: string } }) {
         {/* 일정 추가 */}
         {isLeader && <TodoForm studyId={studyId} studyData={studyData} />}
         {/* 일정 */}
-        <TodoList todos={todoData} />
+        <TodoList todos={todoData} members={studyData.members} />
       </div >
     </>
   )

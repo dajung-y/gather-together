@@ -43,14 +43,6 @@ export async function PATCH(
     const client = await clientPromise;
     const db = client.db();
 
-    console.log("메인공지: " + payload.content);
-    if (action === "updateNotice") {
-      await db.collection("studies").updateOne(
-        { _id: new ObjectId(studyId) },
-        { $set: { mainNotice: { content: payload.content, updatedAt: new Date() } } }
-      );
-    }
-
     if (action === "removeMember") {
       await db.collection<{ members: Member[] }>("studies").updateOne(
         { _id: new ObjectId(studyId) },

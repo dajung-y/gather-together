@@ -22,10 +22,25 @@ export async function PATCH(req: Request, { params }: { params: { todoId: string
     const client = await clientPromise;
     const db = client.db();
 
+    const todo = await db.collection("todos").findOne({ _id: new ObjectId(todoId) });
+    if (!todo) {
+      return NextResponse.json({ error: "투두 없음" }, { status: 404 });
+    }
+
+    let newMemberChecks: string[];
+    if (checked) {
+      // 체크 추가 (중복 방지)
+      newMemberChecks = todo.memberChecks.includes(userId)
+        ? todo.memberChecks
+        : [...todo.memberChecks, userId];
+    } else {
+      // 체크 제거
+      newMemberChecks = todo.memberChecks.filter((id: string) => id !== userId);
+    }
+
     const result = await db.collection("todos").updateOne(
       { _id: new ObjectId(todoId) },
-      { $set: { "checks.$[c].checked": checked } },
-      { arrayFilters: [{ "c.userId": userId }] }
+      { $set: { memberChecks: newMemberChecks } }
     );
 
     return NextResponse.json({ success: result.modifiedCount > 0 });
