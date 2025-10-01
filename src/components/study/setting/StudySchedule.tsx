@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react'
 import debounce from 'lodash.debounce';
+import toast from 'react-hot-toast';
 
 const weekdayLabel = [
   { key: 'mon', label: '월' },
@@ -46,6 +47,9 @@ export default function StudySchedule({ studyId, st, et, wd }: StudyScheduleProp
 
         if (!res.ok) {
           throw new Error(result.error || "서버 오류");
+        }
+        else {
+          toast.success("스터디 시간이 수정되었습니다");
         }
 
         return result;
