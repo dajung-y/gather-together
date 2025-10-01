@@ -1,11 +1,9 @@
-
-import TodoForm from "@/components/study/todo/TodoForm";
-import TodoList from "@/components/study/todo/TodoList";
-import clientPromise from "@/lib/mongodb";
+import TodoBoard from "@/components/study/todo/TodoBoard";
 import { getUserIdFromSession } from "@/lib/session";
+import { getStudyData } from "@/lib/study";
+import { getTodoData } from "@/lib/todo";
 import { StudyData } from "@/types/study";
 import { Todo } from "@/types/todo";
-import { ObjectId } from "mongodb";
 import { redirect } from "next/navigation";
 
 export default async function page({ params }: { params: { id: string } }) {
@@ -17,17 +15,9 @@ export default async function page({ params }: { params: { id: string } }) {
     redirect('/');
   }
 
-  const client = await clientPromise;
-  const db = client.db();
+  const studyData: StudyData = await getStudyData(studyId);
 
-  const study = await db.collection("studies").findOne({ _id: new ObjectId(studyId) });
-  const studyData: StudyData = JSON.parse(JSON.stringify(study));
-
-  const todos = await db.collection("todos").find({ studyId }).toArray();
-  const todoData: Todo[] = JSON.parse(JSON.stringify(todos));
-
-  const isLeader = studyData.members.some(
-    (m) => m.userId === userId && m.role === "leader");
+  const todoData: Todo[] = await getTodoData(studyId);
 
   return (
     <>
@@ -39,10 +29,7 @@ export default async function page({ params }: { params: { id: string } }) {
         lg:px-8 lg:py-4 
       ">
         <p className='headline3 text-primary-500'>할 일</p>
-        {/* 일정 추가 */}
-        {isLeader && <TodoForm studyId={studyId} studyData={studyData} />}
-        {/* 일정 */}
-        <TodoList todos={todoData} members={studyData.members} />
+        <TodoBoard userId={userId} studyId={studyId} studyData={studyData} todoData={todoData} />
       </div >
     </>
   )

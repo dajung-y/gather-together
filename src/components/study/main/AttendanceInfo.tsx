@@ -12,11 +12,12 @@ type AttendanceInfoProps = {
 }
 
 const WEEKDAY_MAP: Record<string, number> = {
-  sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6,
+  mon: 0, tue: 1, wed: 2, thu: 3, fri: 4, sat: 5, sun: 6
 };
 
+
 const WEEKDAY_LABELS: Record<string, string> = {
-  sun: "일", mon: "월", tue: "화", wed: "수", thu: "목", fri: "금", sat: "토",
+  mon: "월", tue: "화", wed: "수", thu: "목", fri: "금", sat: "토", sun: "일"
 };
 
 
@@ -34,7 +35,9 @@ export default function AttendanceInfo({
     const end = new Date(endDate);
 
     const targetDays = weekdays.map(d => WEEKDAY_MAP[d.toLowerCase()]);
-    const targetLabels = weekdays.map(d => WEEKDAY_LABELS[d.toLowerCase()]);
+    const targetLabels = Object.keys(WEEKDAY_MAP)
+      .filter(key => weekdays.includes(key))
+      .map(key => WEEKDAY_LABELS[key]);
 
     const totalDays = Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
     const fullWeeks = Math.floor(totalDays / 7);
@@ -110,6 +113,7 @@ export default function AttendanceInfo({
             </span>
           </div>
         </div>
+        <p className='text-sm text-primary-100'>※ 시작 시간 10분 후 출석 시 지각, 종료 후 출석 시 결석 처리 됩니다</p>
       </div>
     </>
   )

@@ -38,12 +38,12 @@ export async function PATCH(req: Request, { params }: { params: { todoId: string
       newMemberChecks = todo.memberChecks.filter((id: string) => id !== userId);
     }
 
-    const result = await db.collection("todos").updateOne(
+    await db.collection("todos").updateOne(
       { _id: new ObjectId(todoId) },
       { $set: { memberChecks: newMemberChecks } }
     );
 
-    return NextResponse.json({ success: result.modifiedCount > 0 });
+    return NextResponse.json({ success: true });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "알 수 없는 오류";
     return NextResponse.json({ error: message }, { status: 500 });

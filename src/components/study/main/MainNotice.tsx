@@ -11,8 +11,8 @@ type MainNoticeProps = {
 };
 
 export default function MainNotice({ studyId, mainNotice, isLeader }: MainNoticeProps) {
-  const [currentNotice, setCurrentNotice] = useState<string>(mainNotice ?? "공지를 작성해주세요!");
-  const [tempNotice, setTempNotice] = useState<string>(mainNotice ?? "공지를 작성해주세요!");
+  const [currentNotice, setCurrentNotice] = useState<string>(mainNotice ? mainNotice : "메인 공지를 작성해주세요!");
+  const [tempNotice, setTempNotice] = useState<string>(mainNotice ? mainNotice : "메인 공지를 작성해주세요!");
   const [isEditing, setIsEditing] = useState<boolean>(false);
 
   // mainNotice 바뀔 때 tempNotice 초기화
@@ -22,6 +22,7 @@ export default function MainNotice({ studyId, mainNotice, isLeader }: MainNotice
   }, [mainNotice]);
 
   const handleSave = async () => {
+    if (!tempNotice) return;
     try {
       const res = await fetch(`/api/study/${studyId}/main-notice`, {
         method: "PATCH",
@@ -44,8 +45,10 @@ export default function MainNotice({ studyId, mainNotice, isLeader }: MainNotice
   };
 
   const handleCancel = () => {
-    setTempNotice(currentNotice || "");
-    setIsEditing(false);
+    if (confirm("⚠️ 작성 중인 공지를 취소하면 입력한 내용이 모두 삭제됩니다. 계속 진행하시겠습니까?")) {
+      setTempNotice(currentNotice || "");
+      setIsEditing(false);
+    }
   };
 
   return (
@@ -63,8 +66,9 @@ export default function MainNotice({ studyId, mainNotice, isLeader }: MainNotice
             <textarea
               value={tempNotice}
               onChange={(e) => setTempNotice(e.target.value)}
-              className="w-full h-60 resize-none p-4"
+              className="w-full h-60 resize-none p-4 border rounded border-gray-300"
             />
+            {!tempNotice && <p className='text-status-error text-sm'>메인 공지는 필수입니다.</p>}
           </div>
         ) : (
           <div>

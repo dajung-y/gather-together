@@ -9,7 +9,7 @@ type NoticeListProps = {
 export default function NoticeList({ notices, isLeader }: NoticeListProps) {
 
   return (
-    <div>
+    <div className="flex flex-col gap-2">
       {notices && (notices.map((notice) => (
         <NoticeItem notice={notice} isLeader={isLeader} key={notice._id} />
       )))}
