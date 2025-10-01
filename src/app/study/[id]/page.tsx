@@ -63,6 +63,7 @@ export default async function page({ params }: { params: { id: string } }) {
           <MainNotice studyId={studyId} mainNotice={studyData.mainNotice} isLeader={isLeader} />
         </div>
 
+        <hr className="mt-12 mb-2 text-gray-300" />
         {/* 공지 추가*/}
         <NoticeForm studyId={studyId} isLeader={isLeader} />
         {/* 일반 공지 */}
