@@ -37,6 +37,9 @@ export default function Pagination({
     if (onChangePage) {
       onChangePage(page);
     }
+    // 스크롤 이동
+    const studyList = document.getElementById("study-list");
+    studyList?.scrollIntoView({ behavior: "smooth"});
   }
 
   const handleNextButton = () => {

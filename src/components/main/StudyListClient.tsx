@@ -77,8 +77,8 @@ export default function StudyListClient() {
           </div>
         </div>
       </section>
-      {/* 카드 리스트 */}
-      <section className="my-8">
+      {/* 카드 리스트 id추가 */}
+      <section id="study-list" className="my-8 scroll-mt-18 lg:scroll-mt-22">
         { isLoading ? (
           <div className="flex justify-center items-center h-64">
             <span className="animate-pulse headline2 text-primary-500">로딩 중...</span>
