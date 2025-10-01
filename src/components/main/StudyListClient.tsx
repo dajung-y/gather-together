@@ -11,7 +11,7 @@ import CategoryFilter from "./CategoryFilter";
 export default function StudyListClient() {
 
   const [studies, setStudies] = useState<Study[]>([]);
-  const [isRecruiting, setIsRecruiting] = useState<boolean>(true);
+  const [isRecruiting, setIsRecruiting] = useState<boolean | undefined>(true);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [currentPage, setCurrentpage] = useState<number>(1);
   const [totalPage, setTotalPage] = useState<number>(1);
@@ -23,10 +23,25 @@ export default function StudyListClient() {
     const fetchStudies = async () => {
       setIsLoading(true);
       try{
-        // 캐시처리 추가하기
-        const res = await fetch(`/api/study?isRecruiting=${isRecruiting}&page=${currentPage}&category=${category}&search=${encodeURIComponent(searchQuery)}`);
+        const params = new URLSearchParams();
+        console.log(params);
+
+        // 모집중
+        if(isRecruiting) params.set("isRecruiting", "true");
+        // 페이지
+        params.set("page", String(currentPage));
+
+        if(category) params.set("category", category);
+        if(searchQuery) params.set("search",searchQuery);
+
+        // 패치할 url
+        const url = `api/study?${params.toString()}`;
+        console.log("fetch url: ",url);
+
+        const res = await fetch(url);
         const data = await res.json();
-        setStudies(data.data);
+
+        setStudies(data.data || []);
         setTotalPage(data.totalPage || 1);
       } catch(error) {
         console.error("스터디 리스트 불러오기 실패: ",error);
@@ -45,7 +60,7 @@ export default function StudyListClient() {
           <div className="w-1/3 md:w-auto md:flex-shrink-0">
             <RecruitToggle
             isRecruiting={isRecruiting}
-            onToggle = {() => setIsRecruiting(prev => !prev)}
+            onToggle = {() => setIsRecruiting(prev => prev=== true? undefined : true)}
             />
           </div>
           <div className="w-full h-full md:w-auto">
