@@ -5,6 +5,7 @@ import { Notice } from "@/types/notice";
 import { formatDate } from "@/utils/date";
 import { useForm } from "react-hook-form";
 import Button from "@/components/common/Button";
+import toast from "react-hot-toast";
 
 type NoticeItemProps = {
   notice: Notice;
@@ -25,22 +26,26 @@ export default function NoticeItem({ notice, isLeader }: NoticeItemProps) {
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    try {
-      const res = await fetch("/api/notice", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: notice._id }),
-      });
 
-      const data = await res.json();
-      if (data.success) {
-        setDeleted(true);
-      } else {
-        alert("삭제 실패");
+    if (confirm("공지를 삭제하시겠습니까?")) {
+      try {
+        const res = await fetch("/api/notice", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: notice._id }),
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          toast.success("삭제 성공");
+          setDeleted(true);
+        } else {
+          alert("삭제 실패");
+        }
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : "알 수 없는 오류";
+        alert(message);
       }
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "알 수 없는 오류";
-      alert(message);
     }
   };
 
@@ -51,11 +56,13 @@ export default function NoticeItem({ notice, isLeader }: NoticeItemProps) {
   };
 
   const handleEditCancel = () => {
-    setIsEditing(false);
-    reset({
-      title: notice.title,
-      content: notice.content
-    });
+    if (confirm("⚠️ 작성 중인 공지를 취소하면 입력한 내용이 모두 삭제됩니다. 계속 진행하시겠습니까?")) {
+      setIsEditing(false);
+      reset({
+        title: notice.title,
+        content: notice.content
+      });
+    }
   }
 
   const onSubmit = async (data: Notice) => {
@@ -73,6 +80,7 @@ export default function NoticeItem({ notice, isLeader }: NoticeItemProps) {
         }),
       });
 
+      toast.success("수정 성공");
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "알 수 없는 오류";
       console.error(message);
@@ -90,7 +98,7 @@ export default function NoticeItem({ notice, isLeader }: NoticeItemProps) {
             onClick={() => setShowDetail(!showDetail)}>
             <span className="flex-1 headline4">{notice.title} </span>
             <span>{formatDate(notice.createdAt)}</span>
-            <span className="body-sb text-primary-500">NEW</span>
+            {/* <span className="body-sb text-primary-500">NEW</span> */}
             {isLeader &&
               <div className="flex gap-2 items-center">
                 <Pen size={20} className="ml-4 cursor-pointer" onClick={handleEdit} />
