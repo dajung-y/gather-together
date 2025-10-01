@@ -1,25 +1,24 @@
 "use client"
 import Button from "@/components/common/Button";
 import { useForm } from 'react-hook-form';
-import { StudyData } from "@/types/study";
 import { useState } from "react";
+import { Todo } from '@/types/todo'
 
 type TodoFormProps = {
   studyId: string;
-  studyData: StudyData;
+  onAddTodo: (todo: Todo) => void;
 }
 
-type Todo = {
+type FormData = {
   todoDate: string;
   task: string;
-}
+};
 
-export default function TodoForm({
-  studyId }: TodoFormProps) {
-  const { register, handleSubmit, formState: { errors } } = useForm<Todo>();
+export default function TodoForm({ studyId, onAddTodo }: TodoFormProps) {
+  const { reset, register, handleSubmit, formState: { errors } } = useForm<FormData>();
   const [open, setOpen] = useState<boolean>(false);
 
-  const onSubmit = async (data: Todo) => {
+  const onSubmit = async (data: FormData) => {
     try {
       const res = await fetch(`/api/todo/${studyId}`, {
         method: "POST",
@@ -37,8 +36,11 @@ export default function TodoForm({
         alert(`추가 실패: ${result.error || result.message}`);
       }
       else {
-        window.location.reload();
+        onAddTodo({ ...result.task });
+        reset();
       }
+
+
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "알 수 없는 오류";
       alert(message);
