@@ -8,10 +8,12 @@ type TodoCheckProps = {
   task: string;
   todoId: string;
   isChecked: boolean;
+  isMine: boolean;
+  isLeader: boolean;
   canClick: boolean;
 }
 
-export default function TodoCheck({ task, todoId, isChecked, canClick }: TodoCheckProps) {
+export default function TodoCheck({ task, todoId, isChecked, isMine, isLeader, canClick }: TodoCheckProps) {
   const [checked, setChecked] = useState(isChecked);
 
   //debounce 추가
@@ -27,27 +29,27 @@ export default function TodoCheck({ task, todoId, isChecked, canClick }: TodoChe
   }, [todoId]);
 
   const handleCheck = () => {
-    if (!canClick) return;
+    if (!(isMine || isLeader)) return;
     const newChecked = !checked;
     setChecked(newChecked);
     saveCheck(newChecked);
-    if (checked == false)
+    if (checked == false && isMine)
       toast.success(`${task} 완료!`, { duration: 2000 })
   }
 
   return (
     <div className={`flex w-full h-full justify-center items-center
-      ${canClick ? "bg-primary-50" : ""}  border-t border-primary-100`}>
+      ${isMine ? "bg-primary-50" : ""}  border-t border-primary-100`}>
       <input
         type="checkbox"
         checked={checked}
         onChange={() => handleCheck()}
         className={`w-4 h-4 border border-primary-500 rounded-xs
-          ${!canClick ? "text-gray-500" : ""} appearance-none
+          ${!isLeader ? "text-gray-500" : ""} appearance-none
         checked:bg-primary-500 bg-white
         disabled:opacity-40 disabled:bg-gray-200
         accent-primary-500 disabled:checked:bg-primary-300`}
-        disabled={!canClick}
+        disabled={!(isMine || isLeader)}
       />
     </div>
   )
