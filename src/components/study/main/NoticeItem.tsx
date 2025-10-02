@@ -94,7 +94,7 @@ export default function NoticeItem({ notice, isLeader }: NoticeItemProps) {
 
       {!isEditing ?
         <div>
-          <div className="flex gap-2 p-4 border rounded-lg items-center"
+          <div className="flex gap-2 py-2 px-4 border rounded-lg items-center border-gray-500"
             onClick={() => setShowDetail(!showDetail)}>
             <span className="flex-1 headline4">{notice.title} </span>
             <span>{formatDate(notice.createdAt)}</span>

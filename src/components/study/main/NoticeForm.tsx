@@ -8,16 +8,16 @@ import toast from "react-hot-toast";
 type NoticeFormProps = {
   studyId: string;
   isLeader: boolean
+  onAddNotice: (notice: Notice) => void
 }
 
-export default function NoticeForm({ studyId, isLeader }: NoticeFormProps) {
+export default function NoticeForm({ studyId, isLeader, onAddNotice }: NoticeFormProps) {
   const { register, handleSubmit, formState: { errors }, reset } = useForm<Notice>();
 
   const [showInput, setShowInput] = useState(false);
 
   const onSubmit = async (data: Notice) => {
     try {
-
       const res = await fetch("/api/notice", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -30,10 +30,12 @@ export default function NoticeForm({ studyId, isLeader }: NoticeFormProps) {
 
       const result = await res.json();
 
+      console.log("공지 아이디" + result.task._id);
       if (!res.ok) {
         alert(`추가 실패: ${result.error || result.message}`);
       }
       else {
+        onAddNotice({ ...result.task });
         reset();
         setShowInput(!showInput);
         toast("공지가 추가되었습니다");
