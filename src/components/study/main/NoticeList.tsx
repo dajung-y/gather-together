@@ -17,6 +17,7 @@ export default function NoticeList({ notices, isLeader }: NoticeListProps) {
             <NoticeItem notice={notice} isLeader={isLeader} key={notice._id} />
           ))
       }
+
     </div>
   )
 }

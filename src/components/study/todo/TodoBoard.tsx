@@ -27,6 +27,7 @@ export default function TodoBoard({ userId, studyId, studyData, todoData }: Todo
       {/* 일정 추가 */}
       {isLeader && <TodoForm studyId={studyId} startDate={studyData.startDate}
         endDate={studyData.endDate} onAddTodo={handleAddTodo} />}
+
       {/* 일정 */}
       <TodoList todos={todos} members={studyData.members} />
     </div>

@@ -72,16 +72,16 @@ body {
 } */
 
 .button-primary {
-  @apply text-primary-50 border bg-primary-500
+  @apply text-primary-50 bg-primary-500 border border-primary-500
   hover:brightness-75;
 }
 
 .button-secondary {
-  @apply text-primary-700 bg-primary-50
+  @apply text-primary-700 bg-primary-50 border border-primary-50
 }
 
 .button-disabled {
-  @apply text-gray-700 bg-gray-200
+  @apply text-gray-700 bg-gray-200 border border-gray-200
 }
 
 .button-outline {
