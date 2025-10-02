@@ -1,9 +1,17 @@
 "use client";
 
+import React from "react";
 import Sidebar from "@/components/common/Sidebar";
 import { usePathname, useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
-export default function MyPageSidebar({ title = "마이페이지" }: { title?: string }) {
+export default function MyPageSidebar() {
+    const { data } = useSession();
+    const nickname =
+        (data?.user as any)?.nickname ??
+        (data?.user as any)?.name ??
+        "게스트";
+
     const router = useRouter();
     const pathname = usePathname();
 
@@ -13,5 +21,10 @@ export default function MyPageSidebar({ title = "마이페이지" }: { title?: s
         { label: "닉네임 변경", onClick: () => router.replace(`${pathname}?modal=nickname`, { scroll: false }) },
     ];
 
-    return <Sidebar title={title} menuItems={menuItems} />;
+    return (
+        <Sidebar
+            title={<>{nickname}<br/>마이페이지</>}
+            menuItems={menuItems}
+        />
+    );
 }
