@@ -26,6 +26,9 @@ export default async function Layout({ children, params }: LayoutProps) {
   const isMember = studyData.members.some(member => String(member.userId) == String(userId));
   const isLeader = studyData.members.some(member => member.role === "leader" && member.userId === userId);
 
+  for (const member of studyData.members)
+    console.log(member.userId + "," + String(userId));
+  console.log("멤버인가?: " + isMember);
   // 메뉴 생성
   return (
     <div className="min-h-screen flex flex-col lg:flex-row max-w-[1280px] mx-auto">
