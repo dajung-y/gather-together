@@ -4,7 +4,6 @@ import TodoForm from './TodoForm'
 import TodoList from './TodoList'
 import { StudyData } from '@/types/study'
 import { Todo } from '@/types/todo'
-// import TodoSkeleton from './TodoSkeleton'
 
 type TodoBoardProps = {
   userId: string;
@@ -23,12 +22,12 @@ export default function TodoBoard({ userId, studyId, studyData, todoData }: Todo
     setTodos(prev => [...prev, newTodo]);
   }
 
-  // if (isLoading) return (<TodoSkeleton />);
-
   return (
     <div>
       {/* 일정 추가 */}
-      {isLeader && <TodoForm studyId={studyId} onAddTodo={handleAddTodo} />}
+      {isLeader && <TodoForm studyId={studyId} startDate={studyData.startDate}
+        endDate={studyData.endDate} onAddTodo={handleAddTodo} />}
+
       {/* 일정 */}
       <TodoList todos={todos} members={studyData.members} />
     </div>

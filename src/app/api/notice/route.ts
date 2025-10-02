@@ -1,5 +1,7 @@
 import clientPromise from "@/lib/mongodb";
+import { Notice } from "@/types/notice";
 import { ObjectId } from "mongodb";
+import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -20,8 +22,15 @@ export async function POST(req: Request) {
 
     const result = await db.collection("notices").insertOne(noticeData);
 
+    const newNotice: Notice = {
+      _id: result.insertedId.toString(),
+      ...noticeData,
+    };
+
+    revalidateTag('notice-tag');
+
     return NextResponse.json(
-      { success: true, taskId: result.insertedId },
+      { success: true, task: newNotice },
       { status: 201, }
     );
   } catch (err: unknown) {
@@ -51,6 +60,8 @@ export async function DELETE(req: Request) {
   const db = (await clientPromise).db();
   const result = await db.collection("notices").deleteOne({ _id: new ObjectId(id) });
 
+  revalidateTag('notice-tag');
+
   return NextResponse.json({ success: result.deletedCount === 1 });
 }
 
@@ -72,6 +83,8 @@ export async function PATCH(req: Request) {
         },
       }
     );
+
+    revalidateTag('notice-tag');
 
     return NextResponse.json({ success: true });
   } catch (err: unknown) {
