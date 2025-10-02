@@ -2,6 +2,7 @@ import { ObjectId } from "mongodb";
 import clientPromise from "@/lib/mongodb";
 import { NextRequest, NextResponse } from "next/server";
 import { Member } from "@/types/study";
+import { revalidateTag } from "next/cache";
 
 export async function GET(
   req: Request,
@@ -66,6 +67,8 @@ export async function PATCH(
         }
       }
     }
+
+    revalidateTag('study-tag');
 
     return NextResponse.json({ success: true });
   } catch (err: unknown) {
