@@ -13,6 +13,16 @@ export default function TodoList({ todos, members }: TodoListProps) {
   const { data: session } = useSession();
   const userId = session?.user?.id;
 
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const overdueTodos = todos.filter(todo => new Date(todo.date) < today)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+  const activeTodos = todos.filter(todo => new Date(todo.date) >= today)
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+
   return (
     <div className="relative overflow-x-auto pb-4">
       <div className="flex">
@@ -30,8 +40,20 @@ export default function TodoList({ todos, members }: TodoListProps) {
         </div>
       </div>
 
-      {todos?.map((todo, todoIndex) => (
+      {/* {todos?.map((todo, todoIndex) => (
         <div key={todoIndex}>
+          <TodoItem todo={todo} members={members} userId={userId} />
+        </div>
+      ))} */}
+      {activeTodos?.map((todo, todoIndex) => (
+        <div key={todoIndex}>
+          <TodoItem todo={todo} members={members} userId={userId} />
+        </div>
+      ))}
+
+      <p className="pt-4 pb-2 font-bold text-gray-500"></p>
+      {overdueTodos?.map((todo, todoIndex) => (
+        <div key={todoIndex} className='opacity-40'>
           <TodoItem todo={todo} members={members} userId={userId} />
         </div>
       ))}

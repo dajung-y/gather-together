@@ -6,6 +6,8 @@ import { Todo } from '@/types/todo'
 
 type TodoFormProps = {
   studyId: string;
+  startDate: string;
+  endDate: string;
   onAddTodo: (todo: Todo) => void;
 }
 
@@ -14,7 +16,7 @@ type FormData = {
   task: string;
 };
 
-export default function TodoForm({ studyId, onAddTodo }: TodoFormProps) {
+export default function TodoForm({ studyId, startDate, endDate, onAddTodo }: TodoFormProps) {
   const { reset, register, handleSubmit, formState: { errors } } = useForm<FormData>();
   const [open, setOpen] = useState<boolean>(false);
 
@@ -47,6 +49,7 @@ export default function TodoForm({ studyId, onAddTodo }: TodoFormProps) {
     }
   };
 
+  console.log("startDate" + startDate);
   return (
     <div className='my-4'>
       {/* 모바일 화면 */}
@@ -64,6 +67,8 @@ export default function TodoForm({ studyId, onAddTodo }: TodoFormProps) {
             <div className="w-full">
               <input
                 type='date'
+                min={startDate}
+                max={endDate}
                 {...register('todoDate', { required: '날짜를 선택해주세요' })}
                 placeholder='날짜 선택'
                 className='border rounded px-2 py-1 border-gray-400'
@@ -94,6 +99,8 @@ export default function TodoForm({ studyId, onAddTodo }: TodoFormProps) {
         <div>
           <input
             type='date'
+            min={startDate}
+            max={endDate}
             {...register('todoDate', { required: '날짜를 선택해주세요' })}
             placeholder='날짜 선택'
             className='border rounded px-2 py-1 border-gray-400'
