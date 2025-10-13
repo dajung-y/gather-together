@@ -100,7 +100,7 @@ export default function StudyListClient() {
         <div className="my-8 lg:my-16">
           <Pagination
             totalPages={totalPage}
-            perPage={16}
+            currentPage={currentPage}
             onChangePage={setCurrentpage}
           />
         </div>

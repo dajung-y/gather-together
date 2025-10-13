@@ -1,68 +1,56 @@
 "use client"
 import { PaginationProps } from "@/types/pagination"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronsLeft, ChevronsRight } from "lucide-react";
 
-export default function Pagination({
-  perPage,
-  totalPages,
-  onChangePage
-}: PaginationProps) {
-  const pages = [];
-  const [currentPage, setCurrentPage] = useState(1);
-  const [currentPageGroup, setCurrentPageGroup] = useState(0);
-  const startPage = currentPageGroup * perPage;
-  const endPage = currentPageGroup * perPage + perPage - 1;
-  const totalPageGroups = Math.ceil(totalPages / perPage);
+// controlled component로 수정
+interface Props extends PaginationProps {
+  currentPage: number; // 부모에서 내려줄 현재 페이지
+}
 
-  for (let i = 1; i <= totalPages; i++) {
-    pages.push(i);
-  }
+export default function Pagination({
+  totalPages,
+  pagePerGroup=5,
+  currentPage,
+  onChangePage
+}: Props) {
+  const pages = Array.from({length: totalPages}, (_,i) => i+1);
+
+  // 현재 페이지 그룹의 인덱스
+  const currentGroup = Math.floor((currentPage-1) / pagePerGroup);
+
+  const startPage = currentGroup * pagePerGroup + 1;
+  const endPage = Math.min(startPage + pagePerGroup -1, totalPages)
+  const totalGroups = Math.ceil(totalPages / pagePerGroup);
 
   const handlePrevButton = () => {
-    setCurrentPageGroup(prev => {
-      const nextGroup = prev - 1;
-      const nextPage = nextGroup * perPage + 1;
 
-      setCurrentPage(nextPage);
-      if (onChangePage) {
-        onChangePage(nextPage);
-      }
-      return nextGroup;
-    });
+    if(currentGroup === 0) return;
+    const prevGroupFirstPage = (currentGroup-1)* pagePerGroup +1;
+    onChangePage?.(prevGroupFirstPage);
   };
 
   const handlePageButton = (page: number) => {
-    setCurrentPage(page);
-    if (onChangePage) {
-      onChangePage(page);
-    }
+    onChangePage?.(page);
     // 스크롤 이동
     const studyList = document.getElementById("study-list");
     studyList?.scrollIntoView({ behavior: "smooth"});
   }
 
   const handleNextButton = () => {
-    setCurrentPageGroup(prev => {
-      const nextGroup = prev + 1;
-      const nextPage = nextGroup * perPage + 1;
-
-      setCurrentPage(nextPage);
-      if (onChangePage) {
-        onChangePage(nextPage);
-      }
-      return nextGroup;
-    });
+    if(currentGroup >= totalGroups -1) return;
+    const nextGroupFirstPage = (currentGroup +1) * pagePerGroup +1;
+    onChangePage?.(nextGroupFirstPage);
   };
 
   return (
     <div className="flex justify-center gap-2 items-center">
-      {currentPageGroup !== 0 &&
+      {currentGroup !== 0 &&
         <ChevronsLeft className="cursor-pointer text-primary-700" size={24}
           onClick={() => handlePrevButton()} />}
 
 
-      {pages.slice(startPage, endPage).map((page) => (
+      {pages.slice(startPage-1, endPage).map((page) => (
         <button
           key={page}
           className={`${page === currentPage ? "bg-primary-500 text-white" : ""} 
@@ -72,7 +60,7 @@ export default function Pagination({
         </button>
       ))}
 
-      {currentPageGroup < totalPageGroups - 1 &&
+      {currentGroup < totalGroups - 1 &&
         <ChevronsRight className="cursor-pointer text-primary-700" size={24}
           onClick={() => handleNextButton()} />}
     </div>
