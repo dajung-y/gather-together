@@ -7,9 +7,11 @@ import CardList from "./CardList";
 import { Study } from "@/types/study";
 import SearchBar from "./SearchBar";
 import CategoryFilter from "./CategoryFilter";
+import { useRouter } from "next/navigation";
 
 export default function StudyListClient() {
 
+  const router = useRouter();
   const [studies, setStudies] = useState<Study[]>([]);
   const [isRecruiting, setIsRecruiting] = useState<boolean | undefined>(true);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -37,6 +39,7 @@ export default function StudyListClient() {
         // 패치할 url
         const url = `api/study?${params.toString()}`;
         console.log("fetch url: ",url);
+
 
         const res = await fetch(url);
         const data = await res.json();
@@ -77,8 +80,8 @@ export default function StudyListClient() {
           </div>
         </div>
       </section>
-      {/* 카드 리스트 */}
-      <section className="my-8">
+      {/* 카드 리스트 id추가 */}
+      <section id="study-list" className="my-8 scroll-mt-18 lg:scroll-mt-22">
         { isLoading ? (
           <div className="flex justify-center items-center h-64">
             <span className="animate-pulse headline2 text-primary-500">로딩 중...</span>
@@ -97,7 +100,7 @@ export default function StudyListClient() {
         <div className="my-8 lg:my-16">
           <Pagination
             totalPages={totalPage}
-            perPage={16}
+            currentPage={currentPage}
             onChangePage={setCurrentpage}
           />
         </div>

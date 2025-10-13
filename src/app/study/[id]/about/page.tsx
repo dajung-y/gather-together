@@ -26,6 +26,7 @@ interface Study {
   endTime: string;
   title: string;
   description: string;
+  isRecruiting: boolean;
   creator: {
     userId: string;
     nickname: string;
@@ -58,6 +59,7 @@ export default async function Page({params}: PageProps) {
 
   const creatorId = studyDoc?.creator.userId;
   const isCreator = session?.user.id === creatorId;
+  const isRecruiting = studyDoc?.isRecruiting;
 
   if(!studyDoc){
     return (
@@ -168,7 +170,8 @@ export default async function Page({params}: PageProps) {
       </div>
 
       {/* 하단 버튼 영역 */}
-      <section className="mb-8 bg-white">
+      { isRecruiting && (
+        <section className="mb-8 bg-white">
         <div className="max-w-5xl mx-auto p-6">
           <div className="flex justify-center">
             <JoinButton
@@ -178,6 +181,7 @@ export default async function Page({params}: PageProps) {
           </div>
         </div>
       </section>
+      )}
     </div>
   )
 }
