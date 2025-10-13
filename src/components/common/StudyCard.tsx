@@ -45,6 +45,7 @@ export default function StudyCard({
   }
 
   const handleClick = () => {
+
     route.push(`/study/${studyId}/about`);
   }
 
@@ -57,6 +58,7 @@ export default function StudyCard({
       <div className={`
             flex flex-col gap-4 w-full h-full p-4 border border-gray-300 shadow-lg rounded-lg
             ${style.isDisabled ? "bg-gray-100 opacity-60" : "bg-white"}
+            ${style.canEnter ? "mb-3" : ""}
           `}
           onClick={handleClick}
         >

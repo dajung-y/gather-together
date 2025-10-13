@@ -7,9 +7,11 @@ import CardList from "./CardList";
 import { Study } from "@/types/study";
 import SearchBar from "./SearchBar";
 import CategoryFilter from "./CategoryFilter";
+import { useRouter } from "next/navigation";
 
 export default function StudyListClient() {
 
+  const router = useRouter();
   const [studies, setStudies] = useState<Study[]>([]);
   const [isRecruiting, setIsRecruiting] = useState<boolean | undefined>(true);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -37,6 +39,7 @@ export default function StudyListClient() {
         // 패치할 url
         const url = `api/study?${params.toString()}`;
         console.log("fetch url: ",url);
+
 
         const res = await fetch(url);
         const data = await res.json();
