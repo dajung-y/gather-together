@@ -64,6 +64,8 @@ export default function StudyForm({defaultValues}: StudyFormProps) {
       const result = await res.json();
 
       if(res.ok && result.success) {
+        // 세션 추가
+        sessionStorage.setItem("prevPath", "/study/create");
         // toast 알람
         toast.success(isEdit ? "스터디가 수정되었습니다!" : "스터디가 생성되었습니다!", {duration:1500});
         setTimeout(() => {

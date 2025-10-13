@@ -4,8 +4,15 @@ import { useRouter } from 'next/navigation';
 
 export default function BackButton() {
   const router = useRouter();
+  const prevPath = sessionStorage.getItem('prevPath') || '';
   const handleBack = () => {
-    router.back();
+    if(prevPath.includes("study/create")){
+      // 세션정리
+      sessionStorage.removeItem('prevPath');
+      router.push('/');
+    } else {
+      router.back();
+    }
   }
   return (
     <button className='flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100 cursor-pointer'
