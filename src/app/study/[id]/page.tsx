@@ -9,6 +9,8 @@ import { redirect } from "next/navigation";
 import { getUserIdFromSession } from "@/lib/session";
 import clientPromise from "@/lib/mongodb";
 import { getStudyData } from "@/lib/study";
+import NoticeBoard from "@/components/study/main/NoticeBoard";
+import { getNoticeData } from "@/lib/notice";
 
 export default async function page({ params }: { params: { id: string } }) {
   const param = await params;
@@ -26,8 +28,10 @@ export default async function page({ params }: { params: { id: string } }) {
 
   const studyData: StudyData = await getStudyData(studyId);
 
-  const notices = await db.collection("notices").find({ studyId }).toArray();
-  const noticeData: Notice[] = JSON.parse(JSON.stringify(notices));
+  // const notices = await db.collection("notices").find({ studyId }).toArray();
+  // const noticeData: Notice[] = JSON.parse(JSON.stringify(notices));
+
+  const noticeData: Notice[] = await getNoticeData(studyId);
 
   const attendance = await db.collection("attendances").findOne({
     studyId: studyId,
@@ -63,10 +67,9 @@ export default async function page({ params }: { params: { id: string } }) {
           <MainNotice studyId={studyId} mainNotice={studyData.mainNotice} isLeader={isLeader} />
         </div>
 
-        {/* 공지 추가*/}
-        <NoticeForm studyId={studyId} isLeader={isLeader} />
-        {/* 일반 공지 */}
-        <NoticeList notices={noticeData} isLeader={isLeader} />
+        <hr className="mt-12 mb-2 text-gray-300" />
+        <NoticeBoard studyId={studyId} isLeader={isLeader} noticeData={noticeData} />
+
       </div>
     </>
   )

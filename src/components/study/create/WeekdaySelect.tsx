@@ -1,8 +1,6 @@
 // components/study/create/Weekdayselect.tsx
 // 요일 선택폼
 
-// components/study/create/Weekdayselect.tsx
-// 요일 선택폼
 
 interface WeekdaySelectProps {
   value?: string[];
@@ -16,7 +14,11 @@ export default function WeekdaySelect({
   error
 }: WeekdaySelectProps) {
   
-  
+  const weekdayOrder = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+  const sortWeekdays = (days: string[]) => {
+    return days.sort((a,b) => weekdayOrder.indexOf(a) - weekdayOrder.indexOf(b));
+  };
+
   const weekdays = [
     { key: 'mon', label: '월' },
     { key: 'tue', label: '화' },
@@ -32,7 +34,7 @@ export default function WeekdaySelect({
       ? value.filter(day => day !== dayKey) // 존재하면 제거
       : [...value, dayKey];                 // 없으면 추가
 
-    onChange?.(newValue);                   // 부모에게 변경된값 전달
+    onChange?.(sortWeekdays(newValue));     // 부모에게 변경된값 전달
   }
 
   return (

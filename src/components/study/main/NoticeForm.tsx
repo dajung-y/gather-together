@@ -3,20 +3,21 @@ import Button from "@/components/common/Button";
 import { Notice } from "@/types/notice";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 
 type NoticeFormProps = {
   studyId: string;
   isLeader: boolean
+  onAddNotice: (notice: Notice) => void
 }
 
-export default function NoticeForm({ studyId, isLeader }: NoticeFormProps) {
+export default function NoticeForm({ studyId, isLeader, onAddNotice }: NoticeFormProps) {
   const { register, handleSubmit, formState: { errors }, reset } = useForm<Notice>();
 
   const [showInput, setShowInput] = useState(false);
 
   const onSubmit = async (data: Notice) => {
     try {
-
       const res = await fetch("/api/notice", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -29,14 +30,15 @@ export default function NoticeForm({ studyId, isLeader }: NoticeFormProps) {
 
       const result = await res.json();
 
+      console.log("공지 아이디" + result.task._id);
       if (!res.ok) {
         alert(`추가 실패: ${result.error || result.message}`);
       }
       else {
+        onAddNotice({ ...result.task });
         reset();
         setShowInput(!showInput);
-        window.location.reload();
-
+        toast("공지가 추가되었습니다");
       }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "알 수 없는 오류";
@@ -67,8 +69,9 @@ export default function NoticeForm({ studyId, isLeader }: NoticeFormProps) {
               {/* 제목 */}
               <div className="flex-1 flex flex-col">
                 <input
-                  {...register("title", { required: "제목을 입력해주세요" })}
                   type="text"
+                  maxLength={40}
+                  {...register("title", { required: "제목을 입력해주세요" })}
                   placeholder="제목"
                   className="flex-1 border px-4 border-primary-300 rounded-lg"
                 />
@@ -81,16 +84,17 @@ export default function NoticeForm({ studyId, isLeader }: NoticeFormProps) {
               <Button type="submit">공지 추가</Button>
 
             </div>
-            {errors.title && <span className="text-red-500 text-sm">{errors.title.message as string}</span>}
+            {errors.title && <span className="text-status-error text-sm">{errors.title.message as string}</span>}
 
             {/* 내용 */}
             <div className="flex flex-col">
               <textarea
+                maxLength={500}
                 {...register("content", { required: "내용을 입력해주세요" })}
                 placeholder="내용"
                 className="w-full border p-4 border-primary-300 rounded-lg"
               />
-              {errors.content && <span className="text-red-500 text-sm">{errors.content.message as string}</span>}
+              {errors.content && <span className="text-status-error text-sm">{errors.content.message as string}</span>}
             </div>
           </div>
         </form>

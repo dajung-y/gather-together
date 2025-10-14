@@ -1,25 +1,27 @@
 "use client"
 import Button from "@/components/common/Button";
 import { useForm } from 'react-hook-form';
-import { StudyData } from "@/types/study";
 import { useState } from "react";
+import { Todo } from '@/types/todo'
 
 type TodoFormProps = {
   studyId: string;
-  studyData: StudyData;
+  startDate: string;
+  endDate: string;
+  onAddTodo: (todo: Todo) => void;
 }
 
-type Todo = {
+type FormData = {
   todoDate: string;
   task: string;
-}
+};
 
-export default function TodoForm({
-  studyId }: TodoFormProps) {
-  const { register, handleSubmit, formState: { errors } } = useForm<Todo>();
+
+export default function TodoForm({ studyId, startDate, endDate, onAddTodo }: TodoFormProps) {
+  const { reset, register, handleSubmit, formState: { errors } } = useForm<FormData>();
   const [open, setOpen] = useState<boolean>(false);
 
-  const onSubmit = async (data: Todo) => {
+  const onSubmit = async (data: FormData) => {
     try {
       const res = await fetch(`/api/todo/${studyId}`, {
         method: "POST",
@@ -37,14 +39,18 @@ export default function TodoForm({
         alert(`추가 실패: ${result.error || result.message}`);
       }
       else {
-        window.location.reload();
+        onAddTodo({ ...result.task });
+        reset();
       }
+
+
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "알 수 없는 오류";
       alert(message);
     }
   };
 
+  console.log("startDate" + startDate);
   return (
     <div className='my-4'>
       {/* 모바일 화면 */}
@@ -62,6 +68,8 @@ export default function TodoForm({
             <div className="w-full">
               <input
                 type='date'
+                min={startDate}
+                max={endDate}
                 {...register('todoDate', { required: '날짜를 선택해주세요' })}
                 placeholder='날짜 선택'
                 className='border rounded px-2 py-1 border-gray-400'
@@ -92,6 +100,8 @@ export default function TodoForm({
         <div>
           <input
             type='date'
+            min={startDate}
+            max={endDate}
             {...register('todoDate', { required: '날짜를 선택해주세요' })}
             placeholder='날짜 선택'
             className='border rounded px-2 py-1 border-gray-400'

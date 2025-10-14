@@ -35,7 +35,7 @@ export default function NicknameModal() {
         }
         setWorking(true);
         setErrMsg(null);
-
+      
         try {
             const res = await fetch("/api/mypage/nickname", {
                 method: "PATCH",

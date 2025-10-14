@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 import { Todo } from "@/types/todo";
 import { ObjectId } from "mongodb";
+import { revalidateTag } from "next/cache";
 
 export async function GET(
   req: Request,
@@ -52,6 +53,8 @@ export async function POST(req: Request) {
       _id: result.insertedId.toString(),
       ...todoData,
     };
+
+    revalidateTag("todo-tag");
 
     return NextResponse.json(
       { success: true, task: newTodo },
