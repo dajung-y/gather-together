@@ -10,14 +10,15 @@ type StudyDoc = any;
 
 function toCardDTO(s: StudyDoc) {
     const startDate = s?.period?.startDate ?? s?.startDate ?? "";
-    const endDate   = s?.period?.endDate   ?? s?.endDate   ?? "";
+    const endDate = s?.period?.endDate ?? s?.endDate ?? "";
+    const weekdays = s?.schedule?.weekdays ?? s?.weekdays ?? [];
     const startTime = s?.schedule?.startTime ?? s?.startTime ?? "";
-    const endTime   = s?.schedule?.endTime   ?? s?.endTime   ?? "";
+    const endTime = s?.schedule?.endTime ?? s?.endTime ?? "";
 
     const applicants = (s?.applicants ?? []).map((a: any) => ({
         userId: String(a?.userId ?? ""),
-        name:   String(a?.nickname ?? a?.name ?? ""),
-        msg:    String(a?.introduction ?? a?.msg ?? ""),
+        name: String(a?.nickname ?? a?.name ?? ""),
+        msg: String(a?.introduction ?? a?.msg ?? ""),
     }));
 
     return {
@@ -26,7 +27,9 @@ function toCardDTO(s: StudyDoc) {
         title: String(s?.title ?? ""),
         startDate,
         endDate,
-        time: [startTime, endTime].filter(Boolean).join(" ~ "),
+        weekdays,
+        startTime,
+        endTime,
         currentMembers:
             typeof s?.currentMembers === "number" ? s.currentMembers : (s?.members?.length ?? 0),
         maxMembers: Number(s?.capacity ?? 0),

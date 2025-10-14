@@ -25,22 +25,22 @@ async function getUserId(req: NextRequest): Promise<string | null> {
         try {
             const mod = await import("@/app/api/auth/[...nextauth]/route");
             authOptions = (mod as any).authOptions;
-        } catch {}
+        } catch { }
         if (!authOptions) {
             try {
                 const mod = await import("@/pages/api/auth/[...nextauth]");
                 authOptions = (mod as any).authOptions || (mod as any).default;
-            } catch {}
+            } catch { }
         }
         const session = authOptions ? await getServerSession(authOptions) : await getServerSession();
         const id = (session?.user as any)?.id ?? (session?.user as any)?.userId ?? null;
         if (id) return String(id);
-    } catch {}
+    } catch { }
     try {
         const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
         const id = (token as any)?.id ?? (token as any)?.userId ?? (token as any)?.sub;
         if (id) return String(id);
-    } catch {}
+    } catch { }
     const url = new URL(req.url);
     const q = url.searchParams.get("userId");
     if (q) return String(q);
@@ -62,6 +62,8 @@ function mapToStudyItem(
 
     const sdoc = source === "app" ? studyDoc : data;
     const app = source === "app" ? data : undefined;
+
+
 
     const studyName =
         app?.studyName ?? app?.studyTitle ?? app?.title ?? sdoc?.studyName ?? sdoc?.name ?? "";
@@ -175,6 +177,7 @@ export async function GET(req: NextRequest) {
                     period: 1,
                     startTime: 1,
                     endTime: 1,
+                    weekdays: 1,
                     schedule: 1,
                     capacity: 1,
                     currentMembers: 1,
@@ -203,6 +206,7 @@ export async function GET(req: NextRequest) {
                             period: 1,
                             startTime: 1,
                             endTime: 1,
+                            weekdays: 1,
                             schedule: 1,
                             capacity: 1,
                             currentMembers: 1,
@@ -256,6 +260,7 @@ export async function GET(req: NextRequest) {
                     period: 1,
                     startTime: 1,
                     endTime: 1,
+                    weekdays: 1,
                     schedule: 1,
                     capacity: 1,
                     currentMembers: 1,
@@ -288,6 +293,7 @@ export async function GET(req: NextRequest) {
                             period: 1,
                             startTime: 1,
                             endTime: 1,
+                            weekdays: 1,
                             schedule: 1,
                             capacity: 1,
                             currentMembers: 1,
@@ -353,6 +359,7 @@ export async function GET(req: NextRequest) {
                         period: 1,
                         startTime: 1,
                         endTime: 1,
+                        weekdays: 1,
                         schedule: 1,
                         capacity: 1,
                         currentMembers: 1,
