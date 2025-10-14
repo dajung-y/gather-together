@@ -5,7 +5,7 @@ import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { Study } from "@/types/study";
+import { Study, StudyData } from "@/types/study";
 import { authOptions } from "../../auth/[...nextauth]/route";
 
 
@@ -31,8 +31,22 @@ export async function POST(req: NextRequest) {
 
     const client = await clientPromise;
     const db = client.db();
-
     const studyObjectId = new ObjectId(studyId);
+
+    // 스터디 조회
+    const study = await db.collection<StudyData>("studies").findOne({ _id: studyObjectId });
+    if(!study) {
+      return NextResponse.json( { message: "스터디를 찾을 수 없습니다." }, { status: 404 });
+    }
+
+    // user 확인
+    const userId = session.user.id;
+
+    // 멤버인지 확인
+    const isMember = study.members?.some(m => m.userId === userId);
+    if(isMember) {
+      return NextResponse.json( { message: "이미 스터디 멤버입니다" }, { status: 400 });
+    }
 
     // applicant 객체
     const applicant: NonNullable<Study["applicants"]>[number] = {

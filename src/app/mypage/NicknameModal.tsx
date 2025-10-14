@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { toast } from "react-hot-toast";
 import Modal from "@/components/common/Modal";
 
 export default function NicknameModal() {
@@ -15,11 +16,14 @@ export default function NicknameModal() {
     const [working, setWorking] = useState(false);
     const [errMsg, setErrMsg] = useState<string | null>(null);
 
-    const close = () => {
+    const buildNextUrl = () => {
         const p = new URLSearchParams(search.toString());
         p.delete("modal");
-        const next = p.toString() ? `${pathname}?${p.toString()}` : pathname;
-        router.replace(next, { scroll: false });
+        return p.toString() ? `${pathname}?${p.toString()}` : pathname;
+    };
+
+    const close = () => {
+        router.replace(buildNextUrl(), { scroll: false });
     };
 
     const onSubmit = async (e: React.FormEvent) => {
@@ -31,6 +35,7 @@ export default function NicknameModal() {
         }
         setWorking(true);
         setErrMsg(null);
+      
         try {
             const res = await fetch("/api/mypage/nickname", {
                 method: "PATCH",
@@ -42,18 +47,14 @@ export default function NicknameModal() {
                 const t = await res.text().catch(() => "");
                 throw new Error(t || "닉네임 변경 실패");
             }
-
             window.dispatchEvent(new Event("nickname-updated"));
-
-            const p = new URLSearchParams(search.toString());
-            p.delete("modal");
-            const next = p.toString() ? `${pathname}?${p.toString()}` : pathname;
-
-            alert("닉네임 변경이 완료되었습니다!");
-            window.location.replace(next);
-
+            toast.success("닉네임 변경이 완료되었습니다!");
+            close();
+            router.refresh();
         } catch (err: any) {
-            setErrMsg(err?.message ?? "닉네임 변경 실패");
+            const msg = err?.message ?? "닉네임 변경 실패";
+            setErrMsg(msg);
+            toast.error(msg);
         } finally {
             setWorking(false);
         }

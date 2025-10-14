@@ -37,6 +37,11 @@ interface Study {
     introduction: string;
     status: string
   }[];
+  members?: {
+    userId: string;
+    nickname: string;
+    role?: string;
+  }[];
   createdAt: string;
   updatedAt: string;
 }
@@ -177,7 +182,8 @@ export default async function Page({params}: PageProps) {
             <JoinButton
               creatorId={studyData.creator.userId}
               studyId={studyData._id.toString()}
-              applicants={studyData.applicants || []} />
+              applicants={studyData.applicants || []}
+              members={studyData.members || []} />
           </div>
         </div>
       </section>

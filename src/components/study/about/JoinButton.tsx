@@ -20,12 +20,18 @@ interface JoinButtonProps {
     introduction: string;
     status: string
   }[];
+  members: {
+    userId: string;
+    nickname: string;
+    role?: string;
+  }[];
 }
 
 export default function JoinButton({
   creatorId,
   studyId,
-  applicants
+  applicants,
+  members,
 }: JoinButtonProps) {
   const router = useRouter();
   const { data: session } = useSession();
@@ -42,6 +48,12 @@ export default function JoinButton({
   const hasApplied = applicants.some(
     (applicant) => applicant.userId === userId
   );
+
+  const isMember = members.some(
+    (member) => member.userId === userId
+  );
+
+  const disabled = hasApplied || isMember;
 
 
   const handleConfirm = async (formData: {introduction: string}) => {
@@ -79,18 +91,20 @@ export default function JoinButton({
     <Button 
       size="lg"
       className="px-12"
-      disabled={hasApplied}
-      variant={hasApplied ? "disabled" : "primary"}
+      disabled={disabled}
+      variant={disabled ? "disabled" : "primary"}
       onClick={() => {
         if(!userId){
           setIsLoginModalOpen(true); // 로그인 X : 로그인 모달
-        } else if(!hasApplied){
+        } else if(!disabled){
           setIsModalOpen(true)       // 참여 X : 참여 모달
         }
       }}>
       {!userId
         ? "참여하기"
         : hasApplied
+        ? "승인대기"
+        : isMember
         ? "참여완료"
         : "참여하기"  
       }
