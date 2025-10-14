@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
+import {revalidateTag} from "next/cache";
 
 export async function PATCH(req: Request) {
     const session = await getServerSession(authOptions);
@@ -30,6 +31,8 @@ export async function PATCH(req: Request) {
 
     const where = u?.id ? { _id: new ObjectId(u.id) } : { email: u.email };
     await db.collection("users").updateOne(where, { $set: { nickname, updatedAt: new Date() } });
+
+    revalidateTag("study-tag");
 
     return NextResponse.json({ ok: true, nickname });
 }
