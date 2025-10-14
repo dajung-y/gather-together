@@ -1,5 +1,6 @@
 import { ObjectId } from "mongodb";
 import { Notice } from "./notice";
+import { variantStyles } from "@/styles/studyCardStyles";
 
 export interface Study {
   _id: string | ObjectId;
@@ -27,6 +28,22 @@ export interface Study {
     createdAt: Date;
   }[];
   mainNotice?: string;
+}
+
+export type StudyCardInfo = {
+  variant?: keyof typeof variantStyles;
+  studyId?: string;
+  name: string;
+  title: string;
+  startDate: Date;
+  endDate: Date;
+  weekdays: string[];
+  startTime: string;
+  endTime: string;
+  currentMembers: number;
+  maxMembers: number;
+  tag: string;
+  isRecruiting?: boolean;
 }
 
 export interface StudyData extends Study {

@@ -1,9 +1,10 @@
 "use client";
-import { useEffect, useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 import StudyCard from "@/components/common/StudyCard";
 import Modal from "@/components/common/Modal";
 import { getCategoryLabel } from "@/utils/category";
 import { useSession } from "next-auth/react";
+import { start } from "repl";
 
 type StudyItem = {
     studyId: string;
@@ -24,16 +25,18 @@ type CardDTO = {
     id: string;
     name: string;
     variant:
-        | "memberOpen"
-        | "memberClosed"
-        | "leaderOpen"
-        | "leaderClosed"
-        | "mainOpen"
-        | "mainClosed";
+    | "memberOpen"
+    | "memberClosed"
+    | "leaderOpen"
+    | "leaderClosed"
+    | "mainOpen"
+    | "mainClosed";
     title: string;
     startDate: string;
     endDate: string;
-    time: string;
+    weekdays: string[];
+    startTime: string;
+    endTime: string;
     currentMembers: number;
     maxMembers: number;
     tag: string;
@@ -62,6 +65,7 @@ export default function Page() {
     const mapToCard = (s: StudyItem, section: "approved" | "pending" | "rejected"): CardDTO => {
         const startDate = s.period?.startDate ?? (s as any).startDate ?? "";
         const endDate = s.period?.endDate ?? (s as any).endDate ?? "";
+        const weekdays = s.schedule?.weekdays ?? (s as any).weekdays ?? [];
         const startTime = s.schedule?.startTime ?? (s as any).startTime ?? "";
         const endTime = s.schedule?.endTime ?? (s as any).endTime ?? "";
         const variant = section === "approved" ? ("memberOpen" as const) : ("memberClosed" as const);
@@ -73,7 +77,9 @@ export default function Page() {
             title: s.title,
             startDate,
             endDate,
-            time: [startTime, endTime].filter(Boolean).join(" ~ "),
+            weekdays,
+            startTime,
+            endTime,
             currentMembers: s.currentMembers,
             maxMembers: s.capacity,
             tag: s.category,
@@ -105,6 +111,7 @@ export default function Page() {
                     rRes.json(),
                 ]);
 
+
                 setData({
                     approved: (aJson.items ?? []).map((s) => mapToCard(s, "approved")),
                     pending: (pJson.items ?? []).map((s) => mapToCard(s, "pending")),
@@ -125,7 +132,9 @@ export default function Page() {
         title: c.title,
         startDate: new Date(c.startDate),
         endDate: new Date(c.endDate),
-        time: c.time,
+        weekdays: c.weekdays,
+        startTime: c.startTime,
+        endTime: c.endTime,
         currentMembers: c.currentMembers,
         maxMembers: c.maxMembers,
         tag: getCategoryLabel(c.tag),
@@ -180,77 +189,77 @@ export default function Page() {
     return (
         <main className="flex justify-center mt-2 md:mt-[100px]">
             <div className="w-full max-w-[1280px] px-4">
-            <section className="w-full flex flex-col text-[#666] space-y-6">
-            {loading && <p>불러오는 중...</p>}
-            {error && <p className="text-red-500">에러: {error}</p>}
+                <section className="w-full flex flex-col text-[#666] space-y-6">
+                    {loading && <p>불러오는 중...</p>}
+                    {error && <p className="text-red-500">에러: {error}</p>}
 
-            {!loading && !error && (
-                <>
-                    {/* 승인완료 */}
-                    <div>
-                        <h1 className="text-lg sm:text-xl mb-2">승인완료</h1>
-                        <hr className="mt-2 mb-4 sm:mb-6 w-full border-t border-gray-300"/>
-                        <div
-                            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mx-0 sm:mx-5 mb-5">
-                            {data.approved.map((c) => (
-                                <StudyCard key={`approved-${c.id}`} {...toCardProps(c)} />
-                            ))}
-                            {data.approved.length === 0 && (
-                                <p className="text-sm text-gray-500">승인완료 스터디가 없어요.</p>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* 승인대기 */}
-                    <div>
-                        <h1 className="text-lg sm:text-xl mb-2">승인대기</h1>
-                        <hr className="mt-2 mb-4 sm:mb-6 w-full border-t border-gray-300"/>
-                        <div
-                            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mx-0 sm:mx-5 mb-5">
-                            {data.pending.map((c) => (
-                                <div key={`pending-${c.id}`} className="relative">
-                                    <StudyCard {...toCardProps(c)} />
-                                    {/* 투명 오버레이: 상세 이동 완전 차단 */}
-                                    <button
-                                        type="button"
-                                        className="absolute inset-0 z-10 cursor-pointer bg-transparent"
-                                        aria-label="지원 취소 모달 열기"
-                                        onClick={() => openConfirm("pending", c.id)}
-                                    />
+                    {!loading && !error && (
+                        <>
+                            {/* 승인완료 */}
+                            <div>
+                                <h1 className="text-lg sm:text-xl mb-2">승인완료</h1>
+                                <hr className="mt-2 mb-4 sm:mb-6 w-full border-t border-gray-300" />
+                                <div
+                                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mx-0 sm:mx-5 mb-5">
+                                    {data.approved.map((c) => (
+                                        <StudyCard key={`approved-${c.id}`} {...toCardProps(c)} />
+                                    ))}
+                                    {data.approved.length === 0 && (
+                                        <p className="text-sm text-gray-500">승인완료 스터디가 없어요.</p>
+                                    )}
                                 </div>
-                            ))}
-                            {data.pending.length === 0 && (
-                                <p className="text-sm text-gray-500">대기 중인 스터디가 없어요.</p>
-                            )}
-                        </div>
-                    </div>
+                            </div>
 
-                    {/* 승인거절 */}
-                    <div>
-                        <h1 className="text-lg sm:text-xl mb-2">승인거절</h1>
-                        <hr className="mt-2 mb-4 sm:mb-6 w-full border-t border-gray-300"/>
-                        <div
-                            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mx-0 sm:mx-5 mb-10">
-                            {data.rejected.map((c) => (
-                                <div key={`rejected-${c.id}`} className="relative">
-                                    <StudyCard {...toCardProps(c)} />
-                                    <button
-                                        type="button"
-                                        className="absolute inset-0 z-10 cursor-pointer bg-transparent"
-                                        aria-label="지원 삭제 모달 열기"
-                                        onClick={() => openConfirm("rejected", c.id)}
-                                    />
+                            {/* 승인대기 */}
+                            <div>
+                                <h1 className="text-lg sm:text-xl mb-2">승인대기</h1>
+                                <hr className="mt-2 mb-4 sm:mb-6 w-full border-t border-gray-300" />
+                                <div
+                                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mx-0 sm:mx-5 mb-5">
+                                    {data.pending.map((c) => (
+                                        <div key={`pending-${c.id}`} className="relative">
+                                            <StudyCard {...toCardProps(c)} />
+                                            {/* 투명 오버레이: 상세 이동 완전 차단 */}
+                                            <button
+                                                type="button"
+                                                className="absolute inset-0 z-10 cursor-pointer bg-transparent"
+                                                aria-label="지원 취소 모달 열기"
+                                                onClick={() => openConfirm("pending", c.id)}
+                                            />
+                                        </div>
+                                    ))}
+                                    {data.pending.length === 0 && (
+                                        <p className="text-sm text-gray-500">대기 중인 스터디가 없어요.</p>
+                                    )}
                                 </div>
-                            ))}
-                            {data.rejected.length === 0 && (
-                                <p className="text-sm text-gray-500">거절된 스터디가 없어요.</p>
-                            )}
-                        </div>
-                    </div>
-                </>
-            )}
-        </section>
-        </div>
+                            </div>
+
+                            {/* 승인거절 */}
+                            <div>
+                                <h1 className="text-lg sm:text-xl mb-2">승인거절</h1>
+                                <hr className="mt-2 mb-4 sm:mb-6 w-full border-t border-gray-300" />
+                                <div
+                                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mx-0 sm:mx-5 mb-10">
+                                    {data.rejected.map((c) => (
+                                        <div key={`rejected-${c.id}`} className="relative">
+                                            <StudyCard {...toCardProps(c)} />
+                                            <button
+                                                type="button"
+                                                className="absolute inset-0 z-10 cursor-pointer bg-transparent"
+                                                aria-label="지원 삭제 모달 열기"
+                                                onClick={() => openConfirm("rejected", c.id)}
+                                            />
+                                        </div>
+                                    ))}
+                                    {data.rejected.length === 0 && (
+                                        <p className="text-sm text-gray-500">거절된 스터디가 없어요.</p>
+                                    )}
+                                </div>
+                            </div>
+                        </>
+                    )}
+                </section>
+            </div>
 
             {/* 지원 취소/삭제 모달 */}
             <Modal isOpen={confirmOpen} onClose={() => !working && setConfirmOpen(false)}>

@@ -13,7 +13,9 @@ type StudyCardProps = {
   title: string;
   startDate: Date;
   endDate: Date;
-  time: string;
+  weekdays: string[];
+  startTime: string;
+  endTime: string;
   currentMembers: number;
   maxMembers: number;
   tag: string;
@@ -27,7 +29,9 @@ export default function StudyCard({
   title,
   startDate,
   endDate,
-  time,
+  weekdays,
+  startTime,
+  endTime,
   currentMembers,
   maxMembers,
   tag,
@@ -60,8 +64,8 @@ export default function StudyCard({
             ${style.isDisabled ? "bg-gray-100 opacity-60" : "bg-white"}
             ${style.canEnter ? "mb-3" : ""}
           `}
-          onClick={handleClick}
-        >
+        onClick={handleClick}
+      >
         <div className="flex">
           <span className="bg-primary-500 text-white px-2 ">{name}</span>
           {style.canDelete && <X className="ml-auto" />}
@@ -69,7 +73,15 @@ export default function StudyCard({
         <p className="headline3 text-primary-700 mb-2 line-clamp-2">{title}</p>
         <div className="pb-4">
           <p className="body-m">{`${formatDate(startDate)} - ${formatDate(endDate)}`}</p>
-          <p>{time} ~</p>
+          <p>{startTime} ~ {endTime}</p>
+          {weekdays.length > 0 && (
+            <p>
+              {weekdays
+                .map(d => ({ mon: '월', tue: '화', wed: '수', thu: '목', fri: '금', sat: '토', sun: '일' }[d]))
+                .join(', ')}
+            </p>
+          )}
+
           <div className="flex items-center gap-2 text-gray-500">
             <User size={20} />
             <span>{currentMembers}/{maxMembers}</span>
@@ -83,7 +95,7 @@ export default function StudyCard({
               {isRecruiting ? "모집중" : "모집마감"}
             </span>
           )}
-          
+
           {!style.isToggleDisabled &&
             <div className="ml-auto">
               <Toggle />
@@ -92,7 +104,7 @@ export default function StudyCard({
 
         </div>
       </div>
-      {style.canEnter && 
+      {style.canEnter &&
         <Button
           onClick={handleStudyEnter}>
           스터디 입장하기
