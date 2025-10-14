@@ -38,7 +38,7 @@ export default function StudyListClient() {
 
         // 패치할 url
         const url = `api/study?${params.toString()}`;
-        console.log("fetch url: ", url);
+        // console.log("fetch url: ",url);
 
 
         const res = await fetch(url);

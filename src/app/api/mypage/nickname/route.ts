@@ -32,6 +32,13 @@ export async function PATCH(req: Request) {
     const where = u?.id ? { _id: new ObjectId(u.id) } : { email: u.email };
     await db.collection("users").updateOne(where, { $set: { nickname, updatedAt: new Date() } });
 
+
+    // study-creator-nickname 변경
+    await db.collection("studies").updateMany(
+        { "creator.userId": u.id },
+        { $set: { "creator.nickname": nickname } }
+    );
+
     revalidateTag("study-tag");
 
     return NextResponse.json({ ok: true, nickname });
