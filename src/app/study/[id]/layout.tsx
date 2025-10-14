@@ -1,45 +1,39 @@
-// app/study/[id]/layout.tsx
-import MemberCheck from "@/components/study/main/MemberCheck";
-import StudySidebar from "@/components/study/StudySidebar";
-import { getUserIdFromSession } from "@/lib/session";
-import { getStudyData } from "@/lib/study";
-import { StudyData } from "@/types/study";
-import { redirect } from "next/navigation";
+import Sidebar, { handleLeaveRoom } from "@/components/common/Sidebar";
+import { MenuItem } from "@/types/sidebar";
 
-interface LayoutProps {
-  children: React.ReactNode;
-  params: { id: string };
-}
+const menuItems: MenuItem[] = [
+  //링크 이동
+  {
+    label: '메인',
+    path: '/study/1'
+  },
+  {
+    label: '일정',
+    path: '/study/1/todo'
+  },
+  {
+    label: '설정',
+    path: '/study/1/setting'
+  },
 
-export default async function Layout({ children, params }: LayoutProps) {
-  const param = await params;
-  const studyId = await param.id;
+  //함수 실행
+  //useClient 컴포넌트에서만 함수를 만들 수 있기 때문에
+  //sidebar component에서 함수 만든 후 export해서 사용
+  {
+    label: '탈퇴하기',
+    onClick: handleLeaveRoom
+  },
+]
 
-  const userId = await getUserIdFromSession();
-  if (!userId) {
-
-  }
-
-  const studyData: StudyData = await getStudyData(studyId);
-
-  const studyTitle = studyData.studyName;
-  const isMember = studyData.members.some(member => String(member.userId) == String(userId));
-  const isLeader = studyData.members.some(member => member.role === "leader" && member.userId === userId);
-
-  for (const member of studyData.members)
-    console.log(member.userId + "," + String(userId));
-  console.log("멤버인가?: " + isMember);
-  // 메뉴 생성
+export default function Layout({ children }: { children: React.ReactNode; }) {
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row max-w-[1280px] mx-auto">
-      <StudySidebar studyId={studyId} userId={userId} studyTitle={studyTitle} isLeader={isLeader} />
-      <div className="flex-1 flex justify-center">
-        <div className="w-full p-4 flex flex-col">
-          {children}
-        </div>
+    <div>
+      <div className="fixed top-20 left-0">
+        {/* 아래 수정필요! */}
+        <Sidebar title="1일 1영어" menuItems={menuItems} />
       </div>
-      <MemberCheck isMember={isMember} />
-    </div>
 
+      <div>{children}</div>
+    </div>
   );
 }

@@ -36,15 +36,13 @@ export default function AlertModal({
           <h2 className="headline2 mt-8 text-center">{title}</h2>
           { subtitle&& <p className="body my-8 text-center">{subtitle}</p> }
           {/* button */}
-          <div className="flex justify-center w-full my-4 space-x-4">
+          <div className="flex w-full my-4 space-x-4">
             <Button size="md"
                     variant="outline"
-                    className="w-full"
                     onClick={onClose}>
               {cancelText}
             </Button>
             <Button size="md"
-                    className="w-full"
                     onClick={handleConfirm}>
               {confirmText}
             </Button>
