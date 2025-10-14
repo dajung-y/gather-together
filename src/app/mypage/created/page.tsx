@@ -14,16 +14,18 @@ type CardDTO = {
     id: string;
     name: string;
     variant:
-        | "memberOpen"
-        | "memberClosed"
-        | "leaderOpen"
-        | "leaderClosed"
-        | "mainOpen"
-        | "mainClosed";
+    | "memberOpen"
+    | "memberClosed"
+    | "leaderOpen"
+    | "leaderClosed"
+    | "mainOpen"
+    | "mainClosed";
     title: string;
     startDate: string;
     endDate: string;
-    time: string;
+    weekdays: string[];
+    startTime: string;
+    endTime: string;
     currentMembers: number;
     maxMembers: number;
     tag: string;
@@ -98,10 +100,13 @@ export default function Page() {
 
         const startDate = getStartDate(s);
         const endDate = getEndDate(s);
-        const time =
-            typeof s?.time === "string" && s.time.trim().length > 0
-                ? s.time
-                : [getStartTime(s), getEndTime(s)].filter(Boolean).join(" ~ ");
+        const weekdays = s.schedule?.weekdays ?? (s as any).weekdays ?? [];
+        const startTime = getStartTime(s);
+        const endTime = getEndTime(s);
+        // const time =
+        //     typeof s?.time === "string" && s.time.trim().length > 0
+        //         ? s.time
+        //         : [getStartTime(s), getEndTime(s)].filter(Boolean).join(" ~ ");
         const tag = String(s?.tag ?? s?.category ?? "");
 
         return {
@@ -111,7 +116,9 @@ export default function Page() {
             title: getTitle(s),
             startDate,
             endDate,
-            time,
+            startTime,
+            weekdays,
+            endTime,
             currentMembers: getCurrentMembers(s),
             maxMembers: getCapacity(s),
             tag,
@@ -173,7 +180,9 @@ export default function Page() {
         title: c.title,
         startDate: new Date(c.startDate),
         endDate: new Date(c.endDate),
-        time: c.time,
+        weekdays: c.weekdays,
+        startTime: c.startTime,
+        endTime: c.endTime,
         currentMembers: c.currentMembers,
         maxMembers: c.maxMembers,
         tag: getCategoryLabel(c.tag),
@@ -319,17 +328,15 @@ export default function Page() {
                         <div className="inline-flex w-full rounded-xl bg-gray-100 p-1">
                             <button
                                 onClick={() => setActive("open")}
-                                className={`flex-1 rounded-xl px-4 py-2 md:px-5 md:py-3 text-sm md:text-base transition ${
-                                    active === "open" ? "bg-white shadow text-gray-900" : "text-gray-600"
-                                }`}
+                                className={`flex-1 rounded-xl px-4 py-2 md:px-5 md:py-3 text-sm md:text-base transition ${active === "open" ? "bg-white shadow text-gray-900" : "text-gray-600"
+                                    }`}
                             >
                                 모집중
                             </button>
                             <button
                                 onClick={() => setActive("closed")}
-                                className={`flex-1 rounded-xl px-4 py-2 md:px-5 md:py-3 text-sm md:text-base transition ${
-                                    active === "closed" ? "bg-white shadow text-gray-900" : "text-gray-600"
-                                }`}
+                                className={`flex-1 rounded-xl px-4 py-2 md:px-5 md:py-3 text-sm md:text-base transition ${active === "closed" ? "bg-white shadow text-gray-900" : "text-gray-600"
+                                    }`}
                             >
                                 모집마감
                             </button>
@@ -378,8 +385,8 @@ export default function Page() {
                                                                         className="text-gray-700 break-keep whitespace-pre-wrap"
                                                                         style={{ wordBreak: "keep-all" }}
                                                                     >
-                                    {a.msg ?? "메시지 없음"}
-                                  </span>
+                                                                        {a.msg ?? "메시지 없음"}
+                                                                    </span>
                                                                 </div>
 
                                                                 {/* 승인/거절 → 확인 모달 */}
@@ -391,13 +398,13 @@ export default function Page() {
                                                                             e.preventDefault();
                                                                             e.stopPropagation();
                                                                             a.userId &&
-                                                                            setConfirm({
-                                                                                studyId: c.id,
-                                                                                applicantId: String(a.userId),
-                                                                                applicantName: a.name,
-                                                                                title: c.title,
-                                                                                action: "approve",
-                                                                            });
+                                                                                setConfirm({
+                                                                                    studyId: c.id,
+                                                                                    applicantId: String(a.userId),
+                                                                                    applicantName: a.name,
+                                                                                    title: c.title,
+                                                                                    action: "approve",
+                                                                                });
                                                                         }}
                                                                     >
                                                                         승인
@@ -409,13 +416,13 @@ export default function Page() {
                                                                             e.preventDefault();
                                                                             e.stopPropagation();
                                                                             a.userId &&
-                                                                            setConfirm({
-                                                                                studyId: c.id,
-                                                                                applicantId: String(a.userId),
-                                                                                applicantName: a.name,
-                                                                                title: c.title,
-                                                                                action: "reject",
-                                                                            });
+                                                                                setConfirm({
+                                                                                    studyId: c.id,
+                                                                                    applicantId: String(a.userId),
+                                                                                    applicantName: a.name,
+                                                                                    title: c.title,
+                                                                                    action: "reject",
+                                                                                });
                                                                         }}
                                                                     >
                                                                         거절
