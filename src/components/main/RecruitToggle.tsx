@@ -1,20 +1,20 @@
 'use client'
 
-import { useState } from "react"
 import Button from "../common/Button";
 
-export default function RecruitToggle () {
-  const [isRecruit, setIsRecruit] = useState<boolean>(true);
-  const handleRecruitToggle = () => {
-    setIsRecruit((prev) => !prev);
-  }
+interface RecruitToggleProps {
+  isRecruiting: boolean | undefined;
+  onToggle: () => void;
+}
+
+export default function RecruitToggle ({isRecruiting, onToggle} : RecruitToggleProps) {
   return(
     <div className="whitespace-nowrap">
       <Button
         size="md"
-        variant={isRecruit ? "primary" : "outline"}
-        onClick={handleRecruitToggle}>
-          모집중만 보기
+        variant={isRecruiting ? "secondary" : "primary"}
+        onClick={onToggle}>
+          { isRecruiting? "모든스터디 보기" : "모집중만 보기"}
         </Button>
     </div>
   )

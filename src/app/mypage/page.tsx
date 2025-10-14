@@ -1,8 +1,5 @@
-import StudyCard from "@/components/common/StudyCard";
+import { redirect } from "next/navigation";
 
 export default function Page() {
-    return (
-        <>
-        </>
-    );
+    redirect("/mypage/applied");
 }
