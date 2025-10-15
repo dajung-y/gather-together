@@ -222,7 +222,7 @@ export default function Page() {
                                             {/* 투명 오버레이: 상세 이동 완전 차단 */}
                                             <button
                                                 type="button"
-                                                className="absolute inset-0 z-10 cursor-pointer bg-transparent"
+                                                className="absolute top-0 right-0 h-12 w-12 z-10 cursor-pointer bg-transparent"
                                                 aria-label="지원 취소 모달 열기"
                                                 onClick={() => openConfirm("pending", c.id)}
                                             />
@@ -274,18 +274,18 @@ export default function Page() {
                     </p>
                     <div className="flex justify-end gap-2">
                         <button
-                            className="px-3 py-2 rounded-md border"
+                            className="px-3 py-2 rounded-md border border-gray-300 text-gray-600"
                             onClick={() => !working && setConfirmOpen(false)}
                             disabled={working}
                         >
-                            닫기
+                            아니오
                         </button>
                         <button
-                            className="px-3 py-2 rounded-md bg-red-600 text-white disabled:opacity-60"
+                            className="px-3 py-2 min-w-16 rounded-md bg-red-600 text-white disabled:opacity-60"
                             onClick={doRemove}
                             disabled={working}
                         >
-                            {working ? "처리중..." : "삭제"}
+                            {working ? "처리중..." : "네"}
                         </button>
                     </div>
                 </div>

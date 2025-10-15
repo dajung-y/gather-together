@@ -58,8 +58,8 @@ export default function AttendanceInfo({
     <>
       {/* 출석 현황 */}
       <div className="flex flex-col gap-2">
-        <div className="flex gap-4 px-2">
-          <div className="flex flex-col border-r border-gray-300 pr-4">
+        <div className="flex gap-4 px-2 text-sm md:text-base">
+          <div className="flex flex-col border-r border-gray-300 pr-4 ">
             <span className="text-gray-400">기간</span>
             <span className="">{startDate} - {endDate}</span>
           </div>

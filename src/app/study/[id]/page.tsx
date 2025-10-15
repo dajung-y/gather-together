@@ -54,7 +54,7 @@ export default async function page({ params }: { params: { id: string } }) {
       ">
         {/* 상단 */}
         <h1 className="headline1">{studyData.title}</h1>
-        <div className="flex gap-8 mt-8">
+        <div className="flex flex-col lg:flex-row gap-8 mt-8">
           <div className="flex flex-col justify-center gap-4">
             {/* 타이머 */}
             <AttendanceTimer studyId={studyId} {...studyData} />

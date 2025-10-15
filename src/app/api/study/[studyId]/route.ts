@@ -54,6 +54,14 @@ export async function PATCH(
         .collection<{ members: Member[] }>("studies")
         .findOne({ _id: new ObjectId(studyId) });
 
+      //스터디 멤버수 갱신
+      if (study) {
+        await db.collection("studies").updateOne(
+          { _id: new ObjectId(studyId) },
+          { $set: { currentMembers: study.members.length } }
+        );
+      }
+
       // 멤버가 0이면 스터디 삭제 아니면 방장 넘기기
       if (study && study.members.length === 0) {
         await db.collection("studies").deleteOne({ _id: new ObjectId(studyId) });
