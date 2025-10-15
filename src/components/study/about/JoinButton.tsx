@@ -40,20 +40,18 @@ export default function JoinButton({
 
   const userId = session?.user?.id;
 
-  // 본인 작성 글
-  if(userId && userId === creatorId){
-    return null;
-  }
+  // 작성자
+  const isCreator = userId === creatorId;
 
+  // 참여 완료
   const hasApplied = applicants.some(
     (applicant) => applicant.userId === userId
   );
 
+  // 스터디 멤버
   const isMember = members.some(
     (member) => member.userId === userId
   );
-
-  const disabled = hasApplied || isMember;
 
 
   const handleConfirm = async (formData: {introduction: string}) => {
@@ -91,12 +89,14 @@ export default function JoinButton({
     <Button 
       size="lg"
       className="px-12"
-      disabled={disabled}
-      variant={disabled ? "disabled" : "primary"}
+      disabled={hasApplied}
+      variant={hasApplied ? "disabled" : "primary"}
       onClick={() => {
         if(!userId){
           setIsLoginModalOpen(true); // 로그인 X : 로그인 모달
-        } else if(!disabled){
+        } else if(isMember || isCreator) {
+          router.push(`/study/${studyId}`);
+        } else if(!hasApplied){
           setIsModalOpen(true)       // 참여 X : 참여 모달
         }
       }}>
@@ -104,8 +104,8 @@ export default function JoinButton({
         ? "참여하기"
         : hasApplied
         ? "승인대기"
-        : isMember
-        ? "참여완료"
+        : isMember || isCreator
+        ? "스터디 입장하기"
         : "참여하기"  
       }
     </Button>

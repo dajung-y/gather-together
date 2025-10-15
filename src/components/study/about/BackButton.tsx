@@ -1,10 +1,17 @@
 'use client'
 import { ChevronLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function BackButton() {
   const router = useRouter();
-  const prevPath = sessionStorage.getItem('prevPath') || '';
+  const [prevPath, setPrevPath] = useState<string>("");
+  
+  useEffect(() => {
+    const path = sessionStorage.getItem('prevPath') || "";
+    setPrevPath(path);
+  },[]);
+  
   const handleBack = () => {
     if(prevPath.includes("study/create")){
       // 세션정리
