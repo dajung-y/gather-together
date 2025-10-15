@@ -63,8 +63,11 @@ export default function StudySidebar({ studyId, userId, studyTitle, isLeader }: 
   ];
 
   return (
-    <div className="w-full lg:w-64">
-      <Sidebar menuItems={menuItems} title={studyTitle} />
-    </div>
+    // <div className="w-full lg:w-max sticky top-16 self-start">
+    //   <Sidebar menuItems={menuItems} title={studyTitle} />
+    // </div>
+
+    <Sidebar menuItems={menuItems} title={studyTitle} />
+
   )
 }
