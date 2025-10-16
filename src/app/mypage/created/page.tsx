@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import type React from "react";
 import { useSession } from "next-auth/react";
 import StudyCard from "@/components/common/StudyCard";
-import Modal from "@/components/common/Modal";
 import { getCategoryLabel } from "@/utils/category";
+import AlertModal from "@/components/common/AlertModal";
 
 type ApiListResp = { items?: any[]; data?: any[] };
 type Applicant = { userId?: string; name: string; msg?: string };
@@ -302,7 +302,7 @@ export default function Page() {
                 return;
             }
 
-            toggleRecruiting(studyId, nextValue);
+            // toggleRecruiting(studyId, nextValue);
         };
     };
 
@@ -461,64 +461,39 @@ export default function Page() {
                     </section>
                 </div>
 
-                {/* 승인/거절 확인 모달 */}
-                <Modal isOpen={!!confirm} onClose={() => setConfirm(null)}>
-                    <div className="p-6">
-                        <h3 className="text-lg font-semibold mb-3">
-                            {confirm?.action === "approve" ? "신청 승인" : "신청 거절"}
-                        </h3>
-                        <p className="text-sm text-gray-700">
-                            {confirm?.title ? <>“{confirm.title}”</> : "해당"} 스터디에서{" "}
-                            {confirm?.applicantName ?? "지원자"}님의 신청을 <b>{confirm?.action === "approve" ? "승인" : "거절"}</b>
-                            하시겠습니까?
-                        </p>
-
-                        <div className="mt-5 flex justify-end gap-2">
-                            <button type="button" className="px-3 py-2 rounded-md border" onClick={() => setConfirm(null)}>
-                                취소
-                            </button>
-                            <button
-                                type="button"
-                                className="px-3 py-2 rounded-md bg-[#264B1D] text-white disabled:opacity-60"
-                                disabled={!!confirmKey && mutatingKey === confirmKey}
-                                onClick={async () => {
-                                    if (!confirm) return;
-                                    await decideApplicant(confirm.studyId, confirm.applicantId, confirm.action);
-                                    setConfirm(null);
-                                }}
-                            >
-                                확인
-                            </button>
-                        </div>
-                    </div>
-                </Modal>
-
-                {/* 모집완료 모달 */}
-                <Modal isOpen={!!confirmRecruiting} onClose={() => setConfirmRecruiting(null)}>
-                    <div className="p-6">
-                        <h3 className="text-lg font-semibold mb-3">모집 상태 변경</h3>
-                        <p className="text-sm text-gray-700">
-                            해당 스터디를 <b>모집완료</b> 상태로 변경하시겠습니까?
-                        </p>
-                        <div className="mt-5 flex justify-end gap-2">
-                            <button type="button" className="px-3 py-2 rounded-md border" onClick={() => setConfirmRecruiting(null)}>
-                                취소
-                            </button>
-                            <button
-                                type="button"
-                                className="px-3 py-2 rounded-md bg-[#264B1D] text-white disabled:opacity-60"
-                                disabled={!!recruitingMutatingId && confirmRecruiting?.studyId === recruitingMutatingId}
-                                onClick={async () => {
-                                    if (!confirmRecruiting) return;
-                                    await toggleRecruiting(confirmRecruiting.studyId, confirmRecruiting.nextValue);
-                                    setConfirmRecruiting(null);
-                                }}
-                            >
-                                확인
-                            </button>
-                        </div>
-                    </div>
-                </Modal>
+                {/* 승인 확인/거절 모달 */}
+                <AlertModal
+                    isOpen={!!confirm}
+                    onClose={() => setConfirm(null)}
+                    title={confirm?.action === "approve" ? "신청 승인" : "신청 거절"}
+                    subtitle={
+                        confirm ? `${confirm.title? `"${confirm.title}"` : "해당"} 스터디에서 "${
+                            confirm.applicantName ?? "지원자"
+                        }"님의 신청을 ${confirm.action === "approve" ? "승인" : "거절"}하시겠습니까?`
+                        : ""
+                    }
+                    onConfirm={ async () => {
+                        if(!confirm) return;
+                        await decideApplicant(confirm.studyId, confirm.applicantId, confirm.action);
+                        setConfirm(null);
+                    }}
+                    confirmText={
+                        confirm? `${confirm.action === "approve" ? "승인" : "거절"}` : "확인"
+                    }
+                />
+                    
+                 {/* 모집완료 모달 */}
+                 <AlertModal
+                    isOpen={!!confirmRecruiting}
+                    onClose={() => setConfirmRecruiting(null)}
+                    title="모집 상태 변경"
+                    subtitle="해당 스터디를 모집완료로 변경하시겠습니까?"
+                    onConfirm={ async () => {
+                        if(!confirmRecruiting) return;
+                        await toggleRecruiting(confirmRecruiting.studyId, confirmRecruiting.nextValue);
+                        setConfirmRecruiting(null);
+                    }}
+                />
             </main>
         </div>
     );

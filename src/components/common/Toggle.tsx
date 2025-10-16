@@ -44,7 +44,7 @@ export default function Toggle({ on, disabled, onToggle }: ToggleProps) {
         e.preventDefault();
         if (computedDisabled) return;
 
-        if (!isControlled) setInner((prev) => !prev);
+        // if (!isControlled) setInner((prev) => !prev);
 
         if (typeof onToggle === "function") onToggle(e);
     };
