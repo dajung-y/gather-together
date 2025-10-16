@@ -7,7 +7,7 @@ import CardList from "./CardList";
 import { Study, StudyData } from "@/types/study";
 import SearchBar from "./SearchBar";
 import CategoryFilter from "./CategoryFilter";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function StudyListClient() {
 
@@ -21,6 +21,10 @@ export default function StudyListClient() {
   const [searchQuery, setSearchQuery] = useState<string>(""); // api 호출 시 사용할 값
   const [category, setCategory] = useState<string>("");
 
+  //  api url 동기화
+  const [searchParam, setSearchParam] = useSearchParams();
+
+  
   useEffect(() => {
     const fetchStudies = async () => {
       setIsLoading(true);
