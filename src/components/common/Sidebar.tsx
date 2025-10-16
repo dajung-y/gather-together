@@ -20,11 +20,11 @@ export default function Sidebar({ menuItems, title }: SidebarProps) {
 
   return (
     // lg:rounded-r-2xl
-    <div className="w-full lg:w-max sticky top-16 self-start">
+    <div className="w-full lg:w-max sticky top-16 self-start z-30">
       <div className="w-full  max-w-[1280px] lg:w-max h-max bg-primary-50 p-4">
         {isOpen ?
           <div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 min-w-32">
               <p className="text-primary-900 headline4 whitespace-pre-line">{title}</p>
               {/* <ChevronsLeft className="text-gray-500 hidden 2xl:block" onClick={() => setIsOpen(!isOpen)} /> */}
               <ChevronsUp className="text-gray-500 lg:hidden ml-auto" onClick={() => setIsOpen(!isOpen)} />

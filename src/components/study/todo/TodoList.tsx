@@ -45,13 +45,18 @@ export default function TodoList({ todos, members }: TodoListProps) {
           <TodoItem todo={todo} members={members} userId={userId} />
         </div>
       ))} */}
-      {activeTodos?.map((todo, todoIndex) => (
-        <div key={todoIndex}>
-          <TodoItem todo={todo} members={members} userId={userId} />
-        </div>
-      ))}
+      {activeTodos && activeTodos.length > 0 ? (
+        activeTodos.map((todo, todoIndex) => (
+          <div key={todoIndex}>
+            <TodoItem todo={todo} members={members} userId={userId} />
+          </div>
+        ))
+      ) : (
+        <p className="text-gray-500 ">새로운 일정이 없습니다!</p>
+      )}
 
-      <p className="pt-4 pb-2 font-bold text-gray-500"></p>
+      {overdueTodos && overdueTodos.length > 0 && <p className='font-bold mt-8'>종료된 일정</p>}
+      <p className="pb-2 font-bold text-gray-500"></p>
       {overdueTodos?.map((todo, todoIndex) => (
         <div key={todoIndex} className='opacity-40'>
           <TodoItem todo={todo} members={members} userId={userId} />
