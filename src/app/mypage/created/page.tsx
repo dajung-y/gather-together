@@ -384,14 +384,14 @@ export default function Page() {
                                   className="flex flex-col md:grid md:grid-cols-[1fr_auto] md:items-center gap-3 py-3 w-full">
 
                                   {/* 지원내용 */}
-                                  <div className="flex items-start gap-3 flex-1 min-w-0">
-                                    <span className="h-6 w-[2px] bg-primary-300 rounded-full" />
+                                  <div className="flex items-start gap-3 min-w-0">
+                                    <span className="h-6 w-[2px] bg-primary-300 rounded-full shrink-0" />
                                     <div className="flex items-start gap-3 flex-1 min-w-0">
                                       {/* 지원자 명 */}
                                       <span className="text-gray-700 whitespace-nowrap shrink-0">{a.name}</span>
                                       <span className="text-gray-300 shrink-0">|</span>
                                       {/* 지원 메시지 */}
-                                      <div className="text-gray-700 break-keep flex-1 leading-relaxed">
+                                      <div className="text-gray-700 break-words leading-relaxed whitespace-pre-wrap w-full">
                                         {a.msg ?? "메시지 없음"}
                                       </div>
                                     </div>

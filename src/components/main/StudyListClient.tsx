@@ -22,7 +22,7 @@ export default function StudyListClient() {
   const [category, setCategory] = useState<string>("");
 
   //  api url 동기화
-  const [searchParam, setSearchParam] = useSearchParams();
+  // const [searchParam, setSearchParam] = useSearchParams();
 
   
   useEffect(() => {
