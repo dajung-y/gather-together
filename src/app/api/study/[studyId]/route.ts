@@ -44,11 +44,19 @@ export async function PATCH(
     const client = await clientPromise;
     const db = client.db();
 
+    const userId = payload.userId;
     if (action === "removeMember") {
       await db.collection<{ members: Member[] }>("studies").updateOne(
         { _id: new ObjectId(studyId) },
-        { $pull: { members: { userId: payload.userId } } }
+        { $pull: { members: { userId } } }
+
       );
+
+      //지원상황 삭제
+      await db.collection("applications").deleteOne({
+        studyId: new ObjectId(studyId),
+        userId,
+      });
 
       const study = await db
         .collection<{ members: Member[] }>("studies")

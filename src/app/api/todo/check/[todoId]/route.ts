@@ -2,6 +2,7 @@ import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 import { getUserIdFromSession } from "@/lib/session";
+import { revalidateTag } from "next/cache";
 
 export async function PATCH(req: Request, { params }: { params: { todoId: string } }) {
   try {
@@ -42,6 +43,8 @@ export async function PATCH(req: Request, { params }: { params: { todoId: string
       { _id: new ObjectId(todoId) },
       { $set: { memberChecks: newMemberChecks } }
     );
+
+    revalidateTag('todo-tag');
 
     return NextResponse.json({ success: true });
   } catch (err: unknown) {

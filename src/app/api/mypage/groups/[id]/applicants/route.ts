@@ -3,9 +3,10 @@ export const runtime = "nodejs";
 import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
+import { revalidateTag } from "next/cache";
 
 const COLL_STUDIES = "studies";
-const COLL_APPS    = "applications";
+const COLL_APPS = "applications";
 
 const isHex24 = (v: string) => /^[0-9a-fA-F]{24}$/.test(v);
 const toObjectId = (v: string) => (isHex24(v) ? new ObjectId(v) : null);
@@ -116,6 +117,8 @@ export async function PATCH(
                 );
             }
         });
+
+        revalidateTag("study-tag");
 
         return NextResponse.json({ ok: true, action }, { status: 200 });
     } catch (err: any) {
