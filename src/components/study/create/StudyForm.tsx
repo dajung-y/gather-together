@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { usePathname, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AlertModal from "@/components/common/AlertModal";
 
 type FormData = z.infer<typeof studyFormSchema>;
@@ -19,20 +19,37 @@ interface StudyFormProps {
   defaultValues?: Partial<FormData>;
 }
 
+// localstorage 저장
+const savedDataKey = "studyFormData";
+
 export default function StudyForm({defaultValues}: StudyFormProps) {
+  const saved = typeof window !== "undefined" ? localStorage.getItem(savedDataKey) : null;
+  const parsed = saved ? JSON.parse(saved) : {};
   const {
     register, 
     handleSubmit, 
     control, 
     watch,
+    reset,
     formState: {errors, isDirty}
   } = useForm<FormData>({
     resolver: zodResolver(studyFormSchema),
     defaultValues:{
       weekdays: [],
       ...defaultValues,
+      ...parsed,
     }
   });
+
+  useEffect(() => {
+    const subscription = watch((value) => {
+      // 입력값 로컬스토리지에 저장
+      localStorage.setItem(savedDataKey, JSON.stringify(value));
+    });
+
+    // cleanup
+    return () => subscription.unsubscribe();
+  }, [watch])
 
   const router = useRouter();
   const pathname = usePathname();
@@ -41,6 +58,8 @@ export default function StudyForm({defaultValues}: StudyFormProps) {
 
   const handleConfirm = () => {
     if(isEdit){
+      // 취소 시 데이터 삭제
+      localStorage.removeItem(savedDataKey);
       router.push(`/study/${pathname.split("/")[2]}/about`); // 상세페이지로 이동
     } else {
       router.push('/'); // 메인페이지로 이동
@@ -71,6 +90,8 @@ export default function StudyForm({defaultValues}: StudyFormProps) {
         setTimeout(() => {
           router.push(`/study/${result.studyId || pathname.split("/")[2]}/about`);
         }, 1500);
+        // 제출 시 삭제
+        localStorage.removeItem(savedDataKey);
       } else {
         alert(result.error || "오류가 발생했습니다");
       }
@@ -133,7 +154,7 @@ export default function StudyForm({defaultValues}: StudyFormProps) {
         title={isEdit? "글 수정을 취소하시겠습니까?" : "글 작성을 취소하시겠습니까?"}
         subtitle="작성중인 내용은 저장되지 않습니다"
         onConfirm={handleConfirm}
-        />
+      />
     </>
   )
 }
