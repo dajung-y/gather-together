@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 
 type StudyCardProps = {
   variant?: keyof typeof variantStyles;
-  studyId?: string;
+  studyId: string;
   name: string;
   title: string;
   startDate: Date;
@@ -19,7 +19,7 @@ type StudyCardProps = {
   currentMembers: number;
   maxMembers: number;
   tag: string;
-  isRecruiting?: boolean;
+  isRecruiting: boolean;
 }
 
 export default function StudyCard({
@@ -98,7 +98,7 @@ export default function StudyCard({
 
           {!style.isToggleDisabled &&
             <div className="ml-auto">
-              <Toggle />
+              <Toggle studyId={studyId} isRecruiting={isRecruiting} isMax={currentMembers >= maxMembers} />
             </div>
           }
 
