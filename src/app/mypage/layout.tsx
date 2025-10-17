@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import MyPageSidebar from "@/app/mypage/MyPageSidebar";
 import NicknameModal from "@/app/mypage/NicknameModal";
 
@@ -22,7 +22,9 @@ export default function Layout({ children }: { children: ReactNode }) {
                     {children}
                 </div>
             </div>
-            <NicknameModal />
+            <Suspense fallback={null}>
+                <NicknameModal />
+            </Suspense>
         </div>
     );
 }
