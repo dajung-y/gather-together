@@ -34,11 +34,27 @@ export const studyFormSchema = z.object({
   const startTime = values.startTime;
   const endTime = values.endTime;
 
-  if(startTime && endTime && startTime>=endTime){
-    ctx.addIssue({
-      code: "custom",
-      path: ["endTime"],
-      message: "종료시간은 시작시간 이후여야합니다"
-    })
+  if(startTime && endTime){
+    const [startH, startM] = startTime.split(":").map(Number);
+    const [endH, endM] = endTime.split(":").map(Number);
+
+    const startTotal = startH * 60 + startM;
+    const endTotal = endH * 60 + endM;
+
+    const diffMinutes = endTotal - startTotal;
+    
+    if(diffMinutes <= 0) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["endTime"],
+        message: "종료시간은 시작시간 이후로 가능합니다"
+      })
+    } else if (diffMinutes < 30){
+      ctx.addIssue({
+        code: "custom",
+        path: ["endTime"],
+        message: "스터디 최소 시간은 30분입니다"
+      })
+    }
   }
-})
+});
