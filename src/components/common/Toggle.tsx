@@ -8,6 +8,7 @@ type ToggleProps = {
 	isMax: boolean;
 };
 
+
 export default function Toggle({ studyId, isRecruiting, isMax }: ToggleProps) {
 	const [recruiting, setRecruiting] = useState<boolean>(isRecruiting);
 

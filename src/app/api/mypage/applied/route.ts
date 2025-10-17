@@ -28,8 +28,8 @@ async function getUserId(req: NextRequest): Promise<string | null> {
         } catch { }
         if (!authOptions) {
             try {
-                const mod = await import("@/pages/api/auth/[...nextauth]");
-                authOptions = (mod as any).authOptions || (mod as any).default;
+                const mod = await import("@/app/api/auth/[...nextauth]/route");
+                authOptions = (mod as any).authOptions;
             } catch { }
         }
         const session = authOptions ? await getServerSession(authOptions) : await getServerSession();

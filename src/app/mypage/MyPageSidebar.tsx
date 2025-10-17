@@ -23,7 +23,7 @@ export default function MyPageSidebar() {
 
     return (
         <Sidebar
-            title={`${nickname}\n마이페이지`}
+            title={`${nickname} 님`}
             menuItems={menuItems}
         />
     );
