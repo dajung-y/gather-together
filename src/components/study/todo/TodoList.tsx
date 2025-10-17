@@ -22,6 +22,9 @@ export default function TodoList({ todos, members }: TodoListProps) {
   const activeTodos = todos.filter(todo => new Date(todo.date) >= today)
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
+  const sortedMembers = [...members].sort((a, b) =>
+    a.userId === userId ? -1 : b.userId === userId ? 1 : 0
+  );
 
   return (
     <div className="relative overflow-x-auto pb-4">
@@ -32,7 +35,7 @@ export default function TodoList({ todos, members }: TodoListProps) {
         </div>
 
         <div className="flex">
-          {members.map((member, userIndex) => (
+          {sortedMembers.map((member, userIndex) => (
             <div key={userIndex} className="flex w-30 justify-center">
               <span className={`${member.userId == userId ? "font-bold" : "text-gray-600"}`}>{member.nickname}</span>
             </div>
@@ -48,7 +51,7 @@ export default function TodoList({ todos, members }: TodoListProps) {
       {activeTodos && activeTodos.length > 0 ? (
         activeTodos.map((todo, todoIndex) => (
           <div key={todoIndex}>
-            <TodoItem todo={todo} members={members} userId={userId} />
+            <TodoItem todo={todo} members={sortedMembers} userId={userId} />
           </div>
         ))
       ) : (
@@ -59,7 +62,7 @@ export default function TodoList({ todos, members }: TodoListProps) {
       <p className="pb-2 font-bold text-gray-500"></p>
       {overdueTodos?.map((todo, todoIndex) => (
         <div key={todoIndex} className='opacity-40'>
-          <TodoItem todo={todo} members={members} userId={userId} />
+          <TodoItem todo={todo} members={sortedMembers} userId={userId} />
         </div>
       ))}
     </div>

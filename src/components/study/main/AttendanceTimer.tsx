@@ -2,7 +2,7 @@
 
 import Button from '@/components/common/Button';
 import { formatDate, getNextStudyDate } from '@/utils/date';
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 type AttendanceProps = {
   studyId: string;
@@ -23,9 +23,30 @@ export default function AttendanceTimer({
   endTime
 }: AttendanceProps) {
   const nextDate = getNextStudyDate(startDate, endDate, weekdays);
+  const [disabled, setDisabled] = useState(true);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!nextDate) return setDisabled(true);
+
+      const now = new Date();
+      const [startHour, startMin] = startTime.split(":").map(Number);
+      const startDate = new Date(nextDate);
+      startDate.setHours(startHour, startMin, 0, 0);
+
+      const diffMinutes = (startDate.getTime() - now.getTime()) / 1000 / 60;
+
+      // 시작 10분 전부터 버튼 활성화
+      setDisabled(diffMinutes > 10 || now > startDate);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [startTime, nextDate]);
 
 
   const handleAttendance = async () => {
+    if (disabled) return;
+
     const now = new Date();
 
     // 스터디 날 확인
@@ -77,7 +98,7 @@ export default function AttendanceTimer({
     border-primary-300 rounded-lg">
       <p className="text-primary-300">{nextDate ? formatDate(nextDate) : "-"}</p>
       <p className="headline2 pb-4">{startTime} - {endTime}</p>
-      <div>
+      <div className={`${disabled ? "opacity-50 pointer-events-none" : ""}`}>
         <Button size="lg" onClick={handleAttendance}>출석하기</Button>
       </div>
     </div>
