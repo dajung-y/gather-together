@@ -29,6 +29,7 @@ export default function AttendanceInfo({
 }: AttendanceInfoProps) {
   const [count, setCount] = useState(0);
   const [labels, setLabels] = useState<string[]>([]);
+  const [absent, setAbsent] = useState(0);
 
   useEffect(() => {
     const start = new Date(startDate);
@@ -52,6 +53,24 @@ export default function AttendanceInfo({
 
     setCount(newCount);
     setLabels(targetLabels);
+
+    const today = new Date();
+    const untilToday = Math.min(today.getTime(), end.getTime());
+    const daysPassed = Math.floor((untilToday - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+
+    const fullWeeksPassed = Math.floor(daysPassed / 7);
+    const remainingDaysPassed = daysPassed % 7;
+
+    let pastSessions = fullWeeksPassed * targetDays.length;
+    for (let i = 0; i < remainingDaysPassed; i++) {
+      const day = (start.getDay() + i) % 7;
+      if (targetDays.includes(day)) pastSessions++;
+    }
+
+    const present = attendance.present;
+    const late = attendance.late;
+    setAbsent(Math.max(0, pastSessions - (present + late)));
+
   }, [startDate, endDate, weekdays]);
 
   return (
@@ -109,7 +128,7 @@ export default function AttendanceInfo({
             </div>
             <span className="w-full h-full p-2 border-r border-b rounded-br-lg border-gray-300 
                   text-center body-sb text-primary-900">
-              {attendance ? attendance.absent : 0}
+              {absent}
             </span>
           </div>
         </div>
