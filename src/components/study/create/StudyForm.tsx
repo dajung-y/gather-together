@@ -25,7 +25,7 @@ export default function StudyForm({defaultValues}: StudyFormProps) {
     handleSubmit, 
     control, 
     watch,
-    formState: {errors}
+    formState: {errors, isDirty}
   } = useForm<FormData>({
     resolver: zodResolver(studyFormSchema),
     defaultValues:{
@@ -117,8 +117,10 @@ export default function StudyForm({defaultValues}: StudyFormProps) {
               취소
             </Button>
             <Button size="md"
+                    variant={!isDirty ? "disabled" : "primary"}
                     className="w-full"
                     type="submit"
+                    disabled={!isDirty}
                     >
               { isEdit ? "수정" : "등록"}
             </Button>    
