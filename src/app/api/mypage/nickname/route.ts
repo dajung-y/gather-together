@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
-import {revalidateTag} from "next/cache";
+import { revalidateTag } from "next/cache";
 
 export async function PATCH(req: Request) {
     const session = await getServerSession(authOptions);
@@ -37,6 +37,11 @@ export async function PATCH(req: Request) {
     await db.collection("studies").updateMany(
         { "creator.userId": u.id },
         { $set: { "creator.nickname": nickname } }
+    );
+
+    await db.collection("studies").updateMany(
+        { "members.userId": u.id },
+        { $set: { "members.$.nickname": nickname } }
     );
 
     revalidateTag("study-tag");
