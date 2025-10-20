@@ -1,5 +1,6 @@
 import Carousel from "@/components/main/Carousel";
 import StudyListClient from "@/components/main/StudyListClient";
+import { Suspense } from "react";
 
 export default function Home() {
 
@@ -10,7 +11,9 @@ export default function Home() {
         <section className="py-4">
           <Carousel />
         </section>
-        <StudyListClient />
+        <Suspense fallback={<div className="text-center py-10">로딩중</div>}>
+          <StudyListClient />
+        </Suspense>
       </div>
     </main>
   );

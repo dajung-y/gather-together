@@ -11,7 +11,10 @@ import { Toaster } from "react-hot-toast";
 export const metadata: Metadata = {
   title: "모여모여",
   description: "함께 성장하는 스터디 플랫폼, 모여모여에서 새로운 동료들과 학습하세요",
-  keywords: ["스터디", "온라인 스터디", "온라인 학습", "스터디 플랫폼"]
+  keywords: ["스터디", "온라인 스터디", "온라인 학습", "스터디 플랫폼"],
+  icons: {
+    icon: '/logo-icon.png',
+  }
 }
 
 export default function RootLayout({
