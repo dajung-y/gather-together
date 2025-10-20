@@ -27,9 +27,10 @@ export default function AttendanceInfo({
   weekdays,
   attendance
 }: AttendanceInfoProps) {
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState<number>(0);
   const [labels, setLabels] = useState<string[]>([]);
-  const [absent, setAbsent] = useState(0);
+  const [absent, setAbsent] = useState<number>(0);
+  const [pastDays, setPastDays] = useState<number>(0);
 
   useEffect(() => {
     const start = new Date(startDate);
@@ -67,8 +68,9 @@ export default function AttendanceInfo({
       if (targetDays.includes(day)) pastSessions++;
     }
 
-    const present = attendance.present;
-    const late = attendance.late;
+    setPastDays(pastSessions);
+    const present = attendance?.present || 0;
+    const late = attendance?.late || 0;
     setAbsent(Math.max(0, pastSessions - (present + late)));
 
   }, [startDate, endDate, weekdays]);
@@ -95,9 +97,8 @@ export default function AttendanceInfo({
           </div>
           <div className="flex flex-col">
             <span className=" text-gray-400">일수</span>
-            <span className=" text-status-info">{
-              attendance ?
-                (attendance.present + attendance.late + attendance.absent) : 0} /{count}</span>
+            <span className=" text-status-info">
+              {pastDays} / {count}</span>
           </div>
         </div>
         <div className="flex">
