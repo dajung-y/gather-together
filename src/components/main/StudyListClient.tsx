@@ -12,44 +12,48 @@ import { useRouter, useSearchParams } from "next/navigation";
 export default function StudyListClient() {
 
   const router = useRouter();
-  const [studies, setStudies] = useState<StudyData[]>([]);
-  const [isRecruiting, setIsRecruiting] = useState<boolean | undefined>(true);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [currentPage, setCurrentpage] = useState<number>(1);
-  const [totalPage, setTotalPage] = useState<number>(1);
-  const [searchInput, setSearchInput] = useState<string>("");
-  const [searchQuery, setSearchQuery] = useState<string>(""); // api 호출 시 사용할 값
-  const [category, setCategory] = useState<string>("");
+  const searchParams = useSearchParams();
 
-  //  api url 동기화
-  // const [searchParam, setSearchParam] = useSearchParams();
+  // 쿼리 값
 
+  // const [isRecruiting, setIsRecruiting] = useState<boolean | undefined>(true);
+  // const [currentPage, setCurrentpage] = useState<number>(1);
+  // const [searchInput, setSearchInput] = useState<string>("");
+  // const [category, setCategory] = useState<string>("");
+
+  const isRecruitingParam = searchParams.get("isRecruiting");
+  const isRecruiting = isRecruitingParam === null? undefined : isRecruitingParam === "true";
+  const category = searchParams.get("category") || "";
+  const search = searchParams.get("search") || "";
+  const page = Number(searchParams.get("page")) || 1;
   
+  const [studies, setStudies] = useState<StudyData[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [totalPage, setTotalPage] = useState<number>(1);
+  
+  useEffect(() => {
+    if(isRecruitingParam === null){
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("isRecruiting", "true");
+      router.replace(`?${params.toString()}`, {scroll: false})
+    }
+  }, []);
+
   useEffect(() => {
     const fetchStudies = async () => {
       setIsLoading(true);
       try {
-        const params = new URLSearchParams();
-        console.log(params);
-
-        // 모집중
-        if (isRecruiting) params.set("isRecruiting", "true");
-        // 페이지
-        params.set("page", String(currentPage));
-
-        if (category) params.set("category", category);
-        if (searchQuery) params.set("search", searchQuery);
-
-        // 패치할 url
-        const url = `api/study?${params.toString()}`;
-        // console.log("fetch url: ",url);
-
-
-        const res = await fetch(url);
+        const params = new URLSearchParams({
+          ...(isRecruiting ? {isRecruiting : "true"}: {}),
+          ...(category ? {category} : {}),
+          ...(search ? {search} : {}),
+          page: String(page),
+        });
+        const res = await fetch(`/api/study?${params.toString()}`);
         const data = await res.json();
-
         setStudies(data.data || []);
         setTotalPage(data.totalPage || 1);
+        setIsLoading(false);
       } catch (error) {
         console.error("스터디 리스트 불러오기 실패: ", error);
       } finally {
@@ -57,7 +61,16 @@ export default function StudyListClient() {
       }
     };
     fetchStudies();
-  }, [isRecruiting, currentPage, searchQuery, category]);
+  }, [isRecruiting, category, search, page]);
+
+  const updateQuery = (key: string, value: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if(value) params.set(key, value);
+    else params.delete(key);
+
+    if(key !== "page") params.set("page", "1");
+    router.push(`?${params.toString()}`, {scroll: false});
+  }
 
   return (
     <div>
@@ -67,20 +80,19 @@ export default function StudyListClient() {
           <div className="w-1/3 md:w-auto md:flex-shrink-0">
             <RecruitToggle
               isRecruiting={isRecruiting}
-              onToggle={() => setIsRecruiting(prev => prev === true ? undefined : true)}
+              onToggle={() => updateQuery("isRecruiting", isRecruiting ? "" : "true")}
             />
           </div>
           <div className="w-full h-full md:w-auto">
             <CategoryFilter
               value={category}
-              onChange={setCategory}
+              onChange={(v) => updateQuery("category", v)}
             />
           </div>
           <div className="w-full md:flex-1 md:max-w-md">
             <SearchBar
-              value={searchInput}
-              onChange={setSearchInput}
-              onSubmit={() => setSearchQuery(searchInput)} />
+              initialValue={search}
+              onSearch={(v) => updateQuery("search", v)} />
           </div>
         </div>
       </section>
@@ -104,8 +116,8 @@ export default function StudyListClient() {
         <div className="my-8 lg:my-16">
           <Pagination
             totalPages={totalPage}
-            currentPage={currentPage}
-            onChangePage={setCurrentpage}
+            currentPage={page}
+            onChangePage={(p) => updateQuery("page", String(p))}
           />
         </div>
       )}

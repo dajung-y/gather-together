@@ -2,38 +2,39 @@
 
 import { Search } from 'lucide-react';
 import { X } from 'lucide-react';
+import { useState } from 'react';
 
 interface SearchBarProps {
-  value: string;
-  onChange: (val: string) => void;
-  onSubmit: () => void;
+  initialValue?: string;
+  onSearch: (query: string) => void;
 }
 
 export default function SearchBar({
-  value, 
-  onChange,
-  onSubmit
+  initialValue="",
+  onSearch,
 }: SearchBarProps) {
+  const [inputValue, setInputValue] = useState(initialValue);
 
   const handleSubmit = (e:React.FormEvent) => {
     e.preventDefault();
-    onSubmit();
+    onSearch(inputValue.trim());
   }
 
   const handleClear = () => {
-    onChange("");
+    setInputValue("");
+    onSearch("");
   }
 
   return(
     <form onSubmit={handleSubmit} className="flex w-full h-full">
       <input 
         type="text"
-        value={value}
-        onChange={e => onChange(e.target.value)}
+        value={inputValue}
+        onChange={e => setInputValue(e.target.value)}
         placeholder="검색어를 검색하세요"
         className="flex-1 bg-primary-50 px-3 py-1 rounded-l-2xl focus:outline-none"
       />
-      { value && (
+      { inputValue && (
         <button 
           type='button'
           onClick={handleClear}
