@@ -58,13 +58,16 @@ export default function Header() {
           <div className="flex items-center justify-between">
             {/* 로고 */}
             <div>
-              <Link href='/'>
+              <a onClick={(e) => {
+                e.preventDefault();
+                router.replace("/?isRecruiting=true")
+              }}>
                 <Image src="/images/logo.png"
                       alt="모여모여 로고"
                       width={240}
                       height={64}
                       className="w-38 h-10" />
-              </Link>
+              </a>
             </div>
 
             {/* 사용자 메뉴 */}
